@@ -1,0 +1,27 @@
+UI/.DS_Store
+UI/node_modules
+/UI/dist
+
+# local env files
+UI/.env.local
+UI/.env.*.local
+
+# Log files
+UI/npm-debug.log*
+UI/yarn-debug.log*
+UI/yarn-error.log*
+UI/pnpm-debug.log*
+
+# Editor directories and files
+UI/.idea
+UI/.vscode
+UI/*.suo
+UI/*.ntvs*
+UI/*.njsproj
+UI/*.sln
+UI/*.sw?
+
+#API folder
+/API/.vs
+/API/bin/Debug
+/API/obj
