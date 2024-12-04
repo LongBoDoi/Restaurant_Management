@@ -1,5 +1,5 @@
 import BaseService from "./baseService";
-import { UserLogin } from "../models";
+import { Customer, UserLogin } from "../models";
 import MLActionResult from "../models/MLActionResult";
 
 class UserLoginService extends BaseService {
@@ -10,32 +10,36 @@ class UserLoginService extends BaseService {
         this.configApi();
     }
 
-    // /**
-    //  * Tạo tài khoản mới
-    //  */
-    // async createAccount(users: Users) : Promise<MLActionResult> {
-    //     const response = await axios.post(`${this.url}/CreateAccount`, users);
-    //     return response.data;
-    // }
-
     /**
-     * Thực hiện đăng nhập
+     * Tạo tài khoản mới
      */
-    async login(userLogin: UserLogin) : Promise<MLActionResult|undefined> {
-        const response = await this.api.post(`/Login`, userLogin);
+    async registerNewCustomer(customer: Customer) : Promise<MLActionResult> {
+        const response = await this.api.post(`/RegisterNewCustomer`, customer);
         return response.data;
     }
 
-    async getUserData():Promise<MLActionResult|undefined> {
+    /**
+     * Thực hiện đăng nhập khách hàng
+     */
+    async loginCustomer(userLogin: UserLogin) : Promise<MLActionResult> {
+        const response = await this.api.post(`/LoginCustomer`, userLogin);
+        return response.data;
+    }
+
+    /**
+     * Thực hiện đăng nhập nhân viên
+     */
+    async loginEmployee(userLogin: UserLogin) : Promise<MLActionResult> {
+        const response = await this.api.post(`/LoginEmployee`, userLogin);
+        return response.data;
+    }
+
+    /**
+     * Lấy dữ liệu đăng nhập của người dùng
+     */
+    async getUserData():Promise<MLActionResult> {
         const response = await this.api.get('/GetUserData');
         return response.data;
-        // try {
-        //     const response = await axios.get(`${this.url}/GetUserData/${userID}`);
-        //     return response.data;
-        // } catch (error) {
-        //     console.error('Error fetching data:', error);
-        //     return undefined;
-        // }
     }
 }
 

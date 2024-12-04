@@ -19,12 +19,10 @@ declare module 'vue-router/auto-routes' {
    */
   export interface RouteNamedMap {
     '/': RouteRecordInfo<'/', '/', Record<never, never>, Record<never, never>>,
-    '//tests': RouteRecordInfo<'//tests', '/tests', Record<never, never>, Record<never, never>>,
-    '//tests/': RouteRecordInfo<'//tests/', '/tests', Record<never, never>, Record<never, never>>,
-    '//tests/[testID]': RouteRecordInfo<'//tests/[testID]', '/tests/:testID', { testID: ParamValue<true> }, { testID: ParamValue<false> }>,
-    '//tests/[testID]/attempts/': RouteRecordInfo<'//tests/[testID]/attempts/', '/tests/:testID/attempts', { testID: ParamValue<true> }, { testID: ParamValue<false> }>,
-    '//tests/[testID]/attempts/[attemptID]': RouteRecordInfo<'//tests/[testID]/attempts/[attemptID]', '/tests/:testID/attempts/:attemptID', { testID: ParamValue<true>, attemptID: ParamValue<true> }, { testID: ParamValue<false>, attemptID: ParamValue<false> }>,
-    '//tests/[testID]/questions': RouteRecordInfo<'//tests/[testID]/questions', '/tests/:testID/questions', { testID: ParamValue<true> }, { testID: ParamValue<false> }>,
-    '/login': RouteRecordInfo<'/login', '/login', Record<never, never>, Record<never, never>>,
+    '/management': RouteRecordInfo<'/management', '/management', Record<never, never>, Record<never, never>>,
+    '/management/customer': RouteRecordInfo<'/management/customer', '/management/customer', Record<never, never>, Record<never, never>>,
+    '/management/menu': RouteRecordInfo<'/management/menu', '/management/menu', Record<never, never>, Record<never, never>>,
+    '/management/order': RouteRecordInfo<'/management/order', '/management/order', Record<never, never>, Record<never, never>>,
+    '/management/reservation': RouteRecordInfo<'/management/reservation', '/management/reservation', Record<never, never>, Record<never, never>>,
   }
 }

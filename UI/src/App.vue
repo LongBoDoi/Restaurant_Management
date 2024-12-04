@@ -3,41 +3,43 @@
     <MLLoadingScreen v-if="isLoading" />
     <router-view v-else></router-view>
   </div>
+
+  <MLToastMessage />
+
+  <MLDialog />
 </template>
 
 <script lang="ts">
 import { mapActions } from 'pinia';
-import { MLActionResult } from './models';
 import { userStore } from './stores/userStore';
 import EventBus from './common/EventBus';
+import { MLActionResult } from './models';
+import { EnumUserType } from './common/Enumeration';
 
 export default {
   async created() {
-    // const token = localStorage.getItem('authToken');
-    // if (!token) {
-    //   this.redirectToLogin();
-    //   return;
-    // }
+    //Lấy dữ liệu người dùng
+    let result:MLActionResult|undefined = undefined;
+    try {
+      this.isLoading = true;
 
-    // //Lấy dữ liệu người dùng
-    // let result:MLActionResult|undefined = undefined;
-    // try {
-    //   this.isLoading = true;
+      result = await this.$service.UserLoginService.getUserData();
+    } catch (e) {
+      this.redirectToLogin();
+    } finally {
+      this.isLoading = false;
+    }
 
-    //   result = await this.$service.UserLoginService.getUserData();
-    // } catch (e) {
-    //   localStorage.removeItem('userID');
-    //   this.redirectToLogin();
-    // } finally {
-    //   this.isLoading = false;
-    // }
+    if (result?.Success) {
+      this.$session.UserData = result.Data.UserData;
+      this.$session.UserType = result.Data.UserType;
 
-    // if (result?.Success) {
-    //   // this.$session.UserID = userID;
-    // } else {
-    //   localStorage.removeItem('userID');
-    //   this.redirectToLogin();
-    // }
+      if (result.Data.UserType === EnumUserType.Employee && window.location.pathname === '/') {
+        this.$router.replace({name: '/management'});
+      }
+    } else {
+      this.redirectToLogin();
+    }
 
     // EventBus.on('RedirectToLogin', this.redirectToLogin);
   },
@@ -56,8 +58,7 @@ export default {
     ...mapActions(userStore, ['setUserID']),
 
     redirectToLogin() {
-      this.$router.clearRoutes();
-      this.$router.push({name: '/login'});
+      this.$router.replace({name: '/'});
     }
   }
 }

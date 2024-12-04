@@ -18,16 +18,24 @@ import SessionInterface from './common/Session';
 import ServiceInterface from './services';
 import EnumerationInterface from './common/Enumeration';
 import CommonFunction from './common/CommonFunction';
+import VueTheMask from 'vue-the-mask';
+import EventName from './common/EventName';
+import money from 'v-money';
+// import LocalStorageKey from './common/LocalStorageKey';
 
 const app = createApp(App);
 
 app.use(vuetify)
     .use(router)
-    .use(pinia);
+    .use(pinia)
+    .use(VueTheMask)
+    .use(money, {precision: 4});
 
 app.config.globalProperties.$service = new ServiceInterface();
 app.config.globalProperties.$session = {} as SessionInterface;
 app.config.globalProperties.$enumeration = new EnumerationInterface();
-app.config.globalProperties.$commonFunction = new CommonFunction();
+app.config.globalProperties.$commonFunction = CommonFunction;
+// app.config.globalProperties.$localStorageKey = new LocalStorageKey();
+app.config.globalProperties.$eventName = EventName;
 
 app.mount('#app')

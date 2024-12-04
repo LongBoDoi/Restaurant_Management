@@ -1,6 +1,8 @@
+import { EnumUserType } from "./Enumeration";
+
 interface SessionInterface {
-    TokenKey: string,
-    UserID: string
+    UserData: any,
+    UserType: EnumUserType
 }
 
 export default SessionInterface;

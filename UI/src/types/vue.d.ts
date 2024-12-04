@@ -5,6 +5,8 @@ import SessionInterface from '@/common/Session';
 import ServiceInterface from '@/services';
 import EnumerationInterface from '@/common/Enumeration';
 import CommonFunction from '@/common/CommonFunction';
+import LocalStorageKey from '@/common/LocalStorageKey';
+import EventName from '@/common/EventName';
 
 declare module '@vue/runtime-core' {
   interface ComponentCustomProperties {
@@ -13,6 +15,8 @@ declare module '@vue/runtime-core' {
     $session: SessionInterface,
     $service: ServiceInterface,
     $enumeration: EnumerationInterface,
-    $commonFunction: CommonFunction
+    $commonFunction: typeof CommonFunction,
+    $localStorageKey: LocalStorageKey,
+    $eventName: typeof EventName
   }
 }

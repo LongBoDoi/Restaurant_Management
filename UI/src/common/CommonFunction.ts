@@ -1,5 +1,6 @@
 import moment from "moment-timezone";
 import EventBus from "./EventBus";
+import EventName from "./EventName";
 
 class CommonFunction {
     /**
@@ -22,15 +23,17 @@ class CommonFunction {
     /**
      * Định dạng ngày giờ
      */
-    formatDateTime = (date:Date) => {
-        const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-        return moment((moment(date).tz(timeZone) as any)._d).format('DD/MM/YYYY HH:mm:ss');
+    static formatDateTime = (date:Date) => {
+        return moment.utc(date).local().format('DD/MM/YYYY HH:mm');
     };
 
     /**
      * Định dạng giờ
      */
-    formatTime = (date:Date) => {
+    static formatTime = (date:Date, noTimeZone?:boolean) => {
+        if (noTimeZone) {
+            return moment(date).format('HH:mm');
+        }
         const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
         return moment((moment(date).tz(timeZone) as any)._d).format('HH:mm');
     };
@@ -38,13 +41,27 @@ class CommonFunction {
     /**
      * Định dạng ngày
      */
-    formatDate = (date:Date) => {
+    static formatDate = (date:Date) => {
         return moment(date).format('DD/MM/YYYY');
     };
 
-    showDialog = (dialogData:any) => {
-        EventBus.emit('ShowDialog', dialogData);
-    }
+    static getDateValueFormat = (date:Date) => {
+        return moment(date).format('YYYY-MM-DD');
+    };
+
+    static showDialog = (dialogData:any) => {
+        EventBus.emit(EventName.ShowDialog, dialogData);
+    };
+
+    /**
+     * Xử lý exception khi gọi service
+     */
+    static handleException = (e:any) => {
+        EventBus.emit(EventName.ShowToastMessage, {
+            Message: 'Lỗi hệ thống.',
+            Type: 'error'
+        });
+    };
 };
 
 export default CommonFunction;

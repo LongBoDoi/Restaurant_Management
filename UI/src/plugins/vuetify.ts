@@ -10,6 +10,7 @@ import 'vuetify/styles'
 
 // Composables
 import { createVuetify } from 'vuetify'
+import { VTimePicker } from 'vuetify/labs/VTimePicker'
 
 // https://vuetifyjs.com/en/introduction/why-vuetify/#feature-guides
 export default createVuetify({
@@ -19,9 +20,13 @@ export default createVuetify({
       green: {
         colors: {
           primary: '#4CAF50',
-          secondary: '#607D8B',
+          secondary: '#FFC107',
         }
       }
     }
   },
+
+  components: {
+    VTimePicker
+  }
 })

@@ -3,13 +3,8 @@ import BaseService from "./baseService";
 import { EnumChatbotSender } from "@/common/Enumeration";
 import axios from "axios";
 
-class ChatbotService extends BaseService {
+class ChatbotService extends BaseService<ChatbotConversation> {
     protected entityName: string = 'Chatbot';
-    
-    constructor() {
-        super();
-        this.configApi();
-    }
 
     /**
      * Lấy dữ liệu đoạn chat
