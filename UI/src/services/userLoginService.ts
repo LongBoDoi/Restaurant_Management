@@ -2,7 +2,7 @@ import BaseService from "./baseService";
 import { Customer, UserLogin } from "../models";
 import MLActionResult from "../models/MLActionResult";
 
-class UserLoginService extends BaseService {
+class UserLoginService extends BaseService<UserLogin> {
     protected override entityName: string = 'UserLogin';
 
     constructor() {
