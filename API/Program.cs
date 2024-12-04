@@ -36,9 +36,16 @@ if (!String.IsNullOrEmpty(connectionString))
 //CORS policy
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("CorsPolicy",
+    options.AddPolicy("CorsPolicyDevelop",
         builder => builder
             .WithOrigins("http://localhost:5000")
+            .AllowAnyMethod()
+            .AllowAnyHeader()
+            .AllowCredentials());
+
+    options.AddPolicy("CorsPolicy",
+        builder => builder
+            .WithOrigins("http://localhost:80")
             .AllowAnyMethod()
             .AllowAnyHeader()
             .AllowCredentials());
@@ -85,9 +92,11 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+    app.UseCors("CorsPolicyDevelop");
+} else
+{
+    app.UseCors("CorsPolicy");
 }
-
-app.UseCors("CorsPolicy");
 
 app.UseRouting();
 app.UseStaticFiles(new StaticFileOptions
