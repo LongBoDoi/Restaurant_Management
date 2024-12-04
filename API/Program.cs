@@ -10,7 +10,7 @@ var builder = WebApplication.CreateBuilder(args);
 //Use HTTPS
 builder.WebHost.ConfigureKestrel(options =>
 {
-    options.ListenLocalhost(7196);
+    options.ListenLocalhost(7198);
     options.ListenLocalhost(7197, listenOptions =>
     {
         listenOptions.UseHttps();
