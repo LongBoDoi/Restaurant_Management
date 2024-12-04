@@ -1,7 +1,7 @@
 import { MenuItem, MLActionResult } from "@/models";
 import BaseService from "./baseService";
 
-class MenuItemService extends BaseService {
+class MenuItemService extends BaseService<MenuItem> {
     protected entityName: string = 'MenuItem';
     
     constructor() {
