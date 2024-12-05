@@ -117,7 +117,7 @@ export default {
                     this.removeSelectedRecord();
                     break;
                 case this.$enumeration.EnumEditMode.Edit:
-                    this.menuItems[this.selectedIndex] = this.oldMenuItem;
+                    this.dataList[this.selectedIndex] = this.oldMenuItem;
                     break;
             }
             this.isShow = false;
@@ -174,7 +174,7 @@ export default {
             if (!result) return;
 
             if (result.Success) {
-                this.menuItems[this.selectedIndex] = result.Data as MenuItem;
+                this.dataList[this.selectedIndex] = result.Data as MenuItem;
                 EventBus.emit(this.$eventName.ShowToastMessage, {
                     Message: confirmMessage,
                     Type: 'success'
@@ -200,7 +200,7 @@ export default {
     },
 
     computed: {
-        ...mapState(menuItemStore, ['menuItems', 'selectedIndex']),
+        ...mapState(menuItemStore, ['dataList', 'selectedIndex']),
 
         listMenuCategory() {
             return [
