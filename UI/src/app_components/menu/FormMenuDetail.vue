@@ -91,7 +91,7 @@ export default {
     },
 
     methods: {
-        ...mapActions(menuItemStore, ['removeSelectedReservation']),
+        ...mapActions(menuItemStore as any, ['removeSelectedRecord']),
 
         /**
          * Xử lý mở form
@@ -114,7 +114,7 @@ export default {
         handleCloseDialog() {
             switch (this.menuItem.EditMode) {
                 case this.$enumeration.EnumEditMode.Add:
-                    this.removeSelectedReservation();
+                    this.removeSelectedRecord();
                     break;
                 case this.$enumeration.EnumEditMode.Edit:
                     this.menuItems[this.selectedIndex] = this.oldMenuItem;
@@ -153,7 +153,7 @@ export default {
                     await this.updateMenuInfo('Xoá món thành công');
 
                     this.isShow = false;
-                    this.removeSelectedReservation();
+                    this.removeSelectedRecord();
                 }
             });
         },

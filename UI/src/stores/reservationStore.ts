@@ -34,7 +34,7 @@ export const reservationStore = defineStore('reservationStore', {
       this._selectedIndex = index;
     },
 
-    removeSelectedReservation() {
+    removeSelectedRecord() {
       this._reservations.splice(this._selectedIndex, 1);
       this._selectedIndex = 0;
     },

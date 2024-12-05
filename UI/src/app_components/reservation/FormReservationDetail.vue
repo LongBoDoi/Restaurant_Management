@@ -109,7 +109,7 @@ export default {
     },
 
     methods: {
-        ...mapActions(reservationStore, ['setSelectedIndex', 'removeSelectedReservation']),
+        ...mapActions(reservationStore, ['setSelectedIndex', 'removeSelectedRecord']),
 
         /**
          * Xử lý mở form
@@ -129,7 +129,7 @@ export default {
         handleCloseDialog() {
             switch (this.reservation.EditMode) {
                 case this.$enumeration.EnumEditMode.Add:
-                    this.removeSelectedReservation();
+                    this.removeSelectedRecord();
                     break;
                 case this.$enumeration.EnumEditMode.Edit:
                     this.reservations[this.selectedIndex] = this.oldReservation;
@@ -151,7 +151,7 @@ export default {
             await this.updateReservationInfo('Xác nhận thành công');
             this.loading = false;
 
-            this.removeSelectedReservation();
+            this.removeSelectedRecord();
             this.isShow = false;
         },
 
@@ -185,7 +185,7 @@ export default {
                     await this.updateReservationInfo('Huỷ đặt bàn thành công');
 
                     this.isShow = false;
-                    this.removeSelectedReservation();
+                    this.removeSelectedRecord();
                 }
             });
         },

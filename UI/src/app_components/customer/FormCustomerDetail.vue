@@ -81,7 +81,7 @@ export default {
     },
 
     methods: {
-        ...mapActions(customerStore as any, ['removeSelectedReservation']),
+        ...mapActions(customerStore as any, ['removeSelectedRecord']),
 
         /**
          * Xử lý mở form
@@ -101,7 +101,7 @@ export default {
         handleCloseDialog() {
             switch (this.customer.EditMode) {
                 case this.$enumeration.EnumEditMode.Add:
-                    this.removeSelectedReservation();
+                    this.removeSelectedRecord();
                     break;
                 case this.$enumeration.EnumEditMode.Edit:
                     this.dataList[this.selectedIndex] = this.oldCustomer;
@@ -138,7 +138,7 @@ export default {
                     await this.saveChanges('Xoá khách hàng thành công');
 
                     this.isShow = false;
-                    this.removeSelectedReservation();
+                    this.removeSelectedRecord();
                 }
             });
         },

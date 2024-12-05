@@ -41,7 +41,7 @@ export function createStoreOnBase<IMLEntity extends MLEntity>(storeID: string, s
                 this._selectedIndex = index;
             },
 
-            removeSelectedReservation() {
+            removeSelectedRecord() {
                 this._dataList.splice(this._selectedIndex, 1);
                 this._selectedIndex = 0;
             },
