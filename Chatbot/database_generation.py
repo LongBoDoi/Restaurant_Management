@@ -352,8 +352,10 @@ def main():
     db_manager.create_tables()
     
     # Insert sample data
-    for _ in range(5):  # Insert 5 of each type
+    for _ in range(50):  # Insert 5 of each type
         db_manager.insert_customer()
+        
+    for _ in range(20):
         db_manager.insert_employee()
     
     db_manager.insert_menu_items()
