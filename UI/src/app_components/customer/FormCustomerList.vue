@@ -17,7 +17,7 @@
             :headers="[
                 {
                     title: 'Tên khách hàng',
-                    value: 'CustomerName'
+                    value: 'CustomerName',
                 },
                 {
                     title: 'Số điện thoại',

@@ -43,7 +43,7 @@ export const menuItemStore = defineStore('menuItemStore', {
      */
     async getMenuItemsData(page: number, itemsPerPage: number) {
       try {
-        const result:MLActionResult = await menuItemService.getMenuItems(page, itemsPerPage);
+        const result:MLActionResult = await menuItemService.getDataPaging(page, itemsPerPage);
         if (result.Success) {
           this._menuItems = result.Data.MenuItems as MenuItem[];
           this._totalCount = result.Data.TotalCount ?? 0;

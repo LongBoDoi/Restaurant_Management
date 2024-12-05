@@ -66,41 +66,5 @@ namespace API.Controllers
 
             return result;
         }
-
-        /// <summary>
-        /// Cập nhật bản ghi reservation
-        /// </summary>
-        /// <param name="reservation"></param>
-        /// <returns></returns>
-        [Authorize]
-        [HttpPost("UpdateReservationInfo")]
-        public MLActionResult UpdateReservationInfo(Reservation reservation)
-        {
-            MLActionResult result = new();
-
-            try
-            {
-                switch (reservation.EditMode)
-                {
-                    case EnumEditMode.Add:
-                        _context.Reservation.Add(reservation);
-                        break;
-                    case EnumEditMode.Edit:
-                        _context.Entry(reservation).State = EntityState.Modified;
-                        break;
-                    case EnumEditMode.Delete:
-                        _context.Entry(reservation).State = EntityState.Deleted;
-                        break;
-                }
-
-                result.Success = _context.SaveChanges() > 0;
-            }
-            catch (Exception ex)
-            {
-                CommonFunction.HandleException(ex, result, _context);
-            }
-
-            return result;
-        }
     }
 }

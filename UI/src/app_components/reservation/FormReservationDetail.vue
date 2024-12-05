@@ -197,7 +197,7 @@ export default {
             let result:MLActionResult|undefined = undefined;
 
             try {
-                result = await this.$service.ReservationService.updateReservationInfo(this.reservation);
+                result = await this.$service.ReservationService.saveChanges(this.reservation);
             } catch (e) {
                 this.$commonFunction.handleException(e);
             }

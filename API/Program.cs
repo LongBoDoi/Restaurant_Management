@@ -36,16 +36,9 @@ if (!String.IsNullOrEmpty(connectionString))
 //CORS policy
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("CorsPolicyDevelop",
-        builder => builder
-            .WithOrigins("http://localhost:5000")
-            .AllowAnyMethod()
-            .AllowAnyHeader()
-            .AllowCredentials());
-
     options.AddPolicy("CorsPolicy",
         builder => builder
-            .WithOrigins("http://14.225.254.152")
+            .WithOrigins("http://14.225.254.152", "http://localhost:5000")
             .AllowAnyMethod()
             .AllowAnyHeader()
             .AllowCredentials());
@@ -55,6 +48,7 @@ builder.Services.AddCors(options =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+Config.ReadConfig(builder);
 //Add Authentication
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
@@ -70,18 +64,22 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("da3d80f0-b79b-4179-b791-cc4e8bfdeb2b"))
                     };
 
-                    options.Events = new JwtBearerEvents
+                    if (Config.UseCookie)
                     {
-                        OnMessageReceived = context =>
+                        options.Events = new JwtBearerEvents
                         {
-                            var authToken = context.HttpContext.Request.Cookies["AuthToken"];
-                            if (!string.IsNullOrEmpty(authToken))
+                            OnMessageReceived = context =>
                             {
-                                context.Token = authToken;
+                                var authToken = context.HttpContext.Request.Cookies["AuthToken"];
+
+                                if (!string.IsNullOrEmpty(authToken) && authToken == Session.Token)
+                                {
+                                    context.Token = authToken;
+                                }
+                                return Task.CompletedTask;
                             }
-                            return Task.CompletedTask;
-                        }
-                    };
+                        };
+                    }
                 });
 builder.Services.AddAuthorization();
 
@@ -92,11 +90,9 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
-    app.UseCors("CorsPolicyDevelop");
-} else
-{
-    app.UseCors("CorsPolicy");
 }
+
+app.UseCors("CorsPolicy");
 
 app.UseRouting();
 app.UseStaticFiles(new StaticFileOptions
@@ -113,7 +109,7 @@ app.UseStaticFiles(new StaticFileOptions
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 app.MapControllers();
 
 app.Run();

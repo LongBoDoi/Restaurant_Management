@@ -31,14 +31,6 @@ class ReservationService extends BaseService<Reservation> {
         });
         return response?.data as MLActionResult;
     }
-
-    /**
-     * Cập nhật thông tin đặt bàn
-     */
-    async updateReservationInfo(reservation:Reservation) {
-        const response = await this.api.post('/UpdateReservationInfo', reservation);
-        return response?.data as MLActionResult;
-    }
 }
 
 export default ReservationService;

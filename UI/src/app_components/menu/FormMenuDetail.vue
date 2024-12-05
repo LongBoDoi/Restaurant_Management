@@ -166,7 +166,7 @@ export default {
             let result:MLActionResult|undefined = undefined;
 
             try {
-                result = await this.$service.MenuItemService.updateMenuItemInfo(this.menuItem);
+                result = await this.$service.MenuItemService.saveChanges(this.menuItem);
             } catch (e) {
                 this.$commonFunction.handleException(e);
             }

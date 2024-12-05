@@ -35,6 +35,14 @@ class UserLoginService extends BaseService<UserLogin> {
     }
 
     /**
+     * Thực hiện đăng xuất
+     */
+    async logOut() : Promise<MLActionResult> {
+        const response = await this.api.post(`/Logout`);
+        return response.data;
+    }
+
+    /**
      * Lấy dữ liệu đăng nhập của người dùng
      */
     async getUserData():Promise<MLActionResult> {

@@ -31,8 +31,7 @@ export default {
     }
 
     if (result?.Success) {
-      this.$session.UserData = result.Data.UserData;
-      this.$session.UserType = result.Data.UserType;
+      Object.assign(this.$session, result.Data);
 
       if (result.Data.UserType === EnumUserType.Employee && window.location.pathname === '/') {
         this.$router.replace({name: '/management'});

@@ -115,6 +115,9 @@ export default {
             if (!result) return;
 
             if (result.Success) {
+                if (!this.$config.UseCookies) {
+                    localStorage.setItem(this.$localStorageKey.AuthToken, result.Data);
+                }
                 EventBus.emit('ShowToastMessage', {
                     Message: 'Đăng nhập thành công',
                     Type: 'success'
@@ -164,7 +167,10 @@ export default {
                 EventBus.emit('ShowToastMessage', {
                     Message: 'Đăng ký thành công',
                     Type: 'success'
-                })
+                });
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1000);
             } else {
                 switch (result.ErrorCode) {
                     case EnumApplicationErrorCode.DuplicateLoginInfo:
@@ -201,6 +207,9 @@ export default {
 
             if (!result) return;
             if (result.Success) {
+                if (!this.$config.UseCookies) {
+                    localStorage.setItem(this.$localStorageKey.AuthToken, result.Data);
+                }
                 this.employeeRequestMessage = 'Đăng nhập thành công';
                 this.employeeRequestStatus = 'success';
 

@@ -7,6 +7,7 @@ import EnumerationInterface from '@/common/Enumeration';
 import CommonFunction from '@/common/CommonFunction';
 import LocalStorageKey from '@/common/LocalStorageKey';
 import EventName from '@/common/EventName';
+import Config from '@/common/Config';
 
 declare module '@vue/runtime-core' {
   interface ComponentCustomProperties {
@@ -16,7 +17,8 @@ declare module '@vue/runtime-core' {
     $service: ServiceInterface,
     $enumeration: EnumerationInterface,
     $commonFunction: typeof CommonFunction,
-    $localStorageKey: LocalStorageKey,
-    $eventName: typeof EventName
+    $localStorageKey: typeof LocalStorageKey,
+    $eventName: typeof EventName,
+    $config: typeof Config
   }
 }

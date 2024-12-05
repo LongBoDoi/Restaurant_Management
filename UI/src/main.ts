@@ -21,7 +21,8 @@ import CommonFunction from './common/CommonFunction';
 import VueTheMask from 'vue-the-mask';
 import EventName from './common/EventName';
 import money from 'v-money';
-// import LocalStorageKey from './common/LocalStorageKey';
+import LocalStorageKey from './common/LocalStorageKey';
+import Config from './common/Config';
 
 const app = createApp(App);
 
@@ -35,7 +36,8 @@ app.config.globalProperties.$service = new ServiceInterface();
 app.config.globalProperties.$session = {} as SessionInterface;
 app.config.globalProperties.$enumeration = new EnumerationInterface();
 app.config.globalProperties.$commonFunction = CommonFunction;
-// app.config.globalProperties.$localStorageKey = new LocalStorageKey();
+app.config.globalProperties.$localStorageKey = LocalStorageKey;
 app.config.globalProperties.$eventName = EventName;
+app.config.globalProperties.$config = Config;
 
 app.mount('#app')

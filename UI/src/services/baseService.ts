@@ -1,4 +1,6 @@
+import Config from "@/common/Config";
 import EventBus from "@/common/EventBus";
+import LocalStorageKey from "@/common/LocalStorageKey";
 import { MLActionResult } from "@/models";
 import axios, { AxiosInstance } from "axios";
 
@@ -14,6 +16,16 @@ abstract class BaseService<IMLEntity> {
       baseURL: this.baseURL,
       withCredentials: true
     });
+
+    if (!Config.UseCookies) {
+      api.interceptors.request.use((config) => {
+        const token = localStorage.getItem(LocalStorageKey.AuthToken);
+        if (token) {
+          config.headers.Authorization = `Bearer ${token}`;
+        }
+        return config;
+      });
+    }
     
     api.interceptors.response.use(
       response => response,

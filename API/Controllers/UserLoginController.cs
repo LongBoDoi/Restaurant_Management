@@ -19,6 +19,8 @@ namespace API.Controllers
     {
         private class SessionInterface
         {
+            public string UserName { get; set; } = string.Empty;
+
             public object? UserData { get; set; }
 
             public EnumUserType? UserType { get; set; }
@@ -135,15 +137,23 @@ namespace API.Controllers
 
                     string userToken = new JwtSecurityTokenHandler().WriteToken(token);
 
-                    var cookieOptions = new CookieOptions
+                    if (Config.UseCookie)
                     {
-                        HttpOnly = true,
-                        Secure = true,
-                        SameSite = SameSiteMode.None,
-                        Expires = DateTime.UtcNow.AddDays(1)
-                    };
+                        var cookieOptions = new CookieOptions
+                        {
+                            HttpOnly = true,
+                            Secure = true,
+                            SameSite = SameSiteMode.None,
+                            Expires = DateTime.UtcNow.AddDays(1)
+                        };
 
-                    Response.Cookies.Append("AuthToken", userToken, cookieOptions);
+                        Response.Cookies.Append("AuthToken", userToken, cookieOptions);
+                    } else
+                    {
+                        Response.Cookies.Delete("AuthToken");
+                    }
+
+                    result.Data = userToken;
                 } else
                 {
                     result.Success = false;
@@ -199,15 +209,22 @@ namespace API.Controllers
 
                     string userToken = new JwtSecurityTokenHandler().WriteToken(token);
 
-                    var cookieOptions = new CookieOptions
+                    if (Config.UseCookie)
                     {
-                        HttpOnly = true,
-                        Secure = true,
-                        SameSite = SameSiteMode.None,
-                        Expires = DateTime.UtcNow.AddDays(1)
-                    };
+                        var cookieOptions = new CookieOptions
+                        {
+                            HttpOnly = true,
+                            Secure = true,
+                            SameSite = SameSiteMode.None,
+                            Expires = DateTime.UtcNow.AddDays(1)
+                        };
+                        Response.Cookies.Append("AuthToken", userToken, cookieOptions);
+                    } else
+                    {
+                        Response.Cookies.Delete("AuthToken");
+                    }
 
-                    Response.Cookies.Append("AuthToken", userToken, cookieOptions);
+                    result.Data = userToken;
                 }
                 else
                 {
@@ -215,6 +232,36 @@ namespace API.Controllers
                     result.ErrorCode = EnumApplicationErrorCode.InvalidLoginInfo;
                     result.ErrorMsg = "Tên đăng nhập hoặc mật khẩu không chinh xác";
                 }
+            }
+            catch (Exception ex)
+            {
+                CommonFunction.HandleException(ex, result, _context);
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Đăng xuất
+        /// </summary>
+        /// <returns></returns>
+        [Authorize]
+        [HttpPost("Logout")]
+        public MLActionResult Logout()
+        {
+            MLActionResult result = new()
+            {
+                Success = true
+            };
+
+            try
+            {
+                if (!Config.UseCookie)
+                {
+                    Response.Cookies.Delete("AuthToken");
+                }
+
+                //Session.Token = string.Empty;
             }
             catch (Exception ex)
             {
@@ -235,22 +282,27 @@ namespace API.Controllers
 
             try
             {
-                //Request.Cookies.TryGetValue("AuthToken", out string? token);
+                if (!Config.UseCookie)
+                {
+                    Response.Cookies.Delete("AuthToken");
+                }
 
                 string strUserID = User.Claims.FirstOrDefault(x => x.Type == "UserID")?.Value ?? "";
                 _ = Guid.TryParse(strUserID, out Guid userID);
+                string strUserName = User.Claims.FirstOrDefault(x => x.Type == "Username")?.Value ?? "";
                 string strUserType = User.Claims.FirstOrDefault(x => x.Type == "UserType")?.Value ?? "";
                 _ = EnumUserType.TryParse(strUserType, out EnumUserType userType);
 
                 SessionInterface sessionInterface = new ()
                 {
-                    UserType = userType
+                    UserType = userType,
+                    UserName = strUserName,
                 };
 
                 switch (userType)
                 {
                     case EnumUserType.Employee:
-                        sessionInterface.UserData = _context.Employee.FirstOrDefault(e => e.EmployeeID == userID) as Employee;
+                        sessionInterface.UserData = _context.Employee.FirstOrDefault(e => e.EmployeeID == userID);
                         break;
                     case EnumUserType.Customer:
                         sessionInterface.UserData = _context.Customer.FirstOrDefault(e => e.CustomerID == userID);
