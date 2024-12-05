@@ -15,7 +15,7 @@
             no-data-text="Không có dữ liệu" 
             items-per-page-text="Số bản ghi" 
             :headers="tableHeaders"
-            :items="menuItems"
+            :items="dataList as MenuItem[]"
             style="flex-grow: 1;"
             :items-per-page-options="[10, 25, 50, 100]"
             :hover="true"
@@ -64,18 +64,13 @@ export default {
     },
 
     methods: {
-        ...mapActions(menuItemStore, ['getMenuItemsData', 'setSelectedIndex']),
+        ...mapActions(menuItemStore as any, ['getDataPaging', 'setSelectedIndex', 'addNewRecord']),
 
         /**
          * Xử lý thêm món ăn mới
          */
         handleAddNewMenuItem() {
-            const newMenuItem = {
-                EditMode: this.$enumeration.EnumEditMode.Add
-            } as MenuItem;
-
-            this.menuItems.push(newMenuItem);
-            this.setSelectedIndex(this.menuItems.indexOf(newMenuItem));
+            const newMenuItem = this.addNewRecord() as MenuItem;
 
             EventBus.emit(this.$eventName.ShowFormMenuDetail, newMenuItem);
         },
@@ -85,7 +80,7 @@ export default {
          */
         async getMenuItems() {
             this.loading = true;
-            await this.getMenuItemsData(this.options.page, this.options.itemsPerPage);
+            await this.getDataPaging(this.options.page, this.options.itemsPerPage);
             this.loading = false;
         },
 
@@ -93,7 +88,7 @@ export default {
          * Xử lý mở chi tiết món ăn
          */
         handleOpenMenuDetail() {
-            const selectedMenuItem = this.menuItems[this.selectedIndex];
+            const selectedMenuItem = this.dataList[this.selectedIndex];
             selectedMenuItem.EditMode = this.$enumeration.EnumEditMode.Edit;
             
             EventBus.emit(this.$eventName.ShowFormMenuDetail, selectedMenuItem);
@@ -101,7 +96,7 @@ export default {
     },
 
     computed: {
-        ...mapState(menuItemStore, ['menuItems', 'totalCount', 'selectedIndex']),
+        ...mapState(menuItemStore, ['dataList', 'totalCount', 'selectedIndex']),
 
         tableHeaders():any {
             return [
