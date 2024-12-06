@@ -55,7 +55,7 @@
                         :return-object="false"
                         v-model:model-value="record.Role"
                         ref="cbMenuCategory"
-                        label="Loại món"
+                        label="Vai trò"
                         width="50%"
                         variant="outlined"
                         density="compact"
