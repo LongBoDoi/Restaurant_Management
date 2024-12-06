@@ -1,8 +1,12 @@
 interface UserLogin {
     UserLoginID: string,
-    UserID: string,
+    EmployeeID?: string,
+    CustomerID?: string,
     Username: string,
-    Password: string
+    Password: string,
+
+    IsChangePassword: boolean,
+    OldPassword: string
 }
 
 export default UserLogin;

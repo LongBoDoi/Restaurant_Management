@@ -29,9 +29,13 @@ namespace API.Controllers
             {
                 result.Data = new
                 {
-                    Data = _entities.Where(e => e.Role != EnumRole.Admin).Skip((page - 1) * itemsPerPage).Take(itemsPerPage).ToList().Select(e =>
+                    Data = _entities.AsNoTracking().Where(e => e.Role != EnumRole.Admin).Skip((page - 1) * itemsPerPage).Take(itemsPerPage).ToList().Select(e =>
                     {
                         e.UserLogin = _context.UserLogin.AsNoTracking().FirstOrDefault(ul => ul.EmployeeID == e.EmployeeID);
+                        if (e.UserLogin != null)
+                        {
+                            e.UserLogin.Password = string.Empty;
+                        }
                         return e;
                     }),
                     TotalCount = _entities.Count()
@@ -45,11 +49,30 @@ namespace API.Controllers
             return result;
         }
 
-        public override void AfterSaveSuccess(Employee employee)
+        protected override bool BeforeSave(Employee employee, MLActionResult result)
+        {
+            if (employee.EditMode == EnumEditMode.Edit && employee.UserLogin != null && employee.UserLogin.IsChangePassword)
+            {
+                string? oldPassword = _entities.AsNoTracking().Include(e => e.UserLogin).FirstOrDefault(e => e.EmployeeID == employee.EmployeeID)?.UserLogin?.Password;
+                if (!string.IsNullOrEmpty(oldPassword) && employee.UserLogin.OldPassword != oldPassword)
+                {
+                    result.ErrorMsg = "Mật khẩu cũ không chính xác.";
+                    result.Success = false;
+
+                    return false;
+                } else
+                {
+                    _context.Entry(employee.UserLogin).State = EntityState.Modified;
+                }
+            }
+            return true;
+        }
+
+        protected override void AfterSaveSuccess(Employee employee)
         {
             if (employee.UserLogin != null)
             {
-                employee.UserLogin.Employee = null;
+                employee.UserLogin = null;
             }
         }
     }

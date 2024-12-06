@@ -40,11 +40,11 @@ export default {
       this.redirectToLogin();
     }
 
-    // EventBus.on('RedirectToLogin', this.redirectToLogin);
+    EventBus.on(this.$eventName.RedirectToLogin, this.redirectToLogin);
   },
 
   beforeUnmount() {
-    EventBus.off('RedirectToLogin');
+    EventBus.off(this.$eventName.RedirectToLogin);
   },
 
   data() {
@@ -57,7 +57,9 @@ export default {
     ...mapActions(userStore, ['setUserID']),
 
     redirectToLogin() {
-      this.$router.replace({name: '/'});
+      if (window.location.pathname !== '/') {
+        window.location.pathname = '/';
+      }
     }
   }
 }

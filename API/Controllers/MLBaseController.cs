@@ -74,6 +74,11 @@ namespace API.Controllers
                     return result;
                 }
 
+                if (!BeforeSave(entity, result))
+                {
+                    return result;
+                }
+
                 EnumEditMode? editMode = (EnumEditMode?)typeof(IMLEntity).GetProperty("EditMode")?.GetValue(entity);
                 if (editMode.HasValue)
                 {
@@ -115,8 +120,13 @@ namespace API.Controllers
         /// <summary>
         /// Xử lý sau khi save thành công
         /// </summary>
-        public virtual void AfterSaveSuccess(IMLEntity entity)
+        protected virtual void AfterSaveSuccess(IMLEntity entity)
         {
+        }
+
+        protected virtual bool BeforeSave(IMLEntity entity, MLActionResult result)
+        {
+            return true;
         }
         #endregion
     }

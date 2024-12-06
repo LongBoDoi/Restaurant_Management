@@ -1,5 +1,6 @@
 import Config from "@/common/Config";
 import EventBus from "@/common/EventBus";
+import EventName from "@/common/EventName";
 import LocalStorageKey from "@/common/LocalStorageKey";
 import { MLActionResult } from "@/models";
 import axios, { AxiosInstance } from "axios";
@@ -31,7 +32,7 @@ abstract class BaseService<IMLEntity> {
       response => response,
       error => {
           if (error.response?.status === 401) {
-            EventBus.emit('RedirectToLogin');
+            EventBus.emit(EventName.RedirectToLogin);
           }
           return Promise.reject(error);
       }

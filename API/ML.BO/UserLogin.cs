@@ -1,5 +1,6 @@
 ﻿using API.ML.BOBase;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace API.ML.BO
 {
@@ -49,5 +50,11 @@ namespace API.ML.BO
         /// </summary>
         public Customer? Customer { get; set; }
         #endregion
+
+        [NotMapped]
+        public bool IsChangePassword { get; set; }
+
+        [NotMapped]
+        public string OldPassword { get; set; } = string.Empty;
     }
 }

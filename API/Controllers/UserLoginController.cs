@@ -195,7 +195,7 @@ namespace API.Controllers
                     var claims = new[]
                     {
                         new Claim("UserID", customer.CustomerID.ToString()),
-                        new Claim("Username", customer.UserLogin.Username),
+                        new Claim("Username", customer.CustomerName),
                         new Claim("UserType", ((int)EnumUserType.Customer).ToString())
                     };
 

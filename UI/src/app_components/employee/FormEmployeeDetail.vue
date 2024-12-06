@@ -65,32 +65,49 @@
                     />
                 </MLHbox>
 
-                <MLHbox>
-                    <!-- Mật khẩu -->
-                    <VTextField width="50%" type="password" density="compact" variant="outlined" v-model:model-value="(record.UserLogin as any).Password"
-                        :rules="[(v:string|undefined) => v !== undefined && v !== '']"
-                    >
-                        <template v-slot:label>
-                            Mật khẩu
-                            <span style="color: red;">*</span>
-                        </template>
-                    </VTextField>
+                <VCheckbox v-if="editMode === $enumeration.EnumEditMode.Edit && record.UserLogin" color="primary" label="Đổi mật khẩu" v-model:model-value="record.UserLogin.IsChangePassword" />
 
-                    <VSpacer style="width: 16px;" class="flex-shrink-0 flex-grow-0" />
+                <MLVbox v-if="record.UserLogin && editMode === $enumeration.EnumEditMode.Edit && record.UserLogin.IsChangePassword">
+                    <MLHbox>
+                        <!-- Mật khẩu -->
+                        <VTextField width="50%" type="password" density="compact" variant="outlined" v-model:model-value="record.UserLogin.OldPassword"
+                            :rules="[(v:string|undefined) => v !== undefined && v !== '']"
+                        >
+                            <template v-slot:label>
+                                Mật khẩu cũ
+                                <span style="color: red;">*</span>
+                            </template>
+                        </VTextField>
 
-                    <!-- Xác nhận mật khẩu -->
-                    <VTextField width="50%" type="password" density="compact" variant="outlined"
-                        :rules="[
-                            (v:string|undefined) => v !== undefined && v !== '',
-                            (v:string) => v === record.UserLogin?.Password || 'Mật khẩu không trùng khớp.'
-                        ]"
-                    >
-                        <template v-slot:label>
-                            Xác nhận mật khẩu
-                            <span style="color: red;">*</span>
-                        </template>
-                    </VTextField>
-                </MLHbox>
+                        <VSpacer style="width: 50%; margin-left: 8px;" class="flex-shrink-0 flex-grow-1" />
+                    </MLHbox>
+                    <MLHbox>
+                        <!-- Mật khẩu -->
+                        <VTextField width="50%" type="password" density="compact" variant="outlined" v-model:model-value="record.UserLogin.Password"
+                            :rules="[(v:string|undefined) => v !== undefined && v !== '']"
+                        >
+                            <template v-slot:label>
+                                Mật khẩu
+                                <span style="color: red;">*</span>
+                            </template>
+                        </VTextField>
+
+                        <VSpacer style="width: 16px;" class="flex-shrink-0 flex-grow-0" />
+
+                        <!-- Xác nhận mật khẩu -->
+                        <VTextField width="50%" type="password" density="compact" variant="outlined"
+                            :rules="[
+                                (v:string|undefined) => v !== undefined && v !== '',
+                                (v:string) => v === record.UserLogin?.Password || 'Mật khẩu không trùng khớp.'
+                            ]"
+                        >
+                            <template v-slot:label>
+                                Xác nhận mật khẩu
+                                <span style="color: red;">*</span>
+                            </template>
+                        </VTextField>
+                    </MLHbox>
+                </MLVbox>
                 </VForm>
             </VCardItem>
 
