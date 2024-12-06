@@ -67,8 +67,8 @@
 
                 <VCheckbox v-if="editMode === $enumeration.EnumEditMode.Edit && record.UserLogin" color="primary" label="Đổi mật khẩu" v-model:model-value="record.UserLogin.IsChangePassword" />
 
-                <MLVbox v-if="record.UserLogin && editMode === $enumeration.EnumEditMode.Edit && record.UserLogin.IsChangePassword">
-                    <MLHbox>
+                <MLVbox v-if="record.UserLogin && ((editMode === $enumeration.EnumEditMode.Add) || (editMode === $enumeration.EnumEditMode.Edit && record.UserLogin.IsChangePassword))">
+                    <MLHbox v-if="editMode === $enumeration.EnumEditMode.Edit">
                         <!-- Mật khẩu -->
                         <VTextField width="50%" type="password" density="compact" variant="outlined" v-model:model-value="record.UserLogin.OldPassword"
                             :rules="[(v:string|undefined) => v !== undefined && v !== '']"
