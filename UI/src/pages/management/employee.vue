@@ -1,3 +1,4 @@
 <template>
-    Tính năng đang phát triển
+    <FormEmployeeList />
+    <FormEmployeeDetail />
 </template>

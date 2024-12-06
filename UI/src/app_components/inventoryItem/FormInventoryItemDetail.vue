@@ -5,52 +5,50 @@
                 <VProgressLinear v-if="loading" indeterminate color="primary" />
             </template>
             <VCardTitle class="d-flex align-center">
-                Thông tin khách hàng
+                Thông tin nguyên liệu
                 <VBtn variant="plain" class="ml-auto" icon="mdi-close" @click="handleCloseDialog" />
             </VCardTitle>
 
             <VCardItem>
                 <VForm ref="form"> 
-                <MLHbox class="mt-2">
-                    <!-- Tên khách hàng -->
-                    <VTextField width="70%" density="compact" variant="outlined" suffix="đ" v-model:model-value="customer.CustomerName"
+                <!-- Tên nguyên liệu -->
+                <VTextField class="mt-2" density="compact" variant="outlined" v-model:model-value="record.Name"
+                    :rules="[(v:string|undefined) => v !== undefined && v !== '']"
+                >
+                    <template v-slot:label>
+                        Tên nguyên liệu
+                        <span style="color: red;">*</span>
+                    </template>
+                </VTextField>
+
+                <MLHbox>
+                    <!-- Số lượng tồn -->
+                    <VTextField width="40%" type="number" hide-spin-buttons density="compact" variant="outlined" v-model:model-value="record.Quantity"
                         :rules="[(v:string|undefined) => v !== undefined && v !== '']"
                     >
                         <template v-slot:label>
-                            Tên khách hàng
+                            Số lượng tồn
                             <span style="color: red;">*</span>
                         </template>
                     </VTextField>
 
                     <VSpacer style="width: 16px;" class="flex-shrink-0 flex-grow-0" />
 
-                    <!-- Số điện thoại -->
-                    <VTextField width="70%" density="compact" variant="outlined" suffix="đ" v-model:model-value="customer.PhoneNumber"
+                    <!-- Đơn vị tính -->
+                    <VTextField width="60%" density="compact" variant="outlined" v-model:model-value="record.Unit"
                         :rules="[(v:string|undefined) => v !== undefined && v !== '']"
                     >
                         <template v-slot:label>
-                            Số điện thoại
+                            Đơn vị tính
                             <span style="color: red;">*</span>
                         </template>
                     </VTextField>
                 </MLHbox>
-
-                <!-- Địa chỉ -->
-                <VTextField 
-                    density="compact" 
-                    class="flex-grow-1 flex-shrink-0" 
-                    variant="outlined"
-                    v-model:model-value="customer.Address"
-                >
-                    <template v-slot:label>
-                        Địa chỉ
-                    </template>
-                </VTextField>
                 </VForm>
             </VCardItem>
 
             <VCardActions>
-                <VBtn v-if="editMode === $enumeration.EnumEditMode.Edit" prepend-icon="mdi-trash-can-outline" color="error" @click="handleDeleteMenuItem">Xoá khách hàng</VBtn>
+                <VBtn v-if="editMode === $enumeration.EnumEditMode.Edit" prepend-icon="mdi-trash-can-outline" color="error" @click="handleDeleteRecord">Xoá nguyên liệu</VBtn>
 
                 <VSpacer />
 
@@ -64,8 +62,8 @@
 <script lang="ts">
 import { EnumEditMode } from '@/common/Enumeration';
 import EventBus from '@/common/EventBus';
-import { Customer, MLActionResult } from '@/models';
-import { customerStore } from '@/stores/customerStore';
+import { Customer, InventoryItem, MLActionResult } from '@/models';
+import { inventoryItemStore } from '@/stores/inventoryItemStore';
 import { mapActions, mapState } from 'pinia';
 import { VMoney } from 'v-money';
 
@@ -73,38 +71,38 @@ export default {
     directives: {money: VMoney},
 
     created() {
-        EventBus.on(this.$eventName.ShowFormCustomerDetail, this.handleShowDialog as any);
+        EventBus.on(this.$eventName.ShowFormInventoryItemDetail, this.handleShowDialog as any);
     },
 
     beforeUnmount() {
-        EventBus.off(this.$eventName.ShowFormCustomerDetail);
+        EventBus.off(this.$eventName.ShowFormInventoryItemDetail);
     },
 
     methods: {
-        ...mapActions(customerStore as any, ['removeSelectedRecord']),
+        ...mapActions(inventoryItemStore as any, ['removeSelectedRecord']),
 
         /**
          * Xử lý mở form
          */
-        handleShowDialog(customer: Customer) {
-            if (customer) {
-                if (customer.EditMode !== undefined) {
-                    this.editMode = customer.EditMode;
+        handleShowDialog(inventoryItem: InventoryItem) {
+            if (inventoryItem) {
+                if (inventoryItem.EditMode !== undefined) {
+                    this.editMode = inventoryItem.EditMode;
                 }
 
-                this.customer = customer;
-                this.oldCustomer = JSON.parse(JSON.stringify(this.customer));
+                this.record = inventoryItem;
+                this.oldRecord = JSON.parse(JSON.stringify(this.record));
                 this.isShow = true;
             }
         },
 
         handleCloseDialog() {
-            switch (this.customer.EditMode) {
+            switch (this.record.EditMode) {
                 case this.$enumeration.EnumEditMode.Add:
                     this.removeSelectedRecord();
                     break;
                 case this.$enumeration.EnumEditMode.Edit:
-                    this.dataList[this.selectedIndex] = this.oldCustomer;
+                    this.dataList[this.selectedIndex] = this.oldRecord;
                     break;
             }
             this.isShow = false;
@@ -129,13 +127,13 @@ export default {
         /**
          * Xử lý xoá món
          */
-        handleDeleteMenuItem() {
+        handleDeleteRecord() {
             this.$commonFunction.showDialog({
-                Title: 'Xác nhận xoá khách hàng',
-                Message: `Bạn có chắc chắn muốn xoá khách hàng <b>${this.customer.CustomerName}</b> không?`,
+                Title: 'Xác nhận xoá nguyên liệu',
+                Message: `Bạn có chắc chắn muốn xoá nguyên liệu <b>${this.record.Name}</b> không?`,
                 ConfirmAction: async () => {
-                    this.customer.EditMode = this.$enumeration.EnumEditMode.Delete;
-                    if (await this.saveChanges('Xoá khách hàng thành công')) {
+                    this.record.EditMode = this.$enumeration.EnumEditMode.Delete;
+                    if (await this.saveChanges('Xoá nguyên liệu thành công')) {
                         this.isShow = false;
                         this.removeSelectedRecord();
                     }
@@ -151,7 +149,7 @@ export default {
             let result:MLActionResult|undefined = undefined;
 
             try {
-                result = await this.$service.CustomerService.saveChanges(this.customer);
+                result = await this.$service.InventoryItemService.saveChanges(this.record);
             } catch (e) {
                 this.$commonFunction.handleException(e);
             }
@@ -181,13 +179,13 @@ export default {
             loading: <boolean>false,
             editMode: <EnumEditMode>EnumEditMode.Add,
 
-            customer: <Customer>{} as Customer,
-            oldCustomer: <Customer>{} as Customer
+            record: <InventoryItem>{} as InventoryItem,
+            oldRecord: <InventoryItem>{} as InventoryItem
         }
     },
 
     computed: {
-        ...mapState(customerStore, ['dataList', 'selectedIndex']),
+        ...mapState(inventoryItemStore, ['dataList', 'selectedIndex']),
     }
 }
 </script>

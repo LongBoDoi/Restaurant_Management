@@ -29,7 +29,7 @@
                 <VListItem link :to="{name: '/management/order'}" prepend-icon="mdi-silverware-fork-knife" title="Order" />
                 <VListItem link :to="{name: '/management/reservation'}" prepend-icon="mdi-notebook-edit" title="Đặt bàn" />
                 <VListItem link :to="{name: '/management/menu'}" prepend-icon="mdi-food" title="Thực đơn" />
-                <VListItem link :to="{name: '/management/inventory'}" prepend-icon="mdi-food" title="Nguyên liệu" />
+                <VListItem link :to="{name: '/management/inventory'}" prepend-icon="mdi-food-variant" title="Nguyên liệu" />
                 <VListItem link :to="{name: '/management/customer'}" prepend-icon="mdi-account-group" title="Khách hàng" />
                 <VListItem link :to="{name: '/management/employee'}" prepend-icon="mdi-account-file-text" title="Nhân viên" />
             </VList>

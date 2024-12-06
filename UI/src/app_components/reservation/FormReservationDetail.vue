@@ -148,11 +148,11 @@ export default {
             this.reservation.Status = newStatus;
 
             this.loading = true;
-            await this.updateReservationInfo('Xác nhận thành công');
+            if (await this.saveChanges('Xác nhận thành công')) {
+                this.removeSelectedRecord();
+                this.isShow = false;
+            }
             this.loading = false;
-
-            this.removeSelectedRecord();
-            this.isShow = false;
         },
 
         /**
@@ -165,10 +165,10 @@ export default {
             this.reservation.Status = EnumReservationStatus.Active;
 
             this.loading = true;
-            await this.updateReservationInfo('Lưu thành công');
+            if (await this.saveChanges('Lưu thành công')) {
+                this.isShow = false;
+            }
             this.loading = false;
-
-            this.isShow = false;
         },
 
         async validateForm():Promise<boolean> {
@@ -182,10 +182,10 @@ export default {
                 Message: 'Bạn có chắc chắn muốn huỷ đặt bàn này không?',
                 ConfirmAction: async () => {
                     this.reservation.EditMode = this.$enumeration.EnumEditMode.Delete;
-                    await this.updateReservationInfo('Huỷ đặt bàn thành công');
-
-                    this.isShow = false;
-                    this.removeSelectedRecord();
+                    if (await this.saveChanges('Huỷ đặt bàn thành công')) {
+                        this.isShow = false;
+                        this.removeSelectedRecord();
+                    }
                 }
             });
         },
@@ -193,7 +193,7 @@ export default {
         /**
          * Xử lý lưu dữ liệu bản ghi
          */
-        async updateReservationInfo(confirmMessage: string) {
+        async saveChanges(confirmMessage: string):Promise<boolean> {
             let result:MLActionResult|undefined = undefined;
 
             try {
@@ -202,7 +202,7 @@ export default {
                 this.$commonFunction.handleException(e);
             }
 
-            if (!result) return;
+            if (!result) return false;
 
             if (result.Success) {
                 this.reservations[this.selectedIndex] = result.Data as Reservation;
@@ -216,6 +216,8 @@ export default {
                     Type: 'error'
                 });
             }
+
+            return result.Success;
         }
     },
 

@@ -16,6 +16,12 @@ class EventName {
 
     // Mở dialog thông báo
     static ShowDialog = 'ShowDialog';
+
+    // Mở form chi tiết nhân viên
+    static ShowFormInventoryItemDetail = 'ShowFormInventoryItemDetail';
+
+    // Mở form chi tiết nhân viên
+    static ShowFormEmployeeDetail = 'ShowFormEmployeeDetail';
 };
 
 export default EventName;

@@ -136,9 +136,10 @@ export default {
 
             this.menuItem.Price = parseFloat(this.menuItem.Price.toString().replaceAll('.', '').replaceAll(',', ''));
 
-            await this.updateMenuInfo('Lưu thành công');
+            if (await this.saveChanges('Lưu thành công')) {
+                this.isShow = false;
+            }
             this.loading = false;
-            this.isShow = false;
         },
 
         /**
@@ -150,10 +151,10 @@ export default {
                 Message: `Bạn có chắc chắn muốn xoá món <b>${this.menuItem.Name}</b> không?`,
                 ConfirmAction: async () => {
                     this.menuItem.EditMode = this.$enumeration.EnumEditMode.Delete;
-                    await this.updateMenuInfo('Xoá món thành công');
-
-                    this.isShow = false;
-                    this.removeSelectedRecord();
+                    if (await this.saveChanges('Xoá món thành công')) {
+                        this.isShow = false;
+                        this.removeSelectedRecord();
+                    }
                 }
             });
         },
@@ -162,7 +163,7 @@ export default {
          * Lưu thông tin món
          * @param confirmMessage Câu thông báo khi lưu thành công
          */
-        async updateMenuInfo(confirmMessage: string) {
+        async saveChanges(confirmMessage: string):Promise<boolean> {
             let result:MLActionResult|undefined = undefined;
 
             try {
@@ -171,7 +172,7 @@ export default {
                 this.$commonFunction.handleException(e);
             }
 
-            if (!result) return;
+            if (!result) return false;
 
             if (result.Success) {
                 this.dataList[this.selectedIndex] = result.Data as MenuItem;
@@ -185,6 +186,8 @@ export default {
                     Type: 'error'
                 });
             }
+
+            return result.Success;
         }
     },
 

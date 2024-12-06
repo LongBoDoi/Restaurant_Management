@@ -6,3 +6,4 @@ export type { default as Reservation } from './Reservation';
 export type { default as Customer } from './Customer';
 export type { default as Employee } from './Employee';
 export type { default as MenuItem } from './MenuItem';
+export type { default as InventoryItem } from './InventoryItem';

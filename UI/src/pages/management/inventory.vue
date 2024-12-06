@@ -1,3 +1,5 @@
 <template>
-    Tính năng đang phát triển
+    <FormInventoryItemList />
+
+    <FormInventoryItemDetail />
 </template>

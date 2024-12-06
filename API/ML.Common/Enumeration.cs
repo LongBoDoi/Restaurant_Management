@@ -46,7 +46,13 @@
         /// <summary>
         /// Administrator
         /// </summary>
-        Admin = 0
+        Admin = 0,
+
+        Manager = 1,
+
+        Cashier = 2,
+
+        Waiter = 3
     }
 
     public enum EnumMenuItemCategory

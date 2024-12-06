@@ -53,7 +53,16 @@ export enum EnumReservationStatus {
  */
 export enum EnumRole {
     /// Administrator
-    Admin = 0
+    Admin = 0,
+
+    //Quản lý
+    Manager = 1,
+
+    //Thu ngân
+    Cashier = 2,
+
+    //Nhân viên phục vụ
+    Waiter = 3
 }
 
 /**
@@ -79,6 +88,7 @@ class EnumerationInterface {
     EnumMenuItemCategory: typeof EnumMenuItemCategory = EnumMenuItemCategory;
     EnumEditMode: typeof EnumEditMode = EnumEditMode;
     EnumReservationStatus: typeof EnumReservationStatus = EnumReservationStatus;
+    EnumRole: typeof EnumRole = EnumRole;
 }
 
 export default EnumerationInterface;

@@ -1,5 +1,6 @@
 ﻿using API.ML.BOBase;
 using API.ML.Common;
+using System.ComponentModel.DataAnnotations;
 
 namespace API.ML.BO
 {
@@ -8,6 +9,7 @@ namespace API.ML.BO
         /// <summary>
         /// Khoá chính
         /// </summary>
+        [Key]
         public Guid EmployeeID { get; set; }
 
         /// <summary>

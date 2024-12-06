@@ -1,4 +1,5 @@
 ﻿using API.ML.BOBase;
+using System.ComponentModel.DataAnnotations;
 
 namespace API.ML.BO
 {
@@ -7,6 +8,7 @@ namespace API.ML.BO
         /// <summary>
         /// Khoá chính
         /// </summary>
+        [Key]
         public Guid InventoryItemID { get; set; }
 
         /// <summary>

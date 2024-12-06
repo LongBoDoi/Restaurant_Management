@@ -33,7 +33,7 @@ namespace API.Controllers
         /// <returns></returns>
         [Authorize]
         [HttpGet("GetDataPaging")]
-        public MLActionResult GetDataPaging(int page, int itemsPerPage)
+        public virtual MLActionResult GetDataPaging(int page, int itemsPerPage)
         {
             MLActionResult result = new()
             {
@@ -95,6 +95,10 @@ namespace API.Controllers
                 }
 
                 result.Success = _context.SaveChanges() > 0;
+                if (result.Success)
+                {
+                    this.AfterSaveSuccess(entity);
+                }
                 if (editMode != EnumEditMode.Delete)
                 {
                     result.Data = entity;
@@ -106,6 +110,13 @@ namespace API.Controllers
             }
 
             return result;
+        }
+
+        /// <summary>
+        /// Xử lý sau khi save thành công
+        /// </summary>
+        public virtual void AfterSaveSuccess(IMLEntity entity)
+        {
         }
         #endregion
     }
