@@ -50,5 +50,10 @@ namespace API.ML.BO
         /// Thông tin đăng nhập
         /// </summary>
         public UserLogin? UserLogin { get; set; }
+
+        /// <summary>
+        /// Danh sách bản ghi order
+        /// </summary>
+        public IEnumerable<Order>? Orders { get; set; }
     }
 }

@@ -82,6 +82,15 @@ export enum EnumMenuItemCategory {
     Drink = 3
 }
 
+/**
+ * Enum trạng thái order
+ */
+export enum EnumOrderStatus {
+    Active = 1,
+
+    Paid = 2
+}
+
 class EnumerationInterface {
     EnumUserType: typeof EnumUserType = EnumUserType;
     EnumChatbotSender: typeof EnumChatbotSender = EnumChatbotSender;
@@ -89,6 +98,7 @@ class EnumerationInterface {
     EnumEditMode: typeof EnumEditMode = EnumEditMode;
     EnumReservationStatus: typeof EnumReservationStatus = EnumReservationStatus;
     EnumRole: typeof EnumRole = EnumRole;
+    EnumOrderStatus: typeof EnumOrderStatus = EnumOrderStatus;
 }
 
 export default EnumerationInterface;

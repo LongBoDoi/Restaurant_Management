@@ -1,14 +1,13 @@
-import { EnumEditMode, EnumMenuItemCategory } from "@/common/Enumeration";
+import { EnumMenuItemCategory } from "@/common/Enumeration";
+import MLEntity from "./MLEntity";
 
-interface MenuItem {
+interface MenuItem extends MLEntity {
     MenuItemID: string,
     Name: string,
     Description: string,
     Price: number,
-    Category: EnumMenuItemCategory|null,
+    Category: EnumMenuItemCategory,
     OutOfStock: boolean,
-
-    EditMode?: EnumEditMode
 };
 
 export default MenuItem;

@@ -2,7 +2,8 @@
     <MLVbox style="width: 100%; height: 100%; max-height: 100vh;">
         <!-- Toolbar -->
         <VToolbar color="primary">
-            <VContainer style="display: flex;">
+            <VContainer style="display: flex; align-items: center;">
+                <img style="width: 92px; height: 48px; margin-left: 24px; border-radius: 8px; cursor: pointer;" src="/src/resources/app-logo.jpeg" @click="handleLogoClick" />
                 <VSpacer />
 
                 <VBtn rounded variant="tonal" style="margin-right: 24px;" @click="handleLoginClick" v-if="!isCustomerLoggedIn">Đăng nhập</VBtn>
@@ -78,6 +79,10 @@ export default {
             (this.$refs.frmLogin as any).scrollIntoView({
                 behavior: 'smooth'
             });
+        },
+
+        handleLogoClick() {
+            window.location.pathname = '/';
         },
 
         async logOut() {

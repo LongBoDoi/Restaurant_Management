@@ -5,6 +5,7 @@ import MenuItemService, { menuItemService } from "./menuItemService";
 import ReservationService, { reservationService } from "./reservationService";
 import UserLoginService from "./userLoginService";
 import EmployeeService, { employeeService } from "./employeeService";
+import OrderService, { orderService } from "./orderService";
 
 class ServiceInterface {
     UserLoginService: UserLoginService = new UserLoginService;
@@ -14,6 +15,7 @@ class ServiceInterface {
     CustomerService: CustomerService = customerService;
     InventoryItemService: InventoryItemService = inventoryItemService;
     EmployeeService: EmployeeService = employeeService;
+    OrderService: OrderService = orderService
 };
 
 export default ServiceInterface;

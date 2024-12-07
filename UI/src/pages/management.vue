@@ -3,6 +3,7 @@
 <template>
     <VApp>
         <VAppBar app color="primary" >
+            <img style="width: 92px; height: 48px; margin-left: 24px; border-radius: 8px; cursor: pointer;" @click="handleLogoClick" src="/src/resources/app-logo.jpeg" />
             <VSpacer />
             <v-menu :persistent="accountMenuLoading" :close-on-content-click="!accountMenuLoading" offset-y>
                 <template v-slot:activator="{ props }">
@@ -77,7 +78,11 @@ export default {
                 localStorage.removeItem(LocalStorageKey.AuthToken);
                 window.location.reload();
             }
-        }
+        },
+
+        handleLogoClick() {
+            window.location.pathname = '/';
+        },
     },
 
     computed: {

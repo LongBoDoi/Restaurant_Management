@@ -8,16 +8,16 @@ class CommonFunction {
      * @param seconds 
      * @returns 
      */
-    formatTimeBySecond = (seconds:number) => {
+    static formatTimeBySecond = (seconds:number) => {
         const hours = Math.floor(seconds / 3600);
         const minutes = Math.floor((seconds % 3600) / 60);
-        const secs = seconds % 60;
+        // const secs = seconds % 60;
 
         const formattedHours = hours > 0 ? String(hours).padStart(2, '0') : '';
         const formattedMinutes = minutes > 0 ? String(minutes).padStart(2, '0') : '';
-        const formattedSeconds = secs > 0 ? String(secs).padStart(2, '0') : '';
+        // const formattedSeconds = secs > 0 ? String(secs).padStart(2, '0') : '';
 
-        return `${formattedHours}:${formattedMinutes}:${formattedSeconds}`;
+        return `${formattedHours ? `${formattedHours}g` : ''}${formattedMinutes}p`;
     };
 
     /**

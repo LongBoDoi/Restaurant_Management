@@ -16,6 +16,11 @@ namespace API.ML.BO
         public Guid? CustomerID { get; set; }
 
         /// <summary>
+        /// Tên khách hàng
+        /// </summary>
+        public string CustomerName { get; set; } = string.Empty;
+
+        /// <summary>
         /// Tên order
         /// </summary>
         public string OrderName { get; set; } = string.Empty;
@@ -43,6 +48,11 @@ namespace API.ML.BO
         /// <summary>
         /// Danh sách OrderDetail
         /// </summary>
-        public IEnumerable<OrderDetail>? OrderDetails { get; set; }
+        public IEnumerable<OrderDetail> OrderDetails { get; set; } = [];
+
+        /// <summary>
+        /// Dữ liệu khách hàng
+        /// </summary>
+        public Customer? Customer { get; set; }
     }
 }

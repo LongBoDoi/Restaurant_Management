@@ -44,7 +44,7 @@ namespace API.Controllers
             {
                 result.Data = new
                 {
-                    Data = _entities.Skip((page - 1) * itemsPerPage).Take(itemsPerPage).ToList(),
+                    Data = itemsPerPage == -1 ? [.. _entities] : _entities.Skip((page - 1) * itemsPerPage).Take(itemsPerPage).ToList(),
                     TotalCount = _entities.Count()
                 };
             }

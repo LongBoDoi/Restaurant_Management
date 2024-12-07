@@ -59,6 +59,8 @@ export function createStoreOnBase<IMLEntity extends MLEntity>(storeID: string, s
 
             async getDataPaging(page: number, itemsPerPage: number) {
                 try {
+                    this._dataList = [];
+
                     const result:MLActionResult = await service.getDataPaging(page, itemsPerPage);
                     if (result.Success) {
                       this._dataList = result.Data.Data;

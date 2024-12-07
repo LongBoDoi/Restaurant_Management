@@ -33,6 +33,7 @@
                 </td> -->
                 <td>{{ item.Name }}</td>
                 <td style="text-align: end;">{{ item.Price }}</td>
+                <td>{{ getMenuCategoryName(item.Category) }}</td>
                 <td>{{ item.Description }}</td>
                 <td>
                     <MLVbox class="align-center">
@@ -46,6 +47,7 @@
 </template>
 
 <script lang="ts">
+import { EnumMenuItemCategory } from '@/common/Enumeration';
 import EventBus from '@/common/EventBus';
 import { MenuItem } from '@/models';
 import { menuItemStore } from '@/stores/menuItemStore';
@@ -84,6 +86,19 @@ export default {
             this.loading = false;
         },
 
+        getMenuCategoryName(category: EnumMenuItemCategory) {
+            switch (category) {
+                case EnumMenuItemCategory.Appetizers:
+                    return 'Khai vị';
+                case EnumMenuItemCategory.Dessert:
+                    return 'Tráng miệng';
+                case EnumMenuItemCategory.MainCourse:
+                    return 'Món chính';
+                case EnumMenuItemCategory.Drink:
+                    return 'Đồ uống';
+            }
+        },
+
         /**
          * Xử lý mở chi tiết món ăn
          */
@@ -102,6 +117,7 @@ export default {
             return [
                 { title: 'Tên món', value: 'Name', width: 300, color: 'primary' },
                 { title: 'Giá món', value: 'Price', align: 'end', width: 150 },
+                { title: 'Loại món', value: 'Category', width: 200 },
                 { title: 'Mô tả', value: 'Description' },
                 { title: 'Hết hàng', value: 'OutOfStock', align: 'center', width: 150 }
             ]

@@ -62,7 +62,9 @@
 
     public enum EnumOrderStatus
     {
+        Active = 1,
         
+        Paid = 2
     }
 
     /// <summary>

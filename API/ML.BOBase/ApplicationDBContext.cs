@@ -1,7 +1,5 @@
 ﻿using API.ML.BO;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Mysqlx.Crud;
 
 namespace API.ML.BOBase
 {
@@ -89,6 +87,11 @@ namespace API.ML.BOBase
             {
                 entity.HasOne(ul => ul.Employee).WithOne(e => e.UserLogin).HasForeignKey<UserLogin>(ul => ul.EmployeeID);
                 entity.HasOne(ul => ul.Customer).WithOne(c => c.UserLogin).HasForeignKey<UserLogin>(ul => ul.CustomerID);
+            });
+
+            modelBuilder.Entity<Order>(entity =>
+            {
+                entity.HasOne(o => o.Customer).WithMany(o => o.Orders).HasForeignKey(od => od.CustomerID);
             });
 
             modelBuilder.Entity<OrderDetail>(entity =>
