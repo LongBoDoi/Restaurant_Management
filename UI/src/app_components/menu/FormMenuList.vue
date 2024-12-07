@@ -1,22 +1,24 @@
 <!-- Màn danh sách thực đơn -->
 
 <template>
-    <VSheet style="height: 100%; padding: 16px 32px 16px 16px; display: flex; flex-direction: column;">
-        <VLabel style="font-weight: bold; font-size: 2rem;">Thực đơn</VLabel>
+    <VSheet style="height: calc(100vh - 64px); padding: 16px 32px 16px 16px; display: flex; flex-direction: column;">
+        <VLabel class="flex-shrink-0" style="font-weight: bold; font-size: 2rem;">Thực đơn</VLabel>
 
         <VBtn width="fit-content" class="mt-4" color="primary" prepend-icon="mdi-plus" @click="handleAddNewMenuItem">Thêm món mới</VBtn>
 
         <VSpacer style="height: 16px; flex-shrink: 0; flex-grow: 0;" />
 
-        <VDataTableServer
+        <MLVbox style="flex-grow: 1; overflow: hidden;">
+            <VDataTableServer
+            sticky
             :items-length="totalCount"
             :loading="loading"
             loading-text="Đang tải dữ liệu..." 
             no-data-text="Không có dữ liệu" 
             items-per-page-text="Số bản ghi" 
             :headers="tableHeaders"
-            :items="dataList as MenuItem[]"
-            style="flex-grow: 1;"
+            :items="(dataList as MenuItem[])"
+            style="height: 100%;"
             :items-per-page-options="[10, 25, 50, 100]"
             :hover="true"
             v-model:options="options"
@@ -43,6 +45,7 @@
               </tr>
             </template>
         </VDataTableServer>
+        </MLVbox>
     </VSheet>
 </template>
 

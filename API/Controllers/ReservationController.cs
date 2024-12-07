@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace API.Controllers
 {
-    public class ReservationController : MLBaseController<MenuItem>
+    public class ReservationController : MLBaseController<Reservation>
     {
         public ReservationController(ApplicationDBContext context) : base(context)
         {
@@ -55,7 +55,7 @@ namespace API.Controllers
             {
                 result.Data = new
                 {
-                    Reservations = _context.Reservation.Where(r => r.Status == status).OrderBy(r => r.ReservationDate).Skip((page - 1) * itemsPerPage).Take(itemsPerPage).ToList(),
+                    Data = _context.Reservation.Where(r => r.Status == status).OrderBy(r => r.ReservationDate).Skip((page - 1) * itemsPerPage).Take(itemsPerPage).ToList(),
                     TotalCount = _context.Reservation.Count()
                 };
             }

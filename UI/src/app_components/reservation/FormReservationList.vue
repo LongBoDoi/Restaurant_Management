@@ -1,52 +1,56 @@
 <template>
-    <VSheet style="height: 100%; padding: 16px 32px 16px 16px; display: flex; flex-direction: column;">
-        <VLabel style="font-weight: bold; font-size: 2rem;">Đặt bàn</VLabel>
+    <VSheet style="height: calc(100vh - 64px); padding: 16px 32px 16px 16px; display: flex; flex-direction: column;">
+        <VLabel style="font-weight: bold; font-size: 2rem; flex-shrink: 0;">Đặt bàn</VLabel>
         
-        <VBtn width="fit-content" class="mt-4" color="primary" prepend-icon="mdi-plus" @click="handleAddNewReservation">Tạo đặt bàn</VBtn>
+        <VBtn width="fit-content" class="mt-4 flex-shrink-0" color="primary" prepend-icon="mdi-plus" @click="handleAddNewReservation">Tạo đặt bàn</VBtn>
 
         <VSpacer style="height: 16px; flex-shrink: 0; flex-grow: 0;" />
 
-        <VTabs color="primary" v-model="reservationStatus" @update:model-value="getReservations">
+        <VTabs class="flex-shrink-0" color="primary" v-model="reservationStatus" @update:model-value="getReservations">
             <VTab :value="EnumReservationStatus.Pending">Chờ xác nhận</VTab>
             <VTab :value="EnumReservationStatus.Active">Đang hoạt động</VTab>
             <VTab :value="EnumReservationStatus.Closed">Đã nhận</VTab>
         </VTabs>
 
-        <VDataTableServer
-            :items-length="totalCount"
-            :loading="loading"
-            loading-text="Đang tải dữ liệu..." 
-            no-data-text="Không có dữ liệu" 
-            items-per-page-text="Số bản ghi" 
-            :headers="[
-                {
-                    title: 'Khách hàng',
-                    value: 'CustomerName'
-                },
-                {
-                    title: 'Số điện thoại',
-                    value: 'CustomerPhoneNumber',
-                    width: 200
-                },
-                {
-                    title: 'Thời gian',
-                    value: 'ReservationDate',
-                    align: 'center',
-                    width: 250
-                },
-                {
-                    title: 'Trạng thái',
-                    value: 'Status',
-                    width: 250
-                }
-            ]"
-            :items="reservations"
-            style="flex-grow: 1;"
-            :items-per-page-options="[10, 25, 50, 100]"
-            :hover="true"
-            v-model:options="options"
-            @update:options="getReservations"
-        >
+        <VSpacer style="height: 16px; flex-shrink: 0; flex-grow: 0;" />
+
+        <MLVbox style="flex-grow: 1; overflow: hidden;">
+            <VDataTableServer
+                :sticky="true"
+                :items-length="totalCount"
+                :loading="loading"
+                loading-text="Đang tải dữ liệu..." 
+                no-data-text="Không có dữ liệu" 
+                items-per-page-text="Số bản ghi" 
+                :headers="[
+                    {
+                        title: 'Khách hàng',
+                        value: 'CustomerName'
+                    },
+                    {
+                        title: 'Số điện thoại',
+                        value: 'CustomerPhoneNumber',
+                        width: 200
+                    },
+                    {
+                        title: 'Thời gian',
+                        value: 'ReservationDate',
+                        align: 'center',
+                        width: 250
+                    },
+                    {
+                        title: 'Trạng thái',
+                        value: 'Status',
+                        width: 250
+                    }
+                ]"
+                :items="(dataList as Reservation[])"
+                style="height: 100%"
+                :items-per-page-options="[10, 25, 50, 100]"
+                :hover="true"
+                v-model:options="options"
+                @update:options="getReservations"
+            >
             <template v-slot:item="{ item, index }">
               <tr v-if="item !== null" style="cursor: pointer;" :class="{'selected-row': index === selectedIndex}" @click="setSelectedIndex(index)" @dblclick="handleOpenDetail">
                 <!-- <td>
@@ -63,11 +67,12 @@
               </tr>
             </template>
         </VDataTableServer>
+        </MLVbox>
     </VSheet>
 </template>
 
 <script lang="ts">
-import { EnumReservationStatus } from '@/common/Enumeration';
+import { EnumEditMode, EnumReservationStatus } from '@/common/Enumeration';
 import EventBus from '@/common/EventBus';
 import { Reservation } from '@/models';
 import { reservationStore } from '@/stores/reservationStore';
@@ -88,7 +93,7 @@ export default {
     },
 
     methods: {
-        ...mapActions(reservationStore, ['getReservationsData', 'setSelectedIndex']),
+        ...mapActions(reservationStore as any, ['getReservationsData', 'setSelectedIndex', 'addNewRecord']),
 
         /**
          * Lấy danh sách đặt bàn
@@ -100,15 +105,13 @@ export default {
         },
 
         handleAddNewReservation() {
-            const newReservation = {
-                ReservationDate: moment(new Date()).utc().format() as any,
-                EditMode: this.$enumeration.EnumEditMode.Add
+            let newReservation:Reservation = {
+                EditMode: EnumEditMode.Add
             } as Reservation;
-
-            if (this.reservationStatus === this.$enumeration.EnumReservationStatus.Active) {
-                this.reservations.push(newReservation);
-                this.setSelectedIndex(this.reservations.indexOf(newReservation));
+            if (this.reservationStatus === EnumReservationStatus.Active) {
+                newReservation = this.addNewRecord();
             }
+            newReservation.ReservationDate = moment(new Date()).utc().format() as any;
 
             EventBus.emit(this.$eventName.ShowFormReservationDetail, newReservation);
         },
@@ -136,7 +139,7 @@ export default {
         },
 
         handleOpenDetail() {
-            const selectedReservation = this.reservations[this.selectedIndex];
+            const selectedReservation = this.dataList[this.selectedIndex];
             selectedReservation.EditMode = this.$enumeration.EnumEditMode.Edit;
             
             EventBus.emit(this.$eventName.ShowFormReservationDetail, selectedReservation);
@@ -144,7 +147,7 @@ export default {
     },
 
     computed: {
-        ...mapState(reservationStore, ['reservations', 'totalCount', 'selectedIndex']),
+        ...mapState(reservationStore as any, ['dataList', 'totalCount', 'selectedIndex']),
 
         EnumReservationStatus() {
             return EnumReservationStatus;

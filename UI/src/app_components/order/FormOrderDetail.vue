@@ -11,7 +11,7 @@
                         <VBtn variant="plain" class="ml-auto" icon="mdi-close" @click="handleCloseDialog" />
                     </VCardTitle>
 
-                    <div style="flex-grow: 1;">
+                    <div style="flex-grow: 1; overflow: hidden;">
                         <VForm ref="form" style="height: 100%;">
                         <VTabsWindow v-model="tab" style="height: 100%;">
                             <VTabsWindowItem :value="0" style="height: 100%;">

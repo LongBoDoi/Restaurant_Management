@@ -9,7 +9,7 @@
             </div>
         </VCardText>
 
-        <div style="width: 100%; flex-grow: 1; padding: 0.625rem 1rem; display: flex; flex-direction: column;">
+        <div style="width: 100%; flex-grow: 1; padding: 0.625rem 1rem; display: flex; flex-direction: column; overflow: hidden;">
             <VDataTable
                 hide-default-footer
                 no-data-text="Không có dữ liệu" 
@@ -36,9 +36,10 @@
                     },
                 ]"
                 :items="order.OrderDetails"
-                style="width: 100%; flex-grow: 1;"
+                style="width: 100%; height: 100%;"
                 :items-per-page-options="[10, 25, 50, 100]"
                 :hover="true"
+                sticky
             >
                 <template v-slot:item="{ item, index }">
                     <tr v-if="item" style="cursor: pointer;">
@@ -53,17 +54,17 @@
             </VDataTable>
 
             <VDivider />
-
-            <MLHbox style="width: 100%; font-size: 1.25rem; padding: 0.5rem 0;">
-                <VSpacer />
-
-                <MLHbox style="flex-grow: 0.5;">
-                    <b>Tổng tiền:</b>
-                    <VSpacer />
-                    <b>{{ order.TotalAmount ?? 0 }} đ</b>
-                </MLHbox>
-            </MLHbox>
         </div>
+
+        <MLHbox style="width: 100%; font-size: 1.25rem; padding: 0.5rem 1rem;">
+            <VSpacer />
+
+            <MLHbox style="flex-grow: 0.5;">
+                <b>Tổng tiền:</b>
+                <VSpacer />
+                <b>{{ order.TotalAmount ?? 0 }} đ</b>
+            </MLHbox>
+        </MLHbox>
     </MLVbox>
 </template>
 

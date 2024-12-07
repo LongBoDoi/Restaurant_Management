@@ -27,9 +27,10 @@ namespace API.Controllers
 
             try
             {
+                var listData = _entities.AsNoTracking().Where(e => e.Role != EnumRole.Admin);
                 result.Data = new
                 {
-                    Data = _entities.AsNoTracking().Where(e => e.Role != EnumRole.Admin).Skip((page - 1) * itemsPerPage).Take(itemsPerPage).ToList().Select(e =>
+                    Data = listData.Skip((page - 1) * itemsPerPage).Take(itemsPerPage).ToList().Select(e =>
                     {
                         e.UserLogin = _context.UserLogin.AsNoTracking().FirstOrDefault(ul => ul.EmployeeID == e.EmployeeID);
                         if (e.UserLogin != null)
@@ -38,7 +39,7 @@ namespace API.Controllers
                         }
                         return e;
                     }),
-                    TotalCount = _entities.Count()
+                    TotalCount = listData.Count()
                 };
             }
             catch (Exception ex)

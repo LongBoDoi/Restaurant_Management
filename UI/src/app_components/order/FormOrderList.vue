@@ -52,6 +52,7 @@
                     v-model:options="options"
                     :items="dataList"
                     @update:options="getDataList"
+                    sticky
                 >
                     <template v-slot:headers />
                     <template v-slot:body>

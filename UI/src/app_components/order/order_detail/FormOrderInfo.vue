@@ -112,7 +112,7 @@
             <VDivider />
 
             <!-- Danh sách món -->
-            <div style="display: ruby; padding: 0.625rem 1rem;">
+            <div style="display: ruby; padding: 0.625rem 1rem; overflow-y: auto;">
                 <VCard @click="handleMenuItemClick(menu)" color="primary" v-for="menu in listMenu" min-width="150" width="22%" link class="mr-4 mb-4">
                     <VCardItem class="d-flex" style="flex-direction: column;">
                         <VIcon size="108" icon="mdi-noodles" />

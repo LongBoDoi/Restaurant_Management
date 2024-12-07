@@ -109,7 +109,7 @@ export default {
     },
 
     methods: {
-        ...mapActions(reservationStore, ['setSelectedIndex', 'removeSelectedRecord']),
+        ...mapActions(reservationStore as any, ['setSelectedIndex', 'removeSelectedRecord']),
 
         /**
          * Xử lý mở form
@@ -132,7 +132,7 @@ export default {
                     this.removeSelectedRecord();
                     break;
                 case this.$enumeration.EnumEditMode.Edit:
-                    this.reservations[this.selectedIndex] = this.oldReservation;
+                    this.dataList[this.selectedIndex] = this.oldReservation;
                     break;
             }
             this.isShow = false;
@@ -205,7 +205,9 @@ export default {
             if (!result) return false;
 
             if (result.Success) {
-                this.reservations[this.selectedIndex] = result.Data as Reservation;
+                if (this.dataList[this.selectedIndex]) {
+                    this.dataList[this.selectedIndex] = result.Data as Reservation;
+                }
                 EventBus.emit(this.$eventName.ShowToastMessage, {
                     Message: confirmMessage,
                     Type: 'success'
@@ -234,7 +236,7 @@ export default {
     },
 
     computed: {
-        ...mapState(reservationStore, ['reservations', 'selectedIndex']),
+        ...mapState(reservationStore as any, ['dataList', 'selectedIndex']),
 
         reservationStatusName() {
             switch (this.reservation.Status) {
