@@ -1,6 +1,7 @@
 import ChatbotConversationDetail from "./ChatbotConversationDetail";
+import MLEntity from "./MLEntity";
 
-interface ChatbotConversation {
+interface ChatbotConversation extends MLEntity {
     /// Khoá chính
     ConversationID: string,
 

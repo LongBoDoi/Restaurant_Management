@@ -45,6 +45,16 @@ namespace API.ML.BOBase
         /// Bảng đặt bàn
         /// </summary>
         public DbSet<Reservation> Reservation { get; set; }
+
+        /// <summary>
+        /// Bảng hội thoại
+        /// </summary>
+        public DbSet<ChatbotConversation> ChatbotConversation { get; set; }
+
+        /// <summary>
+        /// bảng tin nhắn hội thoại
+        /// </summary>
+        public DbSet<ChatbotConversationDetail> ChatbotConversationDetail { get; set; }
         #endregion
 
         public ApplicationDBContext(DbContextOptions<ApplicationDBContext> options)
@@ -104,11 +114,6 @@ namespace API.ML.BOBase
             modelBuilder.Entity<ChatbotConversation>(entity =>
             {
                 entity.HasOne(cc => cc.Customer).WithMany(c => c.ChatbotConversations).HasForeignKey(cc => cc.CustomerID);
-            });
-
-            modelBuilder.Entity<ChatbotConversationDetail>(entity =>
-            {
-                entity.HasOne(ccd => ccd.ChatbotConversation).WithMany(cc => cc.ChatbotConversationDetails).HasForeignKey(ccd => ccd.ConversationID);
             });
 
             modelBuilder.Entity<ChatbotConversationDetail>(entity =>

@@ -6,6 +6,8 @@ import random
 import re
 import random
 
+from requests_API import getMenuItems
+
 def tao_cau_hoi_dat_ban():
     """Tạo câu hỏi đặt bàn và thực thể liên quan (không có nhãn KHOẢNG_THỜI_GIAN)."""
     so_ban = random.randint(1, 5) if random.random() > 0.5 else None  # Có thể có số bàn hoặc không có
@@ -180,78 +182,21 @@ def tao_cau_hoi_trang_thai_order():
 
 def tao_cau_hoi_goi_mon():
     """Tạo câu hỏi gọi món và thực thể liên quan."""
-    mon_an = [
-    {"name": "Cơm chiên"},
-    {"name": "Phở bò"},
-    {"name": "Bún chả"},
-    {"name": "Bánh mì"},
-    {"name": "Gỏi cuốn"},
-    {"name": "Trà sữa"},
-    {"name": "Cà phê"},
-    {"name": "Bánh cuốn"},
-    {"name": "Bánh bao"},
-    {"name": "Bánh xèo"},
-    {"name": "Bánh tét"},
-    {"name": "Bánh đúc"},
-    {"name": "Bánh ướt"},
-    {"name": "Bánh chưng"},
-    {"name": "Bánh rán"},
-    {"name": "Bánh bột lọc"},
-    {"name": "Bánh bông lan"},
-    {"name": "Bánh cam"},
-    {"name": "Bánh nậm"},
-    {"name": "Bánh pía"},
-    {"name": "Bánh khọt"},
-    {"name": "Cháo gà"},
-    {"name": "Lẩu hải sản"},
-    {"name": "Chả giò"},
-    {"name": "Nem nướng"},
-    {"name": "Cơm tấm"},
-    {"name": "Sữa chua mít"},
-    {"name": "Chè thập cẩm"},
-    {"name": "Bún riêu"},
-    {"name": "Mì xào bò"},
-    {"name": "Soda chanh"},
-    {"name": "Súp cua"},
-    {"name": "Bánh canh cua"},
-    {"name": "Hủ tiếu Nam Vang"},
-    {"name": "Bò kho"},
-    {"name": "Bánh crepe"},
-    {"name": "Hamburger"},
-    {"name": "Khoai tây chiên"},
-    {"name": "Cơm gà Hải Nam"},
-    {"name": "Bánh flan"},
-    {"name": "Chè bắp"},
-    {"name": "Chè chuối"},
-    {"name": "Kem chiên"},
-    {"name": "Xúc xích nướng"},
-    {"name": "Pizza"},
-    {"name": "Cá viên chiên"},
-    {"name": "Há cảo"},
-    {"name": "Xíu mại"},
-    {"name": "Sinh tố"},
-    {"name": "Nước dừa"},
-    {"name": "Chả quế"},
-    {"name": "Bún cá"},
-    {"name": "Nem nướng Nha Trang"},
-    {"name": "Bún bò Huế"},
-    {"name": "Bánh mì nướng Lạng Sơn"},
-    {"name": "Phở cuốn"},
-    {"name": "Mì vằn thắn"},
-    {"name": "Bún riêu cua"},
-    {"name": "Sữa đậu"},
-    {"name": "Trà chanh"}
-]
-
-
+    mon_an = getMenuItems()
 
     so_luong_mon = random.randint(1, 4)
     mon_goi = random.sample(mon_an, so_luong_mon)
 
     # Tạo câu hỏi với danh sách món ăn và số lượng
-    cau_hoi_parts = [f"{random.randint(1, 3)} {mon['name']}" for mon in mon_goi]
-    cau_hoi_1 = f"Tôi muốn gọi {', '.join(cau_hoi_parts[:-1])} và {cau_hoi_parts[-1]}."
-    cau_hoi_2 = f"Cho tôi gọi {', '.join(cau_hoi_parts[:-1])} và {cau_hoi_parts[-1]}."
+    cau_hoi_parts = [f"{random.randint(1, 3)} {mon['Name']}" for mon in mon_goi]
+
+    if len(cau_hoi_parts) == 1:
+        strCauHoiPart = cau_hoi_parts[0]
+    else:
+        strCauHoiPart = f"{', '.join(cau_hoi_parts[:-1])} và {cau_hoi_parts[-1]}"
+
+    cau_hoi_1 = f"Tôi muốn gọi {strCauHoiPart}."
+    cau_hoi_2 = f"Cho tôi gọi {strCauHoiPart}."
     cau_hoi = random.choice([cau_hoi_1, cau_hoi_2])  # Sửa lại để chọn ngẫu nhiên giữa hai câu hỏi
     # Duyệt câu từ đầu đến cuối để xác định thực thể
     entities = []
@@ -357,6 +302,6 @@ def generate_ner_data(data_path, num_samples=5000):
 
 
 if __name__ == "__main__":
-    generate_ner_data("training_data.json", num_samples=50000) 
+    generate_ner_data("training_data.json", num_samples=50) 
     print("Dữ liệu đã được tạo.")
 

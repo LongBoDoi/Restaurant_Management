@@ -1,4 +1,5 @@
-﻿using API.ML.BO;
+﻿using AngleSharp.Dom;
+using API.ML.BO;
 using API.ML.BOBase;
 using API.ML.Common;
 using API.ML.Utility;
@@ -47,6 +48,37 @@ namespace API.Controllers
                     Data = itemsPerPage == -1 ? [.. _entities] : _entities.Skip((page - 1) * itemsPerPage).Take(itemsPerPage).ToList(),
                     TotalCount = _entities.Count()
                 };
+            }
+            catch (Exception ex)
+            {
+                CommonFunction.HandleException(ex, result, _context);
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Lấy dữ liệu theo ID
+        /// </summary>
+        /// <param name="page">Số trang</param>
+        /// <param name="itemsPerPage">Kích thước trang</param>
+        /// <returns></returns>
+        [Authorize]
+        [HttpGet("GetByID")]
+        public virtual MLActionResult GetByID(Guid ID)
+        {
+            MLActionResult result = new()
+            {
+                Success = true
+            };
+
+            try
+            {
+                var keyProperty = typeof(IMLEntity).GetProperties()
+                                                    .FirstOrDefault(prop => prop.GetCustomAttribute<KeyAttribute>() != null);
+
+                result.Data = _entities.FirstOrDefault(x => keyProperty != null && keyProperty.GetValue(x) != null && (Guid?)keyProperty.GetValue(x) == ID);
+                result.Success = result.Data != null;
             }
             catch (Exception ex)
             {

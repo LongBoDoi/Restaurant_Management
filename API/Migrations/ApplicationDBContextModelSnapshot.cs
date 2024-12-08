@@ -47,7 +47,7 @@ namespace API.Migrations
 
                     b.HasIndex("CustomerID");
 
-                    b.ToTable("ChatbotConversation");
+                    b.ToTable("ChatbotConversation", (string)null);
                 });
 
             modelBuilder.Entity("API.ML.BO.ChatbotConversationDetail", b =>
@@ -73,7 +73,7 @@ namespace API.Migrations
 
                     b.HasIndex("ConversationID");
 
-                    b.ToTable("ChatbotConversationDetail");
+                    b.ToTable("ChatbotConversationDetail", (string)null);
                 });
 
             modelBuilder.Entity("API.ML.BO.Customer", b =>
@@ -111,7 +111,7 @@ namespace API.Migrations
                     b.HasIndex("PhoneNumber")
                         .IsUnique();
 
-                    b.ToTable("Customer");
+                    b.ToTable("Customer", (string)null);
                 });
 
             modelBuilder.Entity("API.ML.BO.Employee", b =>
@@ -145,7 +145,7 @@ namespace API.Migrations
 
                     b.HasKey("EmployeeID");
 
-                    b.ToTable("Employee");
+                    b.ToTable("Employee", (string)null);
                 });
 
             modelBuilder.Entity("API.ML.BO.InventoryItem", b =>
@@ -176,7 +176,7 @@ namespace API.Migrations
 
                     b.HasKey("InventoryItemID");
 
-                    b.ToTable("InventoryItem");
+                    b.ToTable("InventoryItem", (string)null);
                 });
 
             modelBuilder.Entity("API.ML.BO.MenuItem", b =>
@@ -209,7 +209,7 @@ namespace API.Migrations
 
                     b.HasKey("MenuItemID");
 
-                    b.ToTable("MenuItem");
+                    b.ToTable("MenuItem", (string)null);
                 });
 
             modelBuilder.Entity("API.ML.BO.Order", b =>
@@ -251,7 +251,7 @@ namespace API.Migrations
 
                     b.HasIndex("CustomerID");
 
-                    b.ToTable("Order");
+                    b.ToTable("Order", (string)null);
                 });
 
             modelBuilder.Entity("API.ML.BO.OrderDetail", b =>
@@ -287,7 +287,7 @@ namespace API.Migrations
 
                     b.HasIndex("OrderID");
 
-                    b.ToTable("OrderDetail");
+                    b.ToTable("OrderDetail", (string)null);
                 });
 
             modelBuilder.Entity("API.ML.BO.Reservation", b =>
@@ -334,7 +334,7 @@ namespace API.Migrations
 
                     b.HasIndex("CustomerID");
 
-                    b.ToTable("Reservation");
+                    b.ToTable("Reservation", (string)null);
                 });
 
             modelBuilder.Entity("API.ML.BO.UserLogin", b =>
@@ -375,7 +375,7 @@ namespace API.Migrations
                     b.HasIndex("EmployeeID")
                         .IsUnique();
 
-                    b.ToTable("UserLogin");
+                    b.ToTable("UserLogin", (string)null);
                 });
 
             modelBuilder.Entity("API.ML.BO.ChatbotConversation", b =>

@@ -97,7 +97,7 @@ def check_menu_exists(entities_detected):
     for ent in entities_detected:
         if ent["label"] == "MÓN_ĂN":
             # Thực hiện truy vấn để kiểm tra món ăn
-            query = "SELECT COUNT(*) FROM Menu WHERE Name = %s"
+            query = "SELECT COUNT(*) FROM MenuItem WHERE Name = %s"
             result = execute_query(query, (ent["text"],))
             if result and result[0]['COUNT(*)'] > 0:
                 return True

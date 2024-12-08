@@ -29,7 +29,7 @@ namespace API.ML.BO
         /// <summary>
         /// Dữ liệu tin nhắn hội thoại
         /// </summary>
-        public IEnumerable<ChatbotConversationDetail>? ChatbotConversationDetails { get; set; }
+        public virtual ICollection<ChatbotConversationDetail> ChatbotConversationDetails { get; set; } = [];
 
         /// <summary>
         /// Dữ liệu khách hàng tạo đoạn hội thoại

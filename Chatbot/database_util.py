@@ -8,7 +8,7 @@ def connect_to_database():
     try:
         connection = mysql.connector.connect(
             host='localhost',        # Thay thế bằng host của bạn
-            database='chatbotdatabase',  # Thay thế bằng tên cơ sở dữ liệu của bạn
+            database='restaurant_management',  # Thay thế bằng tên cơ sở dữ liệu của bạn
             user='root',        # Thay thế bằng tên người dùng của bạn
             password='123456'   # Thay thế bằng mật khẩu của bạn
         )

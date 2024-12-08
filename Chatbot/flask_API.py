@@ -16,57 +16,14 @@ app.secret_key = '123456'  # Hoặc sử dụng chuỗi ngẫu nhiên
 # import os
 # app.secret_key = os.urandom(24)
 
-# Tạo mới conversationID và lưu vào cơ sở dữ liệu
-@app.route('/CreateNewConversation', methods=['POST'])
-def create_new_conversation():
-    conversation_id = str(uuid.uuid4())  # Tạo conversationID mới
-    
-    # Lấy thông tin topic, IsHelpful (ngẫu nhiên)
-    #topic, _, _ = tnm(model_path, user_input)  # Giả sử bạn có cách xác định topic mặc định
-    is_helpful = random.choice([True, False])
-        
-        # Lưu thông tin cuộc trò chuyện vào bảng ChatbotConversation
-    insert_query = """
-            INSERT INTO ChatbotConversation (ConversationID, Topic, IsHelpful)
-            VALUES (%s, %s, %s)
-    """
-    execute_query(insert_query, (conversation_id, None, is_helpful))
-    
-    return jsonify({
-        'Success': True,
-        'Data': {
-            'ConversationID': conversation_id,
-            'Topic': None,
-            'IsHelpful': False
-        }
-    })     
-        
-@app.route('/SendChatbotMessage', methods=['POST'])
-def sendNewMessage():
-    data = request.get_json()
-    conversation_id = data.get('ConversationID')
-    user_input = data.get('Message')
-
-    new_guid = str(uuid.uuid4())
-    data['ConversationDetailID']= new_guid
-
-    insert_detail_query = """
-            INSERT INTO ChatbotConversationDetail (ConversationDetailID, ConversationID, Sender, Message, Timestamp)
-            VALUES (%s, %s, %s, %s, now());
-        """
-    params = (new_guid, conversation_id, "1", user_input)
-    execute_query(insert_detail_query, params)
-
-    return jsonify({
-        'Success': True,
-        'Data': data
-    })
 
 @app.route('/GetNewChatbotResponse', methods=['GET'])
 def getNewChatbotResponse():
     # Nhận dữ liệu từ Vue.js
-    user_input = request.args.get('user_input', '')
-    conversation_id = request.args.get('conversation_id', '')
+    user_input = request.args.get('message', '')
+    conversation_id = request.args.get('conversationID', '')
+    print(user_input)
+    print(conversation_id)
     
     if not user_input:
         return jsonify({'error': 'Missing required parameters'}), 400
@@ -78,6 +35,7 @@ def getNewChatbotResponse():
 
         # Gọi hàm queryExecution với conversation_id
         result = queryExecution(user_input, conversation_id)
+        print(result)
         return jsonify({'Success': True, 'Data': result})
     
     except Exception as e:

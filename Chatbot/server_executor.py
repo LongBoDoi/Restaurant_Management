@@ -2,7 +2,7 @@ import mysql.connector
 from mysql.connector import Error
 import uuid
 from topic_classification import test_ner_model as tnm
-from datetime import datetime
+from datetime import datetime, timezone
 import random
 import json 
 from flask import session
@@ -153,7 +153,7 @@ def xu_ly_yeu_cau_goi_mon(mon_an, so_luong, special_request=None, updateStatus=T
 
         # Truy vấn giá của món ăn từ bảng Menu
         query = """
-        SELECT Price, MenuItemID, OutOfStock FROM Menu WHERE Name = %s
+        SELECT Price, MenuItemID, OutOfStock FROM MenuItem WHERE Name = %s
         """
         result = execute_query(query, param)
 
@@ -231,7 +231,7 @@ def queryExecution(user_input, conversation_id=None, customerID=None):
 
     # Hàm cục bộ để ghi thông điệp vào bảng ChatbotConversationDetail
     conversation_detail_id = str(uuid.uuid4())
-    timestamp = datetime.now()
+    timestamp = datetime.now(timezone.utc)
     def update_conversation_table(message, sender):
             insert_detail_query = """
             INSERT INTO ChatbotConversationDetail (ConversationDetailID, ConversationID, Sender, Message, Timestamp)

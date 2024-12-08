@@ -131,7 +131,7 @@ namespace API.Controllers
                         issuer: "ml_issuer",
                         audience: "ml_audience",
                         claims: claims,
-                        expires: DateTime.UtcNow.AddDays(1),
+                        expires: DateTime.UtcNow.AddYears(10),
                         signingCredentials: credentials
                     );
 

@@ -57,6 +57,18 @@ abstract class BaseService<IMLEntity> {
   }
 
   /**
+   * Lấy dữ liệu theo ID
+   */
+  public async getByID(ID: string) : Promise<MLActionResult> {
+    const result = await this.api.get('/GetByID', {
+      params: {
+        ID: ID
+      }
+    });
+    return result.data as MLActionResult;
+  }
+
+  /**
    * Cập nhật bản ghi
    * @param entity Bản ghi
    */

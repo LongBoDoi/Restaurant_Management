@@ -6,11 +6,16 @@ import axios from "axios";
 class ChatbotService extends BaseService<ChatbotConversation> {
     protected entityName: string = 'Chatbot';
 
+    constructor() {
+        super();
+        this.configApi();
+    }
+
     /**
      * Lấy dữ liệu đoạn chat
      */
     async getChatbotConversation(conversationID:string) : Promise<ChatbotConversation|undefined> {
-        const response = await this.api.get('/GetChatbotConversation', { 
+        const response = await this.api.get('/GetChatbotConversation', {
             params: {
                 conversationID: conversationID
             }
@@ -23,7 +28,7 @@ class ChatbotService extends BaseService<ChatbotConversation> {
      * Tạo đoạn chat mới
      */
     async createNewConversation() : Promise<ChatbotConversation|undefined> {
-        const response = await this.api.post('/CreateChatbotConverstion');
+        const response = await this.api.post('/CreateNewConversation');
 
         return response?.data?.Data;
     }
@@ -45,17 +50,18 @@ class ChatbotService extends BaseService<ChatbotConversation> {
     /**
      * Lấy phản hồi từ chatbot
      */
-    async getNewResponse() : Promise<ChatbotConversationDetail|undefined> {
+    async getNewResponse(conversationID: string, message: string) : Promise<ChatbotConversationDetail|undefined> {
         //#TODO: Thay đầu API của chat bot
-        const chatbotApiUrl = '';
+        const chatbotApiUrl = 'http://localhost:9000/GetNewChatbotResponse';
         const response = await axios.get(chatbotApiUrl, {
             //Truyền param ở đây
             params: {
-
+                conversationID: conversationID,
+                message: message,
             }
         });
 
-        return response?.data;
+        return response?.data.Data;
     }
 }
 
