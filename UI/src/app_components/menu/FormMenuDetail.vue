@@ -180,10 +180,6 @@ export default {
                     Message: confirmMessage,
                     Type: 'success'
                 });
-
-                if (this.menuItem.EditMode === this.$enumeration.EnumEditMode.Add) {
-                    this.$service.ChatbotService.generateNewTrainingData();
-                }
             } else {
                 EventBus.emit(this.$eventName.ShowToastMessage, {
                     Message: result.ErrorMsg,

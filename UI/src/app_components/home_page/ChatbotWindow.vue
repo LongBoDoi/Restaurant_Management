@@ -83,7 +83,6 @@ import { ChatbotConversation, ChatbotConversationDetail } from '@/models';
 
 export default {
     async created() {
-        debugger
         const chatbotConversationID = sessionStorage.getItem('chatbotConversationID');
         if (chatbotConversationID) {
             this.conversation = await this.$service.ChatbotService.getChatbotConversation(chatbotConversationID);

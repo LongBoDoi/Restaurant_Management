@@ -302,6 +302,6 @@ def generate_ner_data(data_path, num_samples=5000):
 
 
 if __name__ == "__main__":
-    generate_ner_data("training_data.json", num_samples=50) 
+    generate_ner_data("training_data.json", num_samples=50000)
     print("Dữ liệu đã được tạo.")
 
