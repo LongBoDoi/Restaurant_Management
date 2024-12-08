@@ -34,8 +34,8 @@ class CommonFunction {
         if (noTimeZone) {
             return moment(date).format('HH:mm');
         }
-        const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-        return moment((moment(date).tz(timeZone) as any)._d).format('HH:mm');
+
+        return moment.utc(date).local().format('HH:mm');
     };
 
     /**

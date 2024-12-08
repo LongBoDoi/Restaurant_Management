@@ -25,4 +25,27 @@ namespace API.ML.BOBase
         /// </summary>
         public EnumApplicationErrorCode? ErrorCode { get; set; }
     }
+
+    public class MLActionResult<IMLEntity> where IMLEntity : MLEntity
+    {
+        /// <summary>
+        /// Có thành công không
+        /// </summary>
+        public bool Success { get; set; }
+
+        /// <summary>
+        /// Dữ liệu trả về
+        /// </summary>
+        public IMLEntity? Data { get; set; }
+
+        /// <summary>
+        /// Thông tin lỗi
+        /// </summary>
+        public string? ErrorMsg { get; set; }
+
+        /// <summary>
+        /// Mã lỗi
+        /// </summary>
+        public EnumApplicationErrorCode? ErrorCode { get; set; }
+    }
 }

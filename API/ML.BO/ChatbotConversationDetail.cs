@@ -1,9 +1,10 @@
-﻿using API.ML.Common;
+﻿using API.ML.BOBase;
+using API.ML.Common;
 using System.ComponentModel.DataAnnotations;
 
 namespace API.ML.BO
 {
-    public class ChatbotConversationDetail
+    public class ChatbotConversationDetail : MLEntity
     {
         /// <summary>
         /// Khoá chính

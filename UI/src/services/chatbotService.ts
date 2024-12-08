@@ -1,7 +1,6 @@
 import { ChatbotConversation, ChatbotConversationDetail } from "@/models";
 import BaseService from "./baseService";
 import { EnumChatbotSender } from "@/common/Enumeration";
-import axios from "axios";
 
 class ChatbotService extends BaseService<ChatbotConversation> {
     protected entityName: string = 'Chatbot';
@@ -44,6 +43,7 @@ class ChatbotService extends BaseService<ChatbotConversation> {
         } as ChatbotConversationDetail;
 
         const response = await this.api.post('/SendChatbotMessage', detail);
+        debugger
         return response?.data?.Data;
     }
 
@@ -52,12 +52,10 @@ class ChatbotService extends BaseService<ChatbotConversation> {
      */
     async getNewResponse(conversationID: string, message: string) : Promise<ChatbotConversationDetail|undefined> {
         //#TODO: Thay đầu API của chat bot
-        const chatbotApiUrl = 'http://localhost:9000/GetNewChatbotResponse';
-        const response = await axios.get(chatbotApiUrl, {
-            //Truyền param ở đây
+        const response = await this.api.get('/GetNewChatbotResponse', {
             params: {
                 conversationID: conversationID,
-                message: message,
+                message: message
             }
         });
 

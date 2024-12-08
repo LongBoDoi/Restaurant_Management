@@ -3,14 +3,18 @@ using API.ML.BOBase;
 using API.ML.Utility;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using MySqlX.XDevAPI;
 using Newtonsoft.Json;
 
 namespace API.Controllers
 {
     public class ChatbotController : MLBaseController<ChatbotConversation>
     {
-        public ChatbotController(ApplicationDBContext context) : base(context)
+        private HttpClient _httpClient;
+
+        public ChatbotController(ApplicationDBContext context, HttpClient client) : base(context)
         {
+            _httpClient = client;
         }
 
         [HttpGet("GetChatbotConversation")]
@@ -26,7 +30,7 @@ namespace API.Controllers
                 ChatbotConversation? conversation = _context.ChatbotConversation.AsNoTracking().FirstOrDefault(cc => cc.ConversationID == conversationID);
                 if (conversation != null)
                 {
-                    var details = _context.ChatbotConversationDetail.AsNoTracking().Where(ccd => ccd.ConversationID == conversationID).ToList();
+                    var details = _context.ChatbotConversationDetail.AsNoTracking().Where(ccd => ccd.ConversationID == conversationID).OrderBy(ccd => ccd.Timestamp).ToList();
                     conversation.ChatbotConversationDetails = details;
                     result.Data = conversation;
                 }
@@ -34,6 +38,27 @@ namespace API.Controllers
             catch (Exception ex)
             {
                 CommonFunction.HandleException(ex, result, _context);
+            }
+
+            return result;
+        }
+
+        [HttpGet("GetNewChatbotResponse")]
+        public async Task<MLActionResult<ChatbotConversationDetail>> GetNewChatbotResponse(Guid conversationID, string message)
+        {
+            MLActionResult<ChatbotConversationDetail> result = new();
+
+            try
+            {
+                HttpResponseMessage response = await _httpClient.GetAsync($"http://127.0.0.1:9000/GetNewChatbotResponse?conversationID={conversationID}&message={message}");
+                response.EnsureSuccessStatusCode();
+
+                return JsonConvert.DeserializeObject<MLActionResult<ChatbotConversationDetail>>(await response.Content.ReadAsStringAsync()) ?? result;
+            }
+            catch (Exception ex)
+            {
+                result.Success = false;
+                result.ErrorMsg = ex.Message;
             }
 
             return result;
