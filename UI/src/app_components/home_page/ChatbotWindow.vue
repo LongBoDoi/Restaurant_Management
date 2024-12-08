@@ -71,7 +71,7 @@
         <VDivider />
 
         <VCardActions style="flex-shrink: 0;">
-            <VTextField ref="txtMessage" :disabled="waitingRequest" v-model:model-value="messageInput" @keypress.enter="sendNewMessage" density="compact" variant="outlined" hide-details rounded placeholder="Nhập tin nhắn..." />
+            <VTextField ref="txtMessage" :disabled="waitingRequest" v-model:model-value="messageInput" @keyup.enter="sendNewMessage" density="compact" variant="outlined" hide-details rounded placeholder="Nhập tin nhắn..." />
             <VIcon :disabled="waitingRequest" @click="sendNewMessage" icon="mdi-send" color="primary" />
         </VCardActions>
     </VCard>
@@ -86,19 +86,19 @@ export default {
         const chatbotConversationID = sessionStorage.getItem('chatbotConversationID');
         if (chatbotConversationID) {
             this.conversation = await this.$service.ChatbotService.getChatbotConversation(chatbotConversationID);
-
-            //Nếu chưa có đoạn hội thoại trước đó thì tạo đoạn hội thoại mới
-            if (!this.conversation) {
-                this.conversation = await this.$service.ChatbotService.createNewConversation();
-                if (!this.conversation) return;
-
-                sessionStorage.setItem('chatbotConversationID', this.conversation.ConversationID);
-            }
-
-            this.$nextTick(() => {
-                this.scrollToBottom();
-            });
         }
+
+        //Nếu chưa có đoạn hội thoại trước đó thì tạo đoạn hội thoại mới
+        if (!this.conversation) {
+            this.conversation = await this.$service.ChatbotService.createNewConversation();
+            if (!this.conversation) return;
+
+            sessionStorage.setItem('chatbotConversationID', this.conversation.ConversationID);
+        }
+
+        this.$nextTick(() => {
+            this.scrollToBottom();
+        });
     },
 
     data() {
@@ -129,7 +129,6 @@ export default {
          * Gửi tin nhắn mới
          */
         async sendNewMessage() {
-            debugger
             if (this.messageInput && this.conversation) {
                 this.waitingRequest = true;
 
