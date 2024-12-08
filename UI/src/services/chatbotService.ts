@@ -43,7 +43,6 @@ class ChatbotService extends BaseService<ChatbotConversation> {
         } as ChatbotConversationDetail;
 
         const response = await this.api.post('/SendChatbotMessage', detail);
-        debugger
         return response?.data?.Data;
     }
 

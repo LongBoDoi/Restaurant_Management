@@ -58,7 +58,7 @@ namespace API.Controllers
             catch (Exception ex)
             {
                 result.Success = false;
-                result.ErrorMsg = ex.Message;
+                result.ErrorMsg = ex.ToString();
             }
 
             return result;
