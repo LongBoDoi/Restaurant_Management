@@ -2,14 +2,15 @@ import mysql.connector
 from mysql.connector import Error
 import uuid
 from topic_classification import test_ner_model as tnm
-from datetime import datetime, timezone
+from datetime import datetime
 import random
 import json 
+import math
 from flask import session
 from database_util import execute_query, connect_to_database
 # Đường dẫn đến dữ liệu huấn luyện và mô hình NER
-data_path = 'training_data.json'
-model_path = "ner_model_sample"
+data_path = 'ner_training_data.json'
+model_path = "ner_model"
 
 # Kết nối cơ sở dữ liệu MySQL
 
@@ -23,12 +24,12 @@ def xu_ly_hoi_thoai_dat_ban(entities, miss_info):
         return None, f"Đề nghị bạn đặt bàn theo cú pháp: Tôi muốn đặt x bàn lúc y giờ ngày m tháng n. Thiếu thông tin: {', '.join(miss_info)}"
 
     # Duyệt qua các thực thể để trích xuất thông tin
-    so_ban = gio = ngay = thang = None
+    so_nguoi = gio = ngay = thang = None
     for entity in entities:
         label = entity['label']
         text = entity['text']
-        if label == 'SỐ_BÀN':
-            so_ban = int(text)
+        if label == 'SỐ_NGƯỜI':
+            so_nguoi = int(text)
         elif label == 'GIỜ':
             gio = int(text)
         elif label == 'NGÀY':
@@ -37,13 +38,13 @@ def xu_ly_hoi_thoai_dat_ban(entities, miss_info):
             thang = int(text)
 
     # Kiểm tra thông tin có đầy đủ không
-    if not all([so_ban, gio, ngay, thang]):
+    if not all([so_nguoi, gio, ngay, thang]):
         return None, "Thông tin không đầy đủ. Đề nghị bạn kiểm tra lại cú pháp đặt bàn."
 
-    return (so_ban, gio, ngay, thang), None
+    return (so_nguoi, gio, ngay, thang), None
 
 
-def xu_ly_yeu_cau_dat_ban(so_ban, gio, ngay, thang, note=None, customer_id=None, updateStatus=True):
+def xu_ly_yeu_cau_dat_ban(so_nguoi, gio, ngay, thang, note=None, customer_id=None, updateStatus=True):
     """
     Xử lý yêu cầu đặt bàn, kiểm tra bàn trống, và thêm thông tin đặt bàn mà không cần quản lý số bàn (reservationInfo).
     """
@@ -72,7 +73,7 @@ def xu_ly_yeu_cau_dat_ban(so_ban, gio, ngay, thang, note=None, customer_id=None,
     if result:
         so_ban_da_dat = result[0]['so_ban_su_dung']
         so_ban_con_lai = TOTAL_TABLES - so_ban_da_dat
-
+        so_ban = math.ceil(so_nguoi / 6)
         if so_ban_con_lai >= so_ban:
             if updateStatus:
                 # Thêm thông tin đặt bàn một lần
@@ -153,7 +154,7 @@ def xu_ly_yeu_cau_goi_mon(mon_an, so_luong, special_request=None, updateStatus=T
 
         # Truy vấn giá của món ăn từ bảng Menu
         query = """
-        SELECT Price, MenuItemID, OutOfStock FROM MenuItem WHERE Name = %s
+        SELECT Price, MenuItemID, OutOfStock FROM Menu WHERE Name = %s
         """
         result = execute_query(query, param)
 
@@ -209,6 +210,61 @@ def xu_ly_yeu_cau_goi_mon(mon_an, so_luong, special_request=None, updateStatus=T
 
     return f"Đặt món thành công. Tổng đơn hàng là {sum_don_hang:.2f} VND."
 
+def xu_ly_hoi_thoai_goi_y(entities):
+    the_loai = []  # Khởi tạo là danh sách rỗng
+    gia = []       # Khởi tạo là danh sách rỗng
+    
+    if not entities:  # Kiểm tra nếu không có thực thể nào
+        return [], "Bạn hãy nhập lại yêu cầu"
+
+    for entity in entities:
+        if entity['label'] == 'THỂ_LOẠI':
+            the_loai.append(entity['text'])
+        elif entity['label'] == 'GIÁ':
+            gia.append(int(entity['text']))
+
+    # Trả về kết quả với cả thể loại và giá nếu có
+    result = {}
+    
+    result['the_loai'] = the_loai
+    result['gia'] = gia
+
+
+    # Kiểm tra nếu không có thông tin nào được xác định
+    if not result:
+        return [], "Không tìm thấy thông tin cụ thể trong yêu cầu của bạn."
+
+    return result, None
+
+def xu_ly_yeu_cau_goi_y(the_loai, gia):
+    category_mapping = {
+        "món chính": "Main Course",
+        "khai vị": "Appetizer",
+        "đồ uống": "Beverage",
+        "tráng miệng": "Dessert",
+    }
+    mapped_category = category_mapping.get(the_loai, the_loai)
+    if gia and the_loai:
+        query = "SELECT Name FROM MENU WHERE PRICE <= %s and Category = %s"
+        param = (gia,mapped_category)
+        result = execute_query(query,param)
+    elif the_loai:
+        query = "SELECT Name FROM MENU WHERE Category = %s"
+        param = (mapped_category,)
+        result = execute_query(query,param)
+    elif gia:
+        query = "SELECT Name FROM MENU WHERE PRICE <= %s"
+        param = (gia,)
+        result = execute_query(query,param)
+    
+    if result == None:
+        return "Trong thực đơn không có món nào như vậy"
+    response = "Đây là một số món ăn theo yêu cầu của bạn: "
+    for item in result:
+        response = response + item['Name'] + ", "
+    return response
+
+    
 def queryExecution(user_input, conversation_id=None, customerID=None):
     """
     Hàm xử lý hội thoại chatbot và trả về toàn bộ chi tiết hội thoại:
@@ -231,7 +287,7 @@ def queryExecution(user_input, conversation_id=None, customerID=None):
 
     # Hàm cục bộ để ghi thông điệp vào bảng ChatbotConversationDetail
     conversation_detail_id = str(uuid.uuid4())
-    timestamp = datetime.now(timezone.utc)
+    timestamp = datetime.now()
     def update_conversation_table(message, sender):
             insert_detail_query = """
             INSERT INTO ChatbotConversationDetail (ConversationDetailID, ConversationID, Sender, Message, Timestamp)
@@ -270,7 +326,23 @@ def queryExecution(user_input, conversation_id=None, customerID=None):
             mon_an = result["mon_an"]
             so_luong = result["so_luong"]
             response = xu_ly_yeu_cau_goi_mon(mon_an, so_luong)
+    elif topic == "gợi ý món ăn":
+        result,error_message = xu_ly_hoi_thoai_goi_y(entities)
+        if error_message:
+            response = error_message
+        elif result:
+            the_loai = result.get('the_loai', [])
+            gia = result.get('gia', [])
+            if the_loai:
+                the_loai_value = the_loai[0]  # Lấy phần tử đầu tiên nếu có
+            else:
+                the_loai_value = None  # Hoặc một giá trị mặc định khác
 
+            if gia:
+                gia_value = gia[0]  # Lấy phần tử đầu tiên nếu có
+            else:
+                gia_value = None
+            response = xu_ly_yeu_cau_goi_y(the_loai_value,gia_value)
     else:
         response = "Hiện tại tôi chưa hỗ trợ chủ đề này. Vui lòng thử lại." 
 
@@ -290,21 +362,22 @@ def queryExecution(user_input, conversation_id=None, customerID=None):
 
 def main():
      # Giả sử có thông tin gọi món từ người dùng
-    user_input = "Tôi muốn đặt 3 bàn lúc 15 giờ ngày 3 tháng 12"
+    user_input = "gọi 1 bún cá, 1 bánh ướt"
+    #user_input = "gợi ý món ăn tráng miệng" #giá dưới 35000 đồng"
     topic, entities, miss_info = tnm(model_path,user_input)
+    result, err_mess = xu_ly_hoi_thoai_goi_y(entities)
+    the_loai = result.get('the_loai', [])
+    gia = result.get('gia', [])
+    if the_loai:
+        the_loai_value = the_loai[0]  # Lấy phần tử đầu tiên nếu có
+    else:
+        the_loai_value = None  # Hoặc một giá trị mặc định khác
+
+    if gia:
+        gia_value = gia[0]  # Lấy phần tử đầu tiên nếu có
+    else:
+        gia_value = None
     print(queryExecution(user_input))
-    #result, error_message = xu_ly_hoi_thoai_dat_ban(entities,miss_info)
-    #so_ban, gio, ngay , thang = result
-    #print(xu_ly_yeu_cau_dat_ban(so_ban,gio,ngay,thang))
-    #print(topic,entities,miss_info)
-    #print(queryExecution(user_input))
-    #print(xu_ly_hoi_thoai_dat_ban(entities,miss_info))
-    #response_order = queryExecution(user_input)
-    #queryExecution(user_query_order)
-    #print(response_order)
-    #result, error_message = xu_ly_hoi_thoai_order(entities)
-    #print(result['mon_an'])
-    #print(an)
 
 if __name__ == "__main__":
     main()
