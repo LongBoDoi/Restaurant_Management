@@ -1,0 +1,40 @@
+{
+  "lang":"vi",
+  "name":"pipeline",
+  "version":"0.0.0",
+  "spacy_version":">=3.8.2,<3.9.0",
+  "description":"",
+  "author":"",
+  "email":"",
+  "url":"",
+  "license":"",
+  "spacy_git_version":"63f1b53",
+  "vectors":{
+    "width":0,
+    "vectors":0,
+    "keys":0,
+    "name":null,
+    "mode":"default"
+  },
+  "labels":{
+    "ner":[
+      "GI\u00c1",
+      "GI\u1edc",
+      "M\u00d3N_\u0102N",
+      "NG\u00c0Y",
+      "S\u1ed0_L\u01af\u1ee2NG",
+      "S\u1ed0_NG\u01af\u1edcI",
+      "TH\u00c1NG",
+      "TH\u1ec2_LO\u1ea0I"
+    ]
+  },
+  "pipeline":[
+    "ner"
+  ],
+  "components":[
+    "ner"
+  ],
+  "disabled":[
+
+  ]
+}
