@@ -30,9 +30,11 @@ export default {
       this.isLoading = false;
     }
 
-    if (result?.Success) {
+    if (result?.Data) {
       Object.assign(this.$session, result.Data);
+    }
 
+    if (result?.Success) {
       if (result.Data.UserType === EnumUserType.Employee && window.location.pathname === '/') {
         this.$router.replace({name: '/management'});
       }
@@ -66,51 +68,4 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-:deep() {
-  .v-application {
-    --primary-color-dark: #8c949a;
-
-    --primary-color-darker: #717a82;
-
-    --border-color: #C3C3C3;
-
-    --normal-font-size: 16px;
-
-    --big-font-size: 25px;
-
-    --bigger-font-size: 40px;
-  }
-
-  .v-application.v-theme--dark {
-
-    --primary-color-dark: #5a6166;
-
-    --primary-color-darker: #727a81;
-
-    color: rgba(255, 255, 255, 0.7);
-
-    .v-card-title, .v-card-item {
-      color: rgba(255, 255, 255, 0.7);
-    }
-  }
-
-  .v-skeleton-loader {
-    background-color: transparent;
-
-    .v-skeleton-loader__ossein {
-      background-color: rgb(var(--v-theme-primary));
-    }
-  }
-
-  .v-label {
-    cursor: inherit;
-    opacity: 1;
-  }
-
-  .v-radio-group {
-    .v-input__details {
-      display: none;
-    }
-  }
-}
 </style>

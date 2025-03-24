@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace API.Migrations
 {
     [DbContext(typeof(ApplicationDBContext))]
-    [Migration("20241207222701_Update081224")]
-    partial class Update081224
+    [Migration("20250316101339_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -62,9 +62,15 @@ namespace API.Migrations
                     b.Property<Guid>("ConversationID")
                         .HasColumnType("char(36)");
 
+                    b.Property<DateTime?>("CreatedDate")
+                        .HasColumnType("datetime(6)");
+
                     b.Property<string>("Message")
                         .IsRequired()
                         .HasColumnType("longtext");
+
+                    b.Property<DateTime?>("ModifiedDate")
+                        .HasColumnType("datetime(6)");
 
                     b.Property<int>("Sender")
                         .HasColumnType("int");
@@ -128,7 +134,7 @@ namespace API.Migrations
 
                     b.Property<string>("EmployeeCode")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("varchar(255)");
 
                     b.Property<string>("EmployeeName")
                         .IsRequired()
@@ -148,7 +154,19 @@ namespace API.Migrations
 
                     b.HasKey("EmployeeID");
 
+                    b.HasIndex("EmployeeCode")
+                        .IsUnique();
+
                     b.ToTable("Employee");
+
+                    b.HasData(
+                        new
+                        {
+                            EmployeeID = new Guid("d0929aef-1a5b-44f6-962d-01f7f9bb2b2b"),
+                            EmployeeCode = "admin",
+                            EmployeeName = "Admin",
+                            Role = 0
+                        });
                 });
 
             modelBuilder.Entity("API.ML.BO.InventoryItem", b =>
@@ -340,6 +358,103 @@ namespace API.Migrations
                     b.ToTable("Reservation");
                 });
 
+            modelBuilder.Entity("API.ML.BO.Setting", b =>
+                {
+                    b.Property<Guid>("SettingID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
+
+                    b.Property<DateTime?>("CreatedDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<int>("DataType")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("ModifiedDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("SettingKey")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<string>("SettingValue")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.HasKey("SettingID");
+
+                    b.HasIndex("SettingKey")
+                        .IsUnique();
+
+                    b.ToTable("Setting");
+
+                    b.HasData(
+                        new
+                        {
+                            SettingID = new Guid("06005218-029d-4040-9332-62e2e5dcb597"),
+                            DataType = 1,
+                            SettingKey = "IntroImageUrl",
+                            SettingValue = ""
+                        },
+                        new
+                        {
+                            SettingID = new Guid("0b10c89c-7b7c-4f98-8828-1d07dffd2f73"),
+                            DataType = 1,
+                            SettingKey = "RestaurantName",
+                            SettingValue = ""
+                        },
+                        new
+                        {
+                            SettingID = new Guid("3f07e912-5330-405d-9679-1d17f9b2eff4"),
+                            DataType = 1,
+                            SettingKey = "RestaurantAddress",
+                            SettingValue = ""
+                        },
+                        new
+                        {
+                            SettingID = new Guid("401ef8c2-370c-470e-ad71-9924a85d18ff"),
+                            DataType = 1,
+                            SettingKey = "RestaurantSlogan",
+                            SettingValue = ""
+                        },
+                        new
+                        {
+                            SettingID = new Guid("43e2553a-5a18-4258-8c14-1852564fb309"),
+                            DataType = 3,
+                            SettingKey = "DisplayMenuScreenForCustomer",
+                            SettingValue = "true"
+                        },
+                        new
+                        {
+                            SettingID = new Guid("5ac03c72-3e46-4f70-9b5f-3160c9ee2327"),
+                            DataType = 2,
+                            SettingKey = "DisplayMenuScreenForCustomerType",
+                            SettingValue = "0"
+                        },
+                        new
+                        {
+                            SettingID = new Guid("b9ea5327-bbda-4f44-ba55-ccf02ed1b7ff"),
+                            DataType = 2,
+                            SettingKey = "DisplayMenuScreenByItemsForCustomerType",
+                            SettingValue = "0"
+                        },
+                        new
+                        {
+                            SettingID = new Guid("d69a097b-f337-4521-a302-d9ed9a876a5e"),
+                            DataType = 1,
+                            SettingKey = "ListMenuScreenForCustomerItems",
+                            SettingValue = "[]"
+                        },
+                        new
+                        {
+                            SettingID = new Guid("f10e0c45-17d3-4715-802e-30a5b5abc14c"),
+                            DataType = 3,
+                            SettingKey = "DisplayBookingScreenForCustomer",
+                            SettingValue = "true"
+                        });
+                });
+
             modelBuilder.Entity("API.ML.BO.UserLogin", b =>
                 {
                     b.Property<Guid>("UserLoginID")
@@ -379,6 +494,16 @@ namespace API.Migrations
                         .IsUnique();
 
                     b.ToTable("UserLogin");
+
+                    b.HasData(
+                        new
+                        {
+                            UserLoginID = new Guid("8b59dd9f-72d8-4d01-a971-03bc98c2262f"),
+                            EmployeeID = new Guid("d0929aef-1a5b-44f6-962d-01f7f9bb2b2b"),
+                            Password = "123456",
+                            Token = "",
+                            Username = "admin"
+                        });
                 });
 
             modelBuilder.Entity("API.ML.BO.ChatbotConversation", b =>

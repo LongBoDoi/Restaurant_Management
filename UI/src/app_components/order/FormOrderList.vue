@@ -1,7 +1,7 @@
 <!-- Màn danh sách khách hàng -->
 
 <template>
-    <VSheet style="height: calc(100vh - 64px); padding: 16px 32px 16px 16px; display: flex; flex-direction: column;">
+    <VSheet style="display: flex; flex-direction: column;">
         <div style="flex-shrink: 0;" class="d-flex flex-column">
         <VLabel style="font-weight: bold; font-size: 2rem;">Order</VLabel>
 

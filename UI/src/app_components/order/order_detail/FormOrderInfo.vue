@@ -38,7 +38,7 @@
 
         <VSpacer />
 
-        <VTextField density="compact" variant="outlined" prepend-inner-icon="mdi-magnify" max-width="300" hide-details placeholder="Nhập tên món..." v-model:model-value="txtSearch" @update:model-value="selectedMenuCategory = undefined" />
+        <VTextField density="compact" variant="outlined" prepend-inner-icon="mdi-magnify" max-width="300" hide-details placeholder="Nhập tên món..." v-model:model-value="txtSearch" @update:model-value="selectedMenuCategory = ''" />
     </MLHbox>
 
     <MLHbox style="flex-grow: 1; padding: 0.625rem 1rem; overflow: hidden;">
@@ -94,16 +94,16 @@
             <VSheet color="secondary" style="padding: 0.625rem;">
                 <VSlideGroup v-model:model-value="selectedMenuCategory">
                     <VSlideGroupItem
-                        v-for="category, index in listMenuCategory"
+                        v-for="category, index in listMenuItemCategory"
                         :key="index"
                     >
                         <v-btn
-                            :color="category.Value === selectedMenuCategory ? 'primary' : undefined"
+                            :color="category.MenuItemCategoryID === selectedMenuCategory ? 'primary' : undefined"
                             class="ma-2"
                             rounded
-                            @click="selectedMenuCategory = category.Value"
+                            @click="selectedMenuCategory = category.MenuItemCategoryID"
                         >
-                            {{ category.Text }}
+                            {{ category.MenuItemCategoryName }}
                         </v-btn>
                     </VSlideGroupItem>
                 </VSlideGroup>
@@ -131,9 +131,8 @@
 </template>
 
 <script lang="ts">
-import { EnumMenuItemCategory } from '@/common/Enumeration';
 import EventBus from '@/common/EventBus';
-import { Customer, MenuItem, MLActionResult, Order } from '@/models';
+import { Customer, MenuItem, MenuItemCategory, Order } from '@/models';
 import OrderDetail from '@/models/OrderDetail';
 import { PropType } from 'vue';
 
@@ -141,6 +140,9 @@ export default {
     created() {
         this.getListCustomer();
         this.getListMenuItem();
+        this.$service.MenuItemCategoryService.getAll().then((data:any) => {
+            this.listMenuItemCategory = data;
+        })
 
         if (this.record.Customer) {
             this.selectedCustomer = this.record.Customer;
@@ -170,35 +172,16 @@ export default {
             loadingMenu: <boolean>false,
             allMenuItems: <MenuItem[]>[],
 
-            selectedMenuCategory: <EnumMenuItemCategory|undefined>undefined,
+            listMenuItemCategory: <MenuItemCategory[]>[],
+
+            selectedMenuCategory: <string>'',
             txtSearch: <string>'',
         }
     },
 
     computed: {
-        listMenuCategory() {
-            return [
-                {
-                    Text: 'Khai vị',
-                    Value: this.$enumeration.EnumMenuItemCategory.Appetizers
-                },
-                {
-                    Text: 'Món chính',
-                    Value: this.$enumeration.EnumMenuItemCategory.MainCourse
-                },
-                {
-                    Text: 'Tráng miệng',
-                    Value: this.$enumeration.EnumMenuItemCategory.Dessert
-                },
-                {
-                    Text: 'Đồ uống',
-                    Value: this.$enumeration.EnumMenuItemCategory.Drink
-                }
-            ]
-        },
-
         listMenu():MenuItem[] {
-            return this.allMenuItems.filter(mi => (this.selectedMenuCategory === undefined || mi.Category === this.selectedMenuCategory) && mi.Name.toLowerCase().includes(this.txtSearch.toLowerCase()));
+            return this.allMenuItems.filter(mi => (this.selectedMenuCategory === '' || mi.MenuItemCategoryID === this.selectedMenuCategory) && mi.Name.toLowerCase().includes(this.txtSearch.toLowerCase()));
         },
     },
 
@@ -238,17 +221,9 @@ export default {
          async getListCustomer() {
             this.loadingCustomer = true;
 
-            try {
-                const result:MLActionResult = await this.$service.CustomerService.getDataPaging(1, -1);
-                if (result.Success) {
-                    this.listCustomer = result.Data.Data as Customer[];
-                }
-            } catch (e) {
-                this.$commonFunction.handleException(e);
-            } finally {
-                this.loadingCustomer = false;
-            }
-            
+            this.listCustomer = await this.$service.CustomerService.getAll();
+
+            this.loadingCustomer = false;
         },
 
         handleCheckoutClick() {
@@ -261,16 +236,9 @@ export default {
          async getListMenuItem() {
             this.loadingMenu = true;
 
-            try {
-                const result:MLActionResult = await this.$service.MenuItemService.getDataPaging(1, -1);
-                if (result.Success) {
-                    this.allMenuItems = result.Data.Data as MenuItem[];
-                }
-            } catch (e) {
-                this.$commonFunction.handleException(e);
-            } finally {
-                this.loadingMenu = false;
-            }
+            this.allMenuItems = await this.$service.MenuItemService.getAll();
+            
+            this.loadingMenu = false;
         },
     },
 

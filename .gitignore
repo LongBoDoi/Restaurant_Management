@@ -25,3 +25,4 @@ UI/*.sw?
 /API/.vs
 /API/bin/Debug
 /API/obj
+/API/wwwroot/uploads

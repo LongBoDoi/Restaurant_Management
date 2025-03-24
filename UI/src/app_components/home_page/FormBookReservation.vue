@@ -1,35 +1,77 @@
 <template>
     <VContainer ref="mainContainer" style="display: flex; align-items: center; justify-content: center;" >
         <MLVbox style="width: 100%; overflow: hidden;" align="center">
-            <VLabel style="font-size: 3rem; font-weight: bold; flex-shrink: 0; color: rgb(var(--v-theme-primary))">Đặt bàn ngay</VLabel>
+            <h2 class="text-2xl md:text-3xl font-bold text-emerald-600 text-center mb-6 mt-6 md:mb-8">
+                Đặt bàn ngay
+            </h2>
 
-            <VSpacer style="height: 24px; flex-grow: 0; flex-shrink: 0;" />
+            <div style="width: 100%; background-color: rgba(var(--v-theme-primary), 0.9);" class="max-w-3xl rounded-lg shadow-xl overflow-hidden transform transition-all duration-500 hover:shadow-2xl">
+                <VProgressLinear color="white" indeterminate v-if="loading" />
+                <VForm ref="form" class="p-8" :disabled="loading">
+                    <div class="grid grid-cols-1 md:grid-cols-2 md:gap-6">
+                        <div class="space-y-2">
+                            <label htmlFor="name" class="block text-white font-medium">
+                                Họ tên
+                            </label>
+                            <VTextField variant="outlined" style="color: white;" bg-color="rgba(52, 211, 153, 0.5)" placeholder="Nhập họ tên của bạn" v-model:model-value="reservation.CustomerName"
+                                :rules="[textFieldRequireRule]"
+                             />
+                        </div>
 
-            <VCard :loading="loading" :disabled="loading" color="primary" width="100%" height="100%" maxWidth="500" class="d-flex flex-column">
-                <VCardItem>
-                    <VForm ref="form">
-                        <MLHbox>
-                            <VTextField v-model:model-value="reservation.CustomerName" :rules="[textFieldRequireRule]" variant="underlined" label="Họ tên" />
-                            <VSpacer style="width: 24px; flex-shrink: 0; flex-grow: 0;" />
-                            <VTextField v-model:model-value="reservation.CustomerPhoneNumber" :rules="[textFieldRequireRule]" variant="underlined" label="SĐT" />
-                        </MLHbox>
+                        <div class="space-y-2">
+                            <label htmlFor="phone" class="block text-white font-medium">
+                                SĐT
+                            </label>
+                            <VTextField variant="outlined" style="color: white;" bg-color="rgba(52, 211, 153, 0.5)" placeholder="Nhập số điện thoại của bạn" v-model:model-value="reservation.CustomerPhoneNumber"
+                                :rules="[textFieldRequireRule]"
+                             />
+                        </div>
+                    </div>
 
-                        <MLHbox>
-                            <MLDateField ref="txtReservationDate" style="flex-grow: 0.7;" :value="currentDate" />
-                            <VSpacer style="width: 24px; flex-shrink: 0; flex-grow: 0;" />
-                            <MLTimeField ref="txtReservationTime" style="flex-grow: 0.3;" :value="suggestBookingTime" />
-                        </MLHbox>
+                    <div class="grid md:grid-cols-2 md:gap-6">
+                        <div class="space-y-2">
+                            <label htmlFor="date" class="block text-white font-medium">
+                                Ngày
+                            </label>
+                            <MLDateField variant="outlined" style="color: white;" bg-color="rgba(52, 211, 153, 0.5)" v-model="reservation.ReservationDate" required />
+                        </div>
 
-                        <VTextField v-model:model-value="reservation.GuestCount" type="number" :rules="[textFieldRequireRule]" hideSpinButtons variant="underlined" label="Số lượng người" />
+                        <div class="space-y-2">
+                            <label htmlFor="time" class="block text-white font-medium">
+                                Giờ
+                            </label>
+                            <MLTimeField variant="outlined" style="color: white;" bg-color="rgba(52, 211, 153, 0.5)" v-model="reservation.ReservationDate" />
+                        </div>
+                    </div>
 
-                        <VTextarea v-model:model-value="reservation.Note" label="Yêu cầu" variant="outlined" placeholder="vd: Số tầng, phòng riêng,..." />
-                    </VForm>
-                </VCardItem>
+                    <div class="space-y-2">
+                        <label htmlFor="guests" class="block text-white font-medium">
+                            Số lượng người
+                        </label>
+                        <div class="flex items-center" style="width: 150px;">
+                            <VTextField :rules="[textFieldRequireRule]" class="text-center" type="number" variant="outlined" style="color: white;" bg-color="rgba(52, 211, 153, 0.5)" hide-spin-buttons v-model:model-value="reservation.GuestCount">
+                                <template #prepend>
+                                    <VIcon icon="mdi-minus" style="cursor: pointer;" @click="if(reservation.GuestCount > 1) { reservation.GuestCount--; }" />
+                                </template>
+                                <template #append>
+                                    <VIcon icon="mdi-plus" style="cursor: pointer;" @click="reservation.GuestCount++;" />
+                                </template>
+                            </VTextField>
+                        </div>
+                    </div>
 
-                <VCardActions>
-                    <VBtn style="background-color: white; color: rgb(var(--v-theme-primary)); margin-left: auto; font-weight: bold;" @click="handleBookReservationRequest">Đặt bàn</VBtn>
-                </VCardActions>
-            </VCard>
+                    <div class="space-y-2">
+                        <label htmlFor="request" class="block text-white font-medium">
+                            Yêu cầu
+                        </label>
+                        <VTextarea variant="outlined" style="color: white;" bg-color="rgba(52, 211, 153, 0.5)" placeholder="Nhập các yêu cầu đặc biệt nếu có" no-resize v-model:model-value="reservation.Note" />
+                    </div>
+
+                    <div class="flex justify-end">
+                        <VBtn style="border-radius: 18px; height: 48px !important; color: rgb(var(--v-theme-primary))" @click="handleBookReservationRequest">ĐẶT BÀN</VBtn>
+                    </div>
+                </VForm>
+            </div>
         </MLVbox>
     </VContainer>
 </template>

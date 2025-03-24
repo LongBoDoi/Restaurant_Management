@@ -8,6 +8,8 @@ import CommonFunction from '@/common/CommonFunction';
 import LocalStorageKey from '@/common/LocalStorageKey';
 import EventName from '@/common/EventName';
 import Config from '@/common/Config';
+import { Setting } from '@/models';
+import CommonValue from '@/common/CommonValue';
 
 declare module '@vue/runtime-core' {
   interface ComponentCustomProperties {
@@ -19,6 +21,7 @@ declare module '@vue/runtime-core' {
     $commonFunction: typeof CommonFunction,
     $localStorageKey: typeof LocalStorageKey,
     $eventName: typeof EventName,
-    $config: typeof Config
+    $config: typeof Config,
+    $commonValue: typeof CommonValue
   }
 }

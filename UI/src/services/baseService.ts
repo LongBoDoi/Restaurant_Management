@@ -1,8 +1,10 @@
+import CommonFunction from "@/common/CommonFunction";
 import Config from "@/common/Config";
 import EventBus from "@/common/EventBus";
 import EventName from "@/common/EventName";
 import LocalStorageKey from "@/common/LocalStorageKey";
 import { MLActionResult } from "@/models";
+import PagingData from "@/models/PagingData";
 import axios, { AxiosInstance } from "axios";
 
 abstract class BaseService<IMLEntity> {
@@ -11,7 +13,7 @@ abstract class BaseService<IMLEntity> {
   protected entityName: string = '';
 
   protected configApi() {
-    this.baseURL = `${import.meta.env.VITE_API_URL}/${this.entityName}`;
+    this.baseURL = `${import.meta.env.VITE_API_URL}/api/${this.entityName}`;
     
     const api = axios.create({
       baseURL: this.baseURL,
@@ -21,15 +23,20 @@ abstract class BaseService<IMLEntity> {
     if (!Config.UseCookies) {
       api.interceptors.request.use((config) => {
         const token = localStorage.getItem(LocalStorageKey.AuthToken);
-        if (token) {
-          config.headers.Authorization = `Bearer ${token}`;
-        }
+        config.headers.Authorization = `Bearer ${token ?? ''}`;
         return config;
       });
     }
     
     api.interceptors.response.use(
-      response => response,
+      response => {
+        const actionResult = response.data as MLActionResult;
+        if (actionResult?.Success === false && actionResult?.ErrorMsg) {
+          CommonFunction.showToastMessage(actionResult.ErrorMsg, 'error');
+        }
+
+        return Promise.resolve(response);
+      },
       error => {
           if (error.response?.status === 401) {
             EventBus.emit(EventName.RedirectToLogin);
@@ -46,14 +53,53 @@ abstract class BaseService<IMLEntity> {
    * @param page Số trang
    * @param itemsPerPage Kích thước trang
    */
-  public async getDataPaging(page: number, itemsPerPage: number) : Promise<MLActionResult> {
-    const result = await this.api.get('/GetDataPaging', {
-      params: {
-        page: page,
-        itemsPerPage: itemsPerPage
+  public async getAll() : Promise<IMLEntity[]> {
+    var result = [] as IMLEntity[];
+
+    try {
+      const response = await this.api.get('/GetAll');
+      const actionResult = response.data as MLActionResult;
+
+      if (actionResult?.Success) {
+        result = actionResult.Data as IMLEntity[];
       }
-    });
-    return result.data as MLActionResult;
+    } catch (e) {
+      CommonFunction.handleException(e);
+    }
+
+    return result;
+  }
+
+  /**
+   * Lấy dữ liệu phân trang
+   * @param page Số trang
+   * @param itemsPerPage Kích thước trang
+   */
+  public async getDataPaging(page: number, itemsPerPage: number) : Promise<PagingData<IMLEntity>> {
+    var result:PagingData<IMLEntity> = {
+      Data: [],
+      TotalCount: 0
+    };
+
+    try {
+      const response = await this.api.get('/GetDataPaging', {
+        params: {
+          page: page,
+          itemsPerPage: itemsPerPage
+        }
+      });
+      const actionResult = response.data as MLActionResult;
+
+      if (actionResult?.Success) {
+        result = actionResult.Data as PagingData<IMLEntity>;
+      } else if (actionResult?.ErrorMsg) {
+        CommonFunction.showToastMessage(actionResult.ErrorMsg, 'error');
+      }
+    } catch (e) {
+      CommonFunction.handleException(e);
+    }
+
+    return result;
   }
 
   /**

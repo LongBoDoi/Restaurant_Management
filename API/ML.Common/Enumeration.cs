@@ -29,6 +29,18 @@
     }
 
     /// <summary>
+    /// Enum kiểu dữ liệu
+    /// </summary>
+    public enum EnumDataType
+    {
+        String = 1,
+
+        Integer = 2,
+
+        Boolean = 3
+    }
+
+    /// <summary>
     /// Enum loại người dùng
     /// </summary>
     public enum EnumUserType
@@ -104,5 +116,35 @@
         Closed = 2
     }
 
+    /// <summary>
+    /// Enum cách hiển thị màn thực đơn cho khách hàng
+    /// </summary>
+    public enum EnumDisplayMenuScreenForCustomerType
+    {
+        /// <summary>
+        /// Theo ảnh
+        /// </summary>
+        ByImages = 0,
 
+        /// <summary>
+        /// Theo món thiết lập
+        /// </summary>
+        ByItems = 1
+    }
+
+    /// <summary>
+    /// Enum cách hiển thị màn thực đơn theo món thiết lập cho khách hàng
+    /// </summary>
+    public enum EnumDisplayMenuScreenByItemsForCustomerType
+    {
+        /// <summary>
+        /// Toàn bộ món
+        /// </summary>
+        All = 0,
+
+        /// <summary>
+        /// Tuỳ chọn
+        /// </summary>
+        Custom = 1
+    }
 }

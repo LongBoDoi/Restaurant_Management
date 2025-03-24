@@ -17,6 +17,17 @@ export enum EnumEditMode {
     Delete = 2
 }
 
+/**
+ * Enum kiểu dữ liệu
+ */
+export enum EnumDataType {
+    String = 1,
+
+    Integer = 2,
+
+    Boolean = 3
+}
+
 export enum EnumUserType {
     Employee = 0,
 
@@ -91,6 +102,27 @@ export enum EnumOrderStatus {
     Paid = 2
 }
 
+/**
+ * Enum ngày trong tuần
+ */
+export enum EnumDayOfWeek {
+    Sunday = 0,
+
+    Monday = 1,
+
+    Tuesday = 2,
+
+    Wednesday = 3,
+
+    Thursday = 4,
+
+    Friday = 5,
+
+    Saturday = 6,
+
+    Holiday = 7
+}
+
 class EnumerationInterface {
     EnumUserType: typeof EnumUserType = EnumUserType;
     EnumChatbotSender: typeof EnumChatbotSender = EnumChatbotSender;
@@ -99,6 +131,7 @@ class EnumerationInterface {
     EnumReservationStatus: typeof EnumReservationStatus = EnumReservationStatus;
     EnumRole: typeof EnumRole = EnumRole;
     EnumOrderStatus: typeof EnumOrderStatus = EnumOrderStatus;
+    EnumDayOfWeek: typeof EnumDayOfWeek = EnumDayOfWeek;
 }
 
 export default EnumerationInterface;

@@ -27,6 +27,33 @@ namespace API.Controllers
         #region Common methods
 
         /// <summary>
+        /// Lấy toàn bộ dữ liệu
+        /// </summary>
+        /// <param name="page">Số trang</param>
+        /// <param name="itemsPerPage">Kích thước trang</param>
+        /// <returns></returns>
+        [Authorize]
+        [HttpGet("GetAll")]
+        public virtual MLActionResult GetAll()
+        {
+            MLActionResult result = new()
+            {
+                Success = true
+            };
+
+            try
+            {
+                result.Data = _entities.ToList();
+            }
+            catch (Exception ex)
+            {
+                CommonFunction.HandleException(ex, result, _context);
+            }
+
+            return result;
+        }
+
+        /// <summary>
         /// Lấy dữ liệu theo phân trang
         /// </summary>
         /// <param name="page">Số trang</param>

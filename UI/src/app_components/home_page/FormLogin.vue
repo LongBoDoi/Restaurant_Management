@@ -1,72 +1,108 @@
 <template>
-    <VContainer class="d-flex" style="padding: unset">
-        <MLVbox style="width: 50%; height: 100%; background-color: rgb(var(--v-theme-primary)); align-items: center; justify-content: center;">
-            <VSheet color="primary" style="display: flex; align-items: center; flex-direction: column;">
-                <VLabel style="font-size: 2rem; color: rgb(var(--v-theme-on-primary)); font-weight: bold;">Dành cho khách hàng</VLabel>
+    <VContainer class="d-flex flex-column justify-center">
+        <h2 class="text-2xl md:text-3xl font-bold text-emerald-600 text-center mb-6 mt-6 md:mb-8">
+            Đăng nhập
+        </h2>
 
-                <VSpacer style="height: 24px; flex-grow: 0; flex-shrink: 0;" />
+        <div class="flex flex-col md:flex-row items-center justify-center gap-8">
+            <div className="backdrop-blur-sm p-8 rounded-xl shadow-2xl w-full max-w-md transition-transform duration-300 hover:translate-y-[-5px]"
+                style="background-color: rgba(var(--v-theme-primary), 0.9);"
+            >
+                <h2 className="text-white text-2xl font-bold text-center mb-6">Dành cho khách hàng</h2>
 
-                <VTabs :disabled="customerLoading" style="width: 100%;" fixedTabs v-model:modelValue="customerTab">
-                    <VTab :value="0">Đăng nhập</VTab>
-                    <VTab :value="1">Đăng ký</VTab>
+                <VTabs fixed-tabs style="color: white;" v-model:model-value="customerTab" :disabled="customerLoading">
+                    <VTab :value="0">ĐĂNG NHẬP</VTab>
+                    <VTab :value="1">ĐĂNG KÝ</VTab>
                 </VTabs>
 
-                <VSpacer style="height: 16px; flex-grow: 0; flex-shrink: 0;" />
+                <VProgressLinear v-if="customerLoading" color="primary" indeterminate />
 
-                <VTabsWindow :modelValue="customerTab" style="width: 400px;">
+                <VTabsWindow v-model:model-value="customerTab">
                     <VTabsWindowItem :value="0">
-                        <VSheet color="primary">
-                            <VForm :disabled="customerLoading" ref="formCustomerLogin">
-                                <VTextField :rules="[textFieldRequireRule]" label="Số điện thoại" variant="underlined" v-model:model-value="customerUserLogin.Username" />
-                                <VTextField :rules="[textFieldRequireRule]" type="password" label="Mật khẩu" variant="underlined" v-model:model-value="customerUserLogin.Password" />
-                            </VForm>
-
-                            <VLabel class="text-error" v-if="customerLoginError">{{ customerLoginError }}</VLabel>
-
-                            <VCardActions>
-                                <VBtn style="background-color: rgb(var(--v-theme-background)); color: rgb(var(--v-theme-primary)); font-weight: bold; margin-left: auto;" @click="handleCustomerLogin">Đăng nhập</VBtn>
-                            </VCardActions>
-                            <VProgressLinear v-if="customerLoading" indeterminate />
-                        </VSheet>
+                        <VForm ref="formCustomerLogin" class="space-y-6 mt-4 sm:mt-6" :disabled="customerLoading" >
+                            <VTextField 
+                                :rules="[textFieldRequireRule]" 
+                                variant="outlined" 
+                                style="
+                                    color: white;
+                                "
+                                label="Số điện thoại"
+                                bg-color="rgba(52, 211, 153, 0.5)"
+                                hide-details
+                                v-model:model-value="customerUserLogin.Username"
+                            />
+                            <VTextField 
+                                type="password"
+                                variant="outlined"
+                                style="color: white;"
+                                bg-color="rgba(52, 211, 153, 0.5)"
+                                label="Mật khẩu"
+                                hide-details
+                                :rules="[textFieldRequireRule]"
+                                v-model:model-value="customerUserLogin.Password"
+                            />
+                            <VBtn 
+                                style="
+                                    background-color: rgb(var(--v-theme-background)); 
+                                    color: rgb(var(--v-theme-primary));
+                                    margin-left: auto;
+                                    width: 100%;
+                                "
+                                rounded
+                                prepend-icon="mdi-login"
+                                :disabled="customerLoading"
+                                @click="handleCustomerLogin"
+                            >
+                                Đăng nhập
+                            </VBtn>
+                        </VForm>
                     </VTabsWindowItem>
                     <VTabsWindowItem :value="1">
-                        <VSheet color="primary">
-                            <VForm :disabled="customerLoading" ref="formCustomerRegister">
-                                <VTextField ref="txtCustomerNameSignup" :rules="[textFieldRequireRule]" label="Họ tên" variant="underlined" />
-                                <VTextField ref="txtCustomerPhoneSignup" :rules="[textFieldRequireRule]" :error="customerPhoneSignupError !== ''" :errorMessages="customerPhoneSignupError" label="Số điện thoại" variant="underlined" @update:modelValue="customerPhoneSignupError = ''" />
-                                <VTextField ref="txtCustomerPasswordSignup" :rules="[textFieldRequireRule]" type="password" label="Mật khẩu" variant="underlined" />
-                                <VTextField ref="txtCustomerConfirmPasswordSignup" :rules="[textFieldRequireRule, confirmPasswordRule]" type="password" label="Nhập lại mật khẩu" variant="underlined" />
+                        <VForm :disabled="customerLoading" ref="formCustomerRegister" class="mt-4 sm:mt-6">
+                            <VTextField ref="txtCustomerNameSignup" class="mt-2" :rules="[textFieldRequireRule]" style="color: white;" label="Họ tên" variant="outlined" bg-color="rgba(52, 211, 153, 0.5)" />
+                            <VTextField ref="txtCustomerPhoneSignup" bg-color="rgba(52, 211, 153, 0.5)" style="color: white;" :rules="[textFieldRequireRule]" :error="customerPhoneSignupError !== ''" :errorMessages="customerPhoneSignupError" label="Số điện thoại" variant="outlined" @update:modelValue="customerPhoneSignupError = ''" />
+                            <VTextField ref="txtCustomerPasswordSignup" bg-color="rgba(52, 211, 153, 0.5)" :rules="[textFieldRequireRule]" style="color: white;" type="password" label="Mật khẩu" variant="outlined" />
+                            <VTextField ref="txtCustomerConfirmPasswordSignup" bg-color="rgba(52, 211, 153, 0.5)" :rules="[textFieldRequireRule, confirmPasswordRule]" style="color: white;" type="password" label="Nhập lại mật khẩu" variant="outlined" />
 
-                                <VCardActions>
-                                    <VBtn :disabled="customerLoading" style="background-color: rgb(var(--v-theme-background)); color: rgb(var(--v-theme-primary)); font-weight: bold; margin-left: auto;" @click="handleCustomerSignup">Đăng ký</VBtn>
-                                </VCardActions>
-                            </VForm>
-                            <VProgressLinear v-if="customerLoading" indeterminate />
-                        </VSheet>
+                            <VCardActions>
+                                <VBtn rounded :disabled="customerLoading" style="background-color: rgb(var(--v-theme-background)); color: rgb(var(--v-theme-primary)); margin-left: auto; width: 100%;" @click="handleCustomerSignup">Đăng ký</VBtn>
+                            </VCardActions>
+                        </VForm>
                     </VTabsWindowItem>
                 </VTabsWindow>
-            </VSheet>
-        </MLVbox>
-        <MLVbox style="width: 50%; height: 100%; align-items: center; justify-content: center;">
-            <VSheet style="width: 400px; min-height: 328px; background-color: transparent; display: flex; align-items: center; flex-direction: column;">
-                <VLabel style="font-size: 2rem; color: rgb(var(--v-theme-primary)); font-weight: bold;">Dành cho nhân viên</VLabel>
+                <!-- <div className="mt-4 text-center">
+                    <a
+                        href="https://webcrumbs.cloud/placeholder"
+                        className="text-white/80 hover:text-white text-sm underline transition-colors"
+                    >
+                        Quên mật khẩu?
+                    </a>
+                </div> -->
+            </div>
 
-                <VSpacer style="height: 80px; flex-grow: 0; flex-shrink: 0;" />
+            <div className="backdrop-blur-sm p-8 rounded-xl shadow-2xl w-full max-w-md transition-transform duration-300 hover:translate-y-[-5px]"
+                style="background-color: rgba(var(--v-theme-primary), 0.9);"
+            >
+                <h2 className="text-white text-2xl font-bold text-center mb-6">Dành cho nhân viên</h2>
 
-                <VForm :disabled="employeeLoading" ref="formLoginCustomer" style="width: 100%;">
-                    <VTextField ref="txtUsernameEmployee" label="Tên đăng nhập" variant="underlined" />
-                    <VTextField @keypress.enter="handleEmployeeLogin" ref="txtPasswordEmployee" type="password" label="Mật khẩu" variant="underlined" />
+                <VForm @keypress.enter="handleEmployeeLogin" :disabled="employeeLoading" ref="formLoginCustomer" style="width: 100%;">
+                    <VTextField :rules="[textFieldRequireRule]" v-model="employeeLoginData.Username" label="Tên đăng nhập" variant="outlined" style="color: white;" bg-color="rgba(52, 211, 153, 0.5)" />
+                    <VTextField :rules="[textFieldRequireRule]" v-model="employeeLoginData.Password" ref="txtPasswordEmployee" type="password" label="Mật khẩu" variant="outlined" style="color: white;" bg-color="rgba(52, 211, 153, 0.5)" />
                 </VForm>
 
-                <VLabel v-if="employeeRequestMessage" :class="`text-${employeeRequestStatus}`">{{ employeeRequestMessage }}</VLabel>
-
                 <VCardActions style="width: 100%; margin-top: 8px;">
-                    <VBtn :disabled="employeeLoading" style="background-color: rgb(var(--v-theme-primary)); color: rgb(var(--v-theme-on-primary)); font-weight: bold; margin-left: auto;" @click="handleEmployeeLogin">Đăng nhập</VBtn>
+                    <VBtn prepend-icon="mdi-badge-account-horizontal-outline" :disabled="employeeLoading" style="background-color: white; color: rgb(var(--v-theme-primary)); margin-left: auto; width: 100%;" @click="handleEmployeeLogin" rounded>Đăng nhập</VBtn>
                 </VCardActions>
-
-                <VProgressLinear v-if="employeeLoading" color="primary" indeterminate />
-            </VSheet>
-        </MLVbox>
+                <!-- <div className="mt-4 text-center">
+                    <a
+                        href="https://webcrumbs.cloud/placeholder"
+                        className="text-white/80 hover:text-white text-sm underline transition-colors"
+                    >
+                        Quên mật khẩu?
+                    </a>
+                </div> -->
+            </div>
+        </div>
     </VContainer>
 </template>
 
@@ -90,6 +126,8 @@ export default {
 
             customerUserLogin: <UserLogin>{} as UserLogin,
             customerLoginError: <string>'',
+
+            employeeLoginData: <UserLogin>{} as UserLogin
         }
     },
 
@@ -184,21 +222,19 @@ export default {
          * Xử lý đăng nhập nhân viên
          */
         async handleEmployeeLogin() {
+            this.employeeLoginData.Username = this.employeeLoginData.Username ?? '';
+            this.employeeLoginData.Password = this.employeeLoginData.Password ?? '';
+
             const form:any = this.$refs.formLoginCustomer;
             const isFormValid:boolean = (await form.validate()).valid;
 
             if (!isFormValid) return;
 
             this.employeeLoading = true;
-
-            const userLogin = {
-                Username: (this.$refs.txtUsernameEmployee as any).value,
-                Password: (this.$refs.txtPasswordEmployee as any).value
-            } as UserLogin;
             
             let result:MLActionResult|undefined = undefined;
             try {
-                result = await this.$service.UserLoginService.loginEmployee(userLogin);
+                result = await this.$service.UserLoginService.loginEmployee(this.employeeLoginData);
             } catch (e) {
                 this.$commonFunction.handleException(e);
             } finally {
@@ -224,7 +260,7 @@ export default {
     computed: {
         textFieldRequireRule() {
             return (str:string|undefined) => {
-                return str !== undefined && str !== '';
+                return str === undefined || str !== '';
             }
         },
 

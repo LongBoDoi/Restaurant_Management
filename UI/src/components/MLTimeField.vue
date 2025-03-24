@@ -2,14 +2,16 @@
     <div>
     <VTextField
         :variant="(variant as any)"
-        density="compact"
+        :density="compact ? 'compact' : 'default'"
         v-mask="'##:##'"
+        :label="label"
         placeholder="HH:MM"
-        label="Giờ"
         append-inner-icon="mdi-clock-outline"
+        :bg-color="bgColor"
         v-model:model-value="txtValue"
         :rules="validationRules"
         ref="txtFieldRef"
+        :hide-details="hideDetails"
         @click:append-inner="showTimePicker = true"
     />
 
@@ -24,6 +26,7 @@
             <span v-bind="props"></span>
         </template>
         <VTimePicker
+        color="primary"
             ref="timePicker"
             ampm-in-title
             title=""
@@ -40,13 +43,26 @@ import moment from 'moment';
 
 export default {
     props: {
+        hideDetails: {
+            type: Boolean,
+            default: false
+        },
+        label: {
+            type: String
+        },
         modelValue: {
             type: [String, Date]
         },
         variant: {
             type: String,
             default: 'underlined'
-        }
+        },
+        compact: {
+            type: Boolean
+        },
+        bgColor: {
+            type: String
+        },
     },
 
     created() {

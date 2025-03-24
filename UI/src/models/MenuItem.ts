@@ -1,4 +1,4 @@
-import { EnumMenuItemCategory } from "@/common/Enumeration";
+import MenuItemCategory from "./MenuItemCategory";
 import MLEntity from "./MLEntity";
 
 interface MenuItem extends MLEntity {
@@ -6,8 +6,11 @@ interface MenuItem extends MLEntity {
     Name: string,
     Description: string,
     Price: number,
-    Category: EnumMenuItemCategory,
+    MenuItemCategoryID: string,
     OutOfStock: boolean,
+    ImageUrl: string,
+
+    MenuItemCategory?: MenuItemCategory
 };
 
 export default MenuItem;

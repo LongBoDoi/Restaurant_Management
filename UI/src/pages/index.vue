@@ -3,10 +3,13 @@
         <!-- Toolbar -->
         <VToolbar color="primary">
             <VContainer style="display: flex; align-items: center;">
-                <img style="width: 92px; height: 48px; margin-left: 24px; border-radius: 8px; cursor: pointer;" src="/src/resources/app-logo.jpeg" @click="handleLogoClick" />
+                <img style="width: 48px; height: 48px; margin-left: 24px; border-radius: 8px; cursor: pointer; border-radius: 50%;" src="/src/resources/app-logo.jpeg" @click="handleLogoClick" />
+                
+                <h1 class="text-white font-semibold tracking-wide ml-3 hidden md:block" style="font-size: 20px;">{{ $commonFunction.getSettingValue('RestaurantName') }}</h1>
+
                 <VSpacer />
 
-                <VBtn rounded variant="tonal" style="margin-right: 24px;" @click="handleLoginClick" v-if="!isCustomerLoggedIn">Đăng nhập</VBtn>
+                <VBtn rounded variant="tonal" style="margin-right: 24px; background-color: white; color: rgb(var(--v-theme-primary));" @click="handleLoginClick" v-if="!isCustomerLoggedIn">Đăng nhập</VBtn>
                 <v-menu v-else :persistent="accountMenuLoading" :close-on-content-click="!accountMenuLoading" offset-y>
                     <template v-slot:activator="{ props }">
                     <VBtn rounded class="mr-6" v-bind="props" prepend-icon="mdi-account-circle">
@@ -28,24 +31,24 @@
             </VContainer>
         </VToolbar>
 
-        <MLVbox class="main-background" style="background-color: rgba(var(--v-theme-primary), 0.2);">
+        <MLVbox class="main-background" style="background-color: rgb(236, 253, 245);">
             <!-- Form thông tin nhà hàng -->
-            <FormRestaurantInfo v-on:viewRestaurantMenu="handleViewMenuClick" v-on:bookReservation="handleBookReservationClick" style="flex-shrink: 0; width: 100%; height: 100%;" />
+            <FormRestaurantInfo v-on:viewRestaurantMenu="handleViewMenuClick" v-on:bookReservation="handleBookReservationClick" class="sm:h-fit md:h-[500px]" />
 
             <!-- chatbot -->
             <ChatbotWindow />
 
             <!-- Form menu nhà hàng -->
-            <div ref="frmRestaurantMenu" style="flex-shrink: 0; width: 100%; height: 100%;">
-                <FormRestaurantMenu style="width: 100%; height: 100%;" />
+            <div ref="frmRestaurantMenu" style="flex-shrink: 0; width: 100%;" class="md:h-full">
+                <FormRestaurantMenu style="width: 100%;" class="md:h-full" />
             </div>  
 
-            <div ref="frmBookReservation" style="flex-shrink: 0; width: 100%; height: 100%;">
-                <FormBookReservation style="width: 100%; height: 100%;" />
+            <div ref="frmBookReservation" style="flex-shrink: 0; width: 100%;" class="md:h-full">
+                <FormBookReservation style="width: 100%;" class="md:h-full" />
             </div>
 
-            <div v-if="!isCustomerLoggedIn" ref="frmLogin" style="flex-shrink: 0; width: 100%; height: 100%;">
-                <FormLogin style="height: 100%;" />
+            <div v-if="!isCustomerLoggedIn" ref="frmLogin" style="flex-shrink: 0; width: 100%;" class="md:h-full">
+                <FormLogin class="md:h-full" />
             </div>
         </MLVbox>
     </MLVbox>
@@ -58,7 +61,7 @@ import MLActionResult from '@/models/MLActionResult';
 export default {
     data() {
         return {
-            accountMenuLoading: false,
+            accountMenuLoading: false
         }
     },
 
@@ -121,5 +124,15 @@ export default {
     flex-grow: 1;
     overflow-y: auto;
     background-size: 100% 100%;
+}
+
+.hidden {
+    display: none;
+}
+
+@media (min-width: 768px) {
+    .md\:block {
+        display: block;
+    }
 }
 </style>

@@ -1,6 +1,8 @@
 import moment from "moment-timezone";
 import EventBus from "./EventBus";
 import EventName from "./EventName";
+import Config from "./Config";
+import { session } from "./Session";
 
 class CommonFunction {
     /**
@@ -54,11 +56,44 @@ class CommonFunction {
     };
 
     /**
+     * Lấy đường dẫn file ảnh trên BE
+     */
+    static getImageUrl = (fileName: string) => {
+        return `${import.meta.env.VITE_API_URL}/uploads/${fileName}`;
+    }
+
+    static showToastMessage = (message:string, type:'error'|'success') => {
+        EventBus.emit(EventName.ShowToastMessage, {
+            Message: message,
+            Type: type
+        });
+    };
+
+    /**
+     * Lấy giá trị thiết lập
+     */
+    static getSettingValue = (settingKey: string):any => {
+        return session.Settings?.find(s => s.SettingKey === settingKey)?.Value;
+    };
+
+    /**
+     * Định dạng số theo hàng nghìn
+     */
+    static formatThousands = (number: number) => {
+        return number?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".") ?? '';
+    }
+
+    /**
      * Xử lý exception khi gọi service
      */
     static handleException = (e:any) => {
+        var errorDetail:string = '';
+        if(Config.ShowErrorOnToast) {
+            errorDetail = ` ${e.message}`;
+        }
+
         EventBus.emit(EventName.ShowToastMessage, {
-            Message: 'Lỗi hệ thống.',
+            Message: `Lỗi hệ thống.${errorDetail}`,
             Type: 'error'
         });
     };

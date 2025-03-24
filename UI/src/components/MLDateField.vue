@@ -4,11 +4,13 @@
             :variant="(variant as any)"
             v-mask="'##/##/####'"
             placeholder="DD/MM/YYYY"
-            label="Ngày"
+            :label="label"
             append-inner-icon="mdi-calendar-month-outline"
+            :bg-color="bgColor"
+            :base-color="baseColor"
             v-model:model-value="txtValue"
             @click:append-inner="showDatePicker = true"
-            density="compact"
+            :density="compact ? 'compact' : 'default'"
             ref="txtFieldRef"
             :rules="validationRules"
         />
@@ -42,12 +44,27 @@ import moment from 'moment';
 
 export default {
     props: {
+        label: {
+            type: String,
+        },
+        compact: {
+            type: Boolean
+        },
         modelValue: {
             type: [Date, String]
         },
         variant: {
             type: String,
             default: 'underlined'
+        },
+        required: {
+            type: Boolean
+        },
+        bgColor: {
+            type: String
+        },
+        baseColor: {
+            type: String
         }
     },
 
@@ -90,19 +107,21 @@ export default {
         validationRules() {
             return [
                 (str:string) => {
-                    const match = str.match(this.dateRegex);
-                    if (!match) return false;
+                    if (this.required) {
+                        const match = str.match(this.dateRegex);
+                        if (!match) return false;
 
-                    const day = match[1];
-                    const month = match[2];
-                    const year = match[3];
+                        const day = match[1];
+                        const month = match[2];
+                        const year = match[3];
 
-                    const dateValue = new Date(`${year}-${month}-${day}`);
-                    if (!isNaN(dateValue as any)) {
-                        return true;
+                        const dateValue = new Date(`${year}-${month}-${day}`);
+                        if (isNaN(dateValue as any)) {
+                            return false;
+                        }
                     }
-
-                    return false;
+                    
+                    return true;
                 }
             ]
         }

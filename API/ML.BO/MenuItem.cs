@@ -1,6 +1,7 @@
 ﻿using API.ML.BOBase;
 using API.ML.Common;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace API.ML.BO
 {
@@ -28,9 +29,9 @@ namespace API.ML.BO
         public decimal Price { get; set; }
 
         /// <summary>
-        /// Loại món
+        /// Nhóm món
         /// </summary>
-        public EnumMenuItemCategory Category { get; set; }
+        public Guid? MenuItemCategoryID { get; set; }
 
         /// <summary>
         /// Hết hàng
@@ -38,8 +39,20 @@ namespace API.ML.BO
         public bool OutOfStock { get; set; }
 
         /// <summary>
+        /// Link ảnh món
+        /// </summary>
+        [StringLength(128)]
+        public string ImageUrl { get; set; } = string.Empty;
+
+        /// <summary>
         /// Dữ liệu order detail
         /// </summary>
         public IEnumerable<OrderDetail>? OrderDetails { get; set; }
+
+        /// <summary>
+        /// Dữ liệu nhóm thực đơn
+        /// </summary>
+        [ForeignKey("MenuItemCategoryID")]
+        public MenuItemCategory? MenuItemCategory { get; set; }
     }
 }

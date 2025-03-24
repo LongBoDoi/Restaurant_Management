@@ -1,7 +1,7 @@
 <!-- Màn danh sách khách hàng -->
 
 <template>
-    <VSheet style="height: calc(100vh - 64px); padding: 16px 32px 16px 16px; display: flex; flex-direction: column;">
+    <VSheet style="display: flex; flex-direction: column;">
         <VLabel class="flex-shrink-0" style="font-weight: bold; font-size: 2rem;">Nhân viên</VLabel>
 
         <VBtn width="fit-content" class="mt-4" color="primary" prepend-icon="mdi-plus" @click="handleAddNewClick">Thêm nhân viên</VBtn>

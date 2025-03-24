@@ -24,6 +24,8 @@ namespace API.Controllers
             public object? UserData { get; set; }
 
             public EnumUserType? UserType { get; set; }
+
+            public List<Setting> Settings { get; set; } = [];
         }
 
         public UserLoginController(ApplicationDBContext context) : base(context)
@@ -55,39 +57,6 @@ namespace API.Controllers
                     _context.Customer.Add(customer);
                     result.Success = _context.SaveChanges() > 0;
                 }
-            }
-            catch (Exception ex)
-            {
-                CommonFunction.HandleException(ex, result, _context);
-            }
-
-            return result;
-        }
-
-        /// <summary>
-        /// Tạo tài khoản admin để đăng nhập
-        /// </summary>
-        /// <returns></returns>
-        [HttpPost("CreateAdminUser")]
-        public MLActionResult CreateAdminUser()
-        {
-            MLActionResult result = new();
-
-            try
-            {
-                Employee employee = new()
-                {
-                    EmployeeCode = "admin",
-                    EmployeeName = "Admin",
-                    Role = EnumRole.Admin,
-                    UserLogin = new()
-                    {
-                        Username = "admin",
-                        Password = "123456"
-                    }
-                };
-                _context.Employee.Add(employee);
-                result.Success = _context.SaveChanges() > 0;
             }
             catch (Exception ex)
             {
@@ -131,7 +100,7 @@ namespace API.Controllers
                         issuer: "ml_issuer",
                         audience: "ml_audience",
                         claims: claims,
-                        expires: DateTime.UtcNow.AddYears(10),
+                        expires: DateTime.UtcNow.AddDays(1),
                         signingCredentials: credentials
                     );
 
@@ -271,9 +240,8 @@ namespace API.Controllers
             return result;
         }
 
-        [Authorize]
         [HttpGet("GetUserData")]
-        public MLActionResult GetUserData()
+        public MLActionResult GetUserData([FromHeader] string authorization)
         {
             MLActionResult result = new()
             {
@@ -282,34 +250,53 @@ namespace API.Controllers
 
             try
             {
-                if (!Config.UseCookie)
+                // Lấy danh sách thiết lập
+                SessionInterface sessionInterface = new SessionInterface
                 {
+                    Settings = _context.Setting.Where(s => CommonValue.CustomerScreenSettingKeys.Contains(s.SettingKey)).ToList()
+                };
+                result.Data = sessionInterface;
+
+                // Validate token
+                if (string.IsNullOrEmpty(authorization) || !authorization.StartsWith("Bearer "))
+                {
+                    result.Success = false;
+                    return result;
+                }
+
+                string token = authorization.Split(" ")[1];
+                JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();
+
+                try
+                {
+                    tokenHandler.ValidateToken(token, CommonValue.TokenValidationParameters, out _);
+
+                    string strUserID = User.Claims.FirstOrDefault(x => x.Type == "UserID")?.Value ?? "";
+                    _ = Guid.TryParse(strUserID, out Guid userID);
+                    string strUserName = User.Claims.FirstOrDefault(x => x.Type == "Username")?.Value ?? "";
+                    string strUserType = User.Claims.FirstOrDefault(x => x.Type == "UserType")?.Value ?? "";
+                    _ = EnumUserType.TryParse(strUserType, out EnumUserType userType);
+
+                    sessionInterface.UserType = userType;
+                    sessionInterface.UserName = strUserName;
+
+                    switch (userType)
+                    {
+                        case EnumUserType.Employee:
+                            sessionInterface.UserData = _context.Employee.FirstOrDefault(e => e.EmployeeID == userID);
+                            break;
+                        case EnumUserType.Customer:
+                            sessionInterface.UserData = _context.Customer.FirstOrDefault(e => e.CustomerID == userID);
+                            break;
+                    }
+
+                    result.Data = sessionInterface;
+                }
+                catch (Exception)
+                {
+                    result.Success = false;
                     Response.Cookies.Delete("AuthToken");
                 }
-
-                string strUserID = User.Claims.FirstOrDefault(x => x.Type == "UserID")?.Value ?? "";
-                _ = Guid.TryParse(strUserID, out Guid userID);
-                string strUserName = User.Claims.FirstOrDefault(x => x.Type == "Username")?.Value ?? "";
-                string strUserType = User.Claims.FirstOrDefault(x => x.Type == "UserType")?.Value ?? "";
-                _ = EnumUserType.TryParse(strUserType, out EnumUserType userType);
-
-                SessionInterface sessionInterface = new ()
-                {
-                    UserType = userType,
-                    UserName = strUserName,
-                };
-
-                switch (userType)
-                {
-                    case EnumUserType.Employee:
-                        sessionInterface.UserData = _context.Employee.FirstOrDefault(e => e.EmployeeID == userID);
-                        break;
-                    case EnumUserType.Customer:
-                        sessionInterface.UserData = _context.Customer.FirstOrDefault(e => e.CustomerID == userID);
-                        break;
-                }
-
-                result.Data = sessionInterface;
             }
             catch (Exception ex)
             {

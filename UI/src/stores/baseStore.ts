@@ -1,13 +1,11 @@
-import CommonFunction from "@/common/CommonFunction";
 import { EnumEditMode } from "@/common/Enumeration";
-import EventBus from "@/common/EventBus";
-import EventName from "@/common/EventName";
-import { MLActionResult } from "@/models";
 import MLEntity from "@/models/MLEntity";
+import PagingData from "@/models/PagingData";
 import BaseService from "@/services/baseService";
 import { defineStore } from "pinia";
 
 export function createStoreOnBase<IMLEntity extends MLEntity>(storeID: string, service:BaseService<any>, config?: any) {
+
     return defineStore(storeID, {
         state: () => {
             return {
@@ -58,24 +56,12 @@ export function createStoreOnBase<IMLEntity extends MLEntity>(storeID: string, s
             },
 
             async getDataPaging(page: number, itemsPerPage: number) {
-                try {
-                    this._dataList = [];
-
-                    const result:MLActionResult = await service.getDataPaging(page, itemsPerPage);
-                    if (result.Success) {
-                      this._dataList = result.Data.Data;
-                      this._totalCount = result.Data.TotalCount ?? 0;
-            
-                      this._selectedIndex = 0;
-                    } else {
-                      EventBus.emit(EventName.ShowToastMessage, {
-                          Message: result.ErrorMsg,
-                          Type: 'error'
-                      });
-                    }
-                } catch (e) {
-                    CommonFunction.handleException(e);
-                }
+                const pagingData:PagingData<IMLEntity> = await service.getDataPaging(page, itemsPerPage);
+                
+                this._dataList = pagingData.Data;
+                this._totalCount = pagingData.TotalCount;
+      
+                this._selectedIndex = 0;
             },
 
             ...config?.actions

@@ -7,6 +7,7 @@
 // Styles
 import '@mdi/font/css/materialdesignicons.css'
 import 'vuetify/styles'
+import '/src/styles/main.scss';
 
 // Composables
 import { createVuetify } from 'vuetify'
@@ -19,8 +20,9 @@ export default createVuetify({
     themes: {
       green: {
         colors: {
-          primary: '#4CAF50',
-          secondary: '#FFC107',
+          primary: 'rgb(16, 185, 129)',
+          secondary: 'rgb(245, 158, 11)',
+          // surface: '#F9FAFB'
         }
       }
     }

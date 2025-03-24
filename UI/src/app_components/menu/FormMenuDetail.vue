@@ -1,79 +1,128 @@
 <template>
-    <VDialog max-width="800" persistent :model-value="isShow">
-        <VCard :disabled="loading">
+    <VDialog width="600" max-height="90vh" persistent :model-value="isShow">
+        <VCard :disabled="loading" style="border-radius: 36px;">
             <template v-slot:loader>
                 <VProgressLinear v-if="loading" indeterminate color="primary" />
             </template>
-            <VCardTitle class="d-flex align-center">
-                Thông tin món
-                <VBtn variant="plain" class="ml-auto" icon="mdi-close" @click="handleCloseDialog" />
+            <VCardTitle class="bg-gradient-to-r from-teal-600 to-green-500 px-6 py-4 d-flex justify-between items-center">
+                <h2 className="text-white text-xl font-bold">Thông tin món</h2>
+                <VBtn variant="plain" style="color: white; opacity: 1;" class="ml-auto" icon="mdi-close" @click="handleCloseDialog" />
             </VCardTitle>
 
-            <VCardItem>
+            <VCardItem class="pa-6">
                 <VForm ref="form">
-                <!-- Tên món -->
-                <VTextField 
-                    density="compact" 
-                    class="mt-2 flex-grow-1 flex-shrink-0" 
-                    variant="outlined" 
-                    v-model:model-value="menuItem.Name"
-                    :rules="[(v:string|undefined) => v !== undefined && v !== '']"
-                >
-                    <template v-slot:label>
-                        Tên món
-                        <span style="color: red;">*</span>
-                    </template>
-                </VTextField>
+                    <div className="grid grid-cols-2 gap-4 mb-6">
+                        <div className="col-span-2">
+                            <label className="block text-sm font-medium text-gray-700">Tên món <span style="color: red;">*</span></label>
+                            <!-- Tên món -->
+                            <VTextField 
+                                density="compact"
+                                class="mt-1 flex-grow-1 flex-shrink-0" 
+                                variant="outlined" 
+                                v-model:model-value="menuItem.Name"
+                                hide-details
+                                label=""
+                                :rules="[(v:string|undefined) => v !== undefined && v !== '']"
+                            >
+                                <template #details>
+                                </template>
+                            </VTextField>
+                        </div>
 
-                <MLHbox>
-                    <!-- Giá món -->
-                    <VTextField width="60%" v-money="moneyConfig" density="compact" variant="outlined" suffix="đ" v-model:model-value="menuItem.Price">
-                        <template v-slot:label>
-                            Giá món
-                        </template>
-                    </VTextField>
+                        <div>
+                            <!-- Giá món -->
+                            <label className="block text-sm font-medium text-gray-700">Giá món</label>
+                            <VTextField class="w-full mt-1" v-money="moneyConfig" density="compact" variant="outlined" suffix="đ" v-model:model-value="menuItem.Price" hide-details />
+                        </div>
 
-                    <VSpacer style="width: 16px;" class="flex-shrink-0 flex-grow-0" />
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Nhóm thực đơn</label>
 
-                    <!-- Loại món -->
-                    <VSelect
-                        :return-object="false"
-                        v-model:model-value="menuItem.Category"
-                        ref="cbMenuCategory"
-                        label="Loại món"
-                        width="40%"
-                        variant="outlined"
-                        density="compact"
-                        :items="listMenuCategory"
-                        item-title="Text"
-                        item-value="Value"
-                    />
-                </MLHbox>
+                            <!-- Nhóm thực đơn -->
+                            <VCombobox
+                                class="mt-1"
+                                :return-object="false"
+                                v-model:model-value="menuItem.MenuItemCategoryID"
+                                ref="cbMenuCategory"
+                                variant="outlined"
+                                density="compact"
+                                :items="lstMenuItemCategory"
+                                hide-details
+                                item-title="MenuItemCategoryName"
+                                item-value="MenuItemCategoryID"
+                            />
+                        </div>
 
-                <!-- Mô tả -->
-                <VTextarea no-resize label="Mô tả" variant="outlined" v-model:model-value="menuItem.Description" />
+                        <div className="col-span-2">
+                            <!-- Mô tả -->
+                            <label className="block text-sm font-medium text-gray-700">Mô tả</label>
+                            <VTextarea no-resize class="mt-1" variant="outlined" v-model:model-value="menuItem.Description" hide-details />
+                        </div>
 
-                <!-- Hết hàng -->
-                <VCheckbox color="primary" label="Hết hàng" v-model:model-value="menuItem.OutOfStock" />
+                        <div className="col-span-2">
+                            <!-- Ảnh món -->
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Ảnh món</label>
+                            <div class="intro-image-box mt-1">
+                                <template v-if="itemImageUrl">
+                                    <VImg :src="itemImageUrl" />
+                                    <VIcon class="close-icon" icon="mdi-close" color="red" @click="onRemoveMenuItemImage" />
+                                </template>
+
+                                <template v-else>
+                                    <div @click="selectImage()" style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; cursor: pointer;">
+                                        <VIcon icon="mdi-image-plus-outline" color="rgb(156, 163, 175)" />
+                                    </div>
+                                </template>
+                                
+                                <VFileInput
+                                    ref="introImage"
+                                    v-show="false"
+                                    accept="image/*"
+                                    v-model:model-value="itemImage"
+                                    v-on:update:model-value="getImageUrls"
+                                />
+                            </div>
+                        </div>
+
+                        <div className="col-span-2">
+                            <!-- Hết hàng -->
+                            <VCheckbox color="primary" class="text-gray-700" style="opacity: 1;" label="Hết hàng" v-model:model-value="menuItem.OutOfStock" hide-details />
+                        </div>
+
+                        <div className="col-span-2" v-if="false">
+                            <!-- Nguyên liệu -->
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Nguyên liệu</label>
+                            <VCombobox
+                                class="mt-1"
+                                :return-object="false"
+                                ref="cbMenuCategory"
+                                variant="outlined"
+                                density="compact"
+                                :items="lstMenuItemCategory"
+                                hide-details
+                                item-title="MenuItemCategoryName"
+                                item-value="MenuItemCategoryID"
+                                multiple
+                            />
+                        </div>
+                    </div>
                 </VForm>
             </VCardItem>
 
-            <VCardActions>
-                <VBtn v-if="editMode === $enumeration.EnumEditMode.Edit" prepend-icon="mdi-trash-can-outline" color="error" @click="handleDeleteMenuItem">Xoá món</VBtn>
-
+            <VCardActions class="px-6 py-4 bg-gray-50 border-t flex justify-end space-x-3">
                 <VSpacer />
 
-                <VBtn @click="handleCloseDialog">Huỷ</VBtn>
-                <VBtn variant="tonal" style="background-color: rgb(var(--v-theme-primary)); color: rgb(var(--v-theme-on-primary));" @click="handleSaveClick">Lưu</VBtn>
+                <VBtn class="border-gray-300 text-gray-700" variant="outlined" rounded @click="handleCloseDialog">Huỷ</VBtn>
+                <VBtn variant="tonal" class="bg-green-500 text-white ml-1" rounded @click="handleSaveClick">Lưu thay đổi</VBtn>
             </VCardActions>
         </VCard>
     </VDialog>
 </template>
 
 <script lang="ts">
-import { EnumEditMode, EnumMenuItemCategory } from '@/common/Enumeration';
+import { EnumEditMode } from '@/common/Enumeration';
 import EventBus from '@/common/EventBus';
-import { MLActionResult } from '@/models';
+import { MenuItemCategory, MLActionResult } from '@/models';
 import MenuItem from '@/models/MenuItem';
 import { menuItemStore } from '@/stores/menuItemStore';
 import { mapActions, mapState } from 'pinia';
@@ -82,8 +131,12 @@ import { VMoney } from 'v-money';
 export default {
     directives: {money: VMoney},
 
-    created() {
+    async created() {
         EventBus.on(this.$eventName.ShowFormMenuDetail, this.handleShowDialog as any);
+
+        this.loading = true;
+        this.lstMenuItemCategory = await this.$service.MenuItemCategoryService.getAll();
+        this.loading = false;
     },
 
     beforeUnmount() {
@@ -102,10 +155,15 @@ export default {
                     this.editMode = menuItem.EditMode;
                 }
                 if (menuItem.EditMode === this.$enumeration.EnumEditMode.Add) {
-                    menuItem.Category = EnumMenuItemCategory.Appetizers;
+                    // menuItem.MenuItemCategoryID = EnumMenuItemCategory.Appetizers.toString();
                 }
 
                 this.menuItem = menuItem;
+                
+                if (menuItem.ImageUrl) {
+                    this.itemImageUrl = this.$commonFunction.getImageUrl(menuItem.ImageUrl);
+                }
+
                 this.oldMenuItem = JSON.parse(JSON.stringify(this.menuItem));
                 this.isShow = true;
             }
@@ -136,58 +194,60 @@ export default {
 
             this.menuItem.Price = parseFloat(this.menuItem.Price.toString().replaceAll('.', '').replaceAll(',', ''));
 
-            if (await this.saveChanges('Lưu thành công')) {
+            if ((await this.saveChanges('Lưu thành công')).Success) {
                 this.isShow = false;
             }
             this.loading = false;
         },
 
         /**
-         * Xử lý xoá món
-         */
-        handleDeleteMenuItem() {
-            this.$commonFunction.showDialog({
-                Title: 'Xác nhận xoá món',
-                Message: `Bạn có chắc chắn muốn xoá món <b>${this.menuItem.Name}</b> không?`,
-                ConfirmAction: async () => {
-                    this.menuItem.EditMode = this.$enumeration.EnumEditMode.Delete;
-                    if (await this.saveChanges('Xoá món thành công')) {
-                        this.isShow = false;
-                        this.removeSelectedRecord();
-                    }
-                }
-            });
-        },
-
-        /**
          * Lưu thông tin món
          * @param confirmMessage Câu thông báo khi lưu thành công
          */
-        async saveChanges(confirmMessage: string):Promise<boolean> {
-            let result:MLActionResult|undefined = undefined;
+        async saveChanges(confirmMessage: string):Promise<MLActionResult> {
+            let result:MLActionResult = {
+                Success: false
+            };
 
-            try {
-                result = await this.$service.MenuItemService.saveChanges(this.menuItem);
-            } catch (e) {
-                this.$commonFunction.handleException(e);
-            }
-
-            if (!result) return false;
-
+            result = await this.$service.MenuItemService.updateMenuItem(this.menuItem, this.itemImage);
             if (result.Success) {
-                this.dataList[this.selectedIndex] = result.Data as MenuItem;
+                Object.assign(this.menuItem, result.Data as MenuItem);
+
                 EventBus.emit(this.$eventName.ShowToastMessage, {
                     Message: confirmMessage,
                     Type: 'success'
                 });
-            } else {
-                EventBus.emit(this.$eventName.ShowToastMessage, {
-                    Message: result.ErrorMsg,
-                    Type: 'error'
-                });
+
+                this.itemImage = undefined;
             }
 
-            return result.Success;
+            return result;
+        },
+
+        async selectImage() {
+            await this.$nextTick();
+
+            const introImage = (this.$refs.introImage as any);
+
+            const input = introImage.$el.querySelector('input[type=file]');
+            input.click();
+        },
+
+        getImageUrls(file:File|File[]) {
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    this.itemImage = file as File;
+                    this.itemImageUrl = e.target?.result as string;
+                };
+                reader.readAsDataURL(file as File);
+            }
+        },
+
+        onRemoveMenuItemImage() {
+            this.itemImage = undefined;
+            this.itemImageUrl = '';
+            this.menuItem.ImageUrl = '';
         }
     },
 
@@ -198,33 +258,17 @@ export default {
             editMode: <EnumEditMode>EnumEditMode.Add,
 
             menuItem: <MenuItem>{} as MenuItem,
-            oldMenuItem: <MenuItem>{} as MenuItem
+            oldMenuItem: <MenuItem>{} as MenuItem,
+
+            itemImage: <File|undefined>undefined,
+            itemImageUrl: <string>'',
+
+            lstMenuItemCategory: <MenuItemCategory[]>[]
         }
     },
 
     computed: {
         ...mapState(menuItemStore, ['dataList', 'selectedIndex']),
-
-        listMenuCategory() {
-            return [
-                {
-                    Text: 'Khai vị',
-                    Value: this.$enumeration.EnumMenuItemCategory.Appetizers
-                },
-                {
-                    Text: 'Món chính',
-                    Value: this.$enumeration.EnumMenuItemCategory.MainCourse
-                },
-                {
-                    Text: 'Tráng miệng',
-                    Value: this.$enumeration.EnumMenuItemCategory.Dessert
-                },
-                {
-                    Text: 'Đồ uống',
-                    Value: this.$enumeration.EnumMenuItemCategory.Drink
-                }
-            ]
-        },
 
         moneyConfig() {
             return {
@@ -236,3 +280,28 @@ export default {
     }
 }
 </script>
+
+<style lang="scss" scoped>
+.intro-image-box {
+    width: 96px; 
+    height: 96px; 
+    border: 2px dashed rgb(209, 213, 219);
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    border-radius: 24px; 
+    position: relative;
+    flex-shrink: 0;
+
+    .close-icon {
+        position: absolute; 
+        top: 0; 
+        right: 0; 
+        display: none;
+    }
+
+    &:hover .close-icon {
+        display: block !important;
+    }
+}
+</style>
