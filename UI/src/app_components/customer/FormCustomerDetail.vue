@@ -1,61 +1,58 @@
 <template>
-    <VDialog max-width="800" persistent :model-value="isShow">
-        <VCard :disabled="loading">
+    <VDialog width="500" persistent :model-value="isShow">
+        <VCard :disabled="loading" style="border-radius: 36px;">
             <template v-slot:loader>
                 <VProgressLinear v-if="loading" indeterminate color="primary" />
             </template>
-            <VCardTitle class="d-flex align-center">
-                Thông tin khách hàng
-                <VBtn variant="plain" class="ml-auto" icon="mdi-close" @click="handleCloseDialog" />
+            
+            <!-- Header -->
+            <VCardTitle class="bg-gradient-to-r from-teal-600 to-green-500 px-6 py-4 d-flex justify-between items-center">
+                <h2 className="text-white text-xl font-bold">Khách hàng</h2>
+                <VBtn variant="plain" style="color: white; opacity: 1; width: 40px; height: 40px;" class="ml-auto" icon="mdi-close" @click="handleCloseDialog" />
             </VCardTitle>
 
-            <VCardItem>
+            <!-- Body -->
+            <VCardItem class="pa-6">
                 <VForm ref="form"> 
-                <MLHbox class="mt-2">
-                    <!-- Tên khách hàng -->
-                    <VTextField width="70%" density="compact" variant="outlined" suffix="đ" v-model:model-value="customer.CustomerName"
-                        :rules="[(v:string|undefined) => v !== undefined && v !== '']"
-                    >
-                        <template v-slot:label>
-                            Tên khách hàng
-                            <span style="color: red;">*</span>
-                        </template>
-                    </VTextField>
+                    <div className="space-y-4">
+                        <!-- Tên khách hàng -->
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700">Tên khách hàng <span style="color: red;">*</span></label>
+                            <VTextField class="mt-1" density="compact" variant="outlined" v-model:model-value="record.CustomerName" hide-details
+                                :rules="[(v:string|undefined) => v !== undefined && v !== '']"
+                            />
+                        </div>
 
-                    <VSpacer style="width: 16px;" class="flex-shrink-0 flex-grow-0" />
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700">Số điện thoại <span style="color: red;">*</span></label>
+                            <VTextField class="mt-1" density="compact" variant="outlined" v-model:model-value="record.PhoneNumber" hide-details
+                                v-mask="'0### ### ###'"
+                                :rules="[
+                                    (v:string|undefined) => v !== undefined && v !== ''
+                                ]"
+                            />
+                        </div>
 
-                    <!-- Số điện thoại -->
-                    <VTextField width="70%" density="compact" variant="outlined" suffix="đ" v-model:model-value="customer.PhoneNumber"
-                        :rules="[(v:string|undefined) => v !== undefined && v !== '']"
-                    >
-                        <template v-slot:label>
-                            Số điện thoại
-                            <span style="color: red;">*</span>
-                        </template>
-                    </VTextField>
-                </MLHbox>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700">Email</label>
+                            <VTextField class="mt-1" type="email" density="compact" variant="outlined" v-model:model-value="record.Email" hide-details
+                                :rules="[
+                                    (v:string|undefined) => !v || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)
+                                ]"
+                            />
+                        </div>
 
-                <!-- Địa chỉ -->
-                <VTextField 
-                    density="compact" 
-                    class="flex-grow-1 flex-shrink-0" 
-                    variant="outlined"
-                    v-model:model-value="customer.Address"
-                >
-                    <template v-slot:label>
-                        Địa chỉ
-                    </template>
-                </VTextField>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700">Địa chỉ</label>
+                            <VTextField class="mt-1" type="email" density="compact" variant="outlined" v-model:model-value="record.Address" hide-details />
+                        </div>
+                    </div>
                 </VForm>
             </VCardItem>
 
-            <VCardActions>
-                <VBtn v-if="editMode === $enumeration.EnumEditMode.Edit" prepend-icon="mdi-trash-can-outline" color="error" @click="handleDeleteMenuItem">Xoá khách hàng</VBtn>
-
-                <VSpacer />
-
-                <VBtn @click="handleCloseDialog">Huỷ</VBtn>
-                <VBtn variant="tonal" style="background-color: rgb(var(--v-theme-primary)); color: rgb(var(--v-theme-on-primary));" @click="handleSaveClick">Lưu</VBtn>
+            <VCardActions class="px-6 py-4 bg-gray-50 border-t flex justify-end space-x-3">
+                <VBtn class="border-gray-300 text-gray-700" variant="outlined" rounded @click="handleCloseDialog">Huỷ</VBtn>
+                <VBtn variant="tonal" class="bg-green-500 hover:bg-green-600 text-white ml-1" rounded @click="handleSaveClick">Lưu</VBtn>
             </VCardActions>
         </VCard>
     </VDialog>
@@ -86,25 +83,25 @@ export default {
         /**
          * Xử lý mở form
          */
-        handleShowDialog(customer: Customer) {
-            if (customer) {
-                if (customer.EditMode !== undefined) {
-                    this.editMode = customer.EditMode;
+        handleShowDialog(record: Customer) {
+            if (record) {
+                if (record.EditMode !== undefined) {
+                    this.editMode = record.EditMode;
                 }
 
-                this.customer = customer;
-                this.oldCustomer = JSON.parse(JSON.stringify(this.customer));
+                this.record = record;
+                Object.assign(this.oldRecord, this.record);
                 this.isShow = true;
             }
         },
 
         handleCloseDialog() {
-            switch (this.customer.EditMode) {
+            switch (this.record.EditMode) {
                 case this.$enumeration.EnumEditMode.Add:
                     this.removeSelectedRecord();
                     break;
                 case this.$enumeration.EnumEditMode.Edit:
-                    this.dataList[this.selectedIndex] = this.oldCustomer;
+                    Object.assign(this.record, this.oldRecord);
                     break;
             }
             this.isShow = false;
@@ -120,59 +117,23 @@ export default {
             if (!formValid) return;
 
             this.loading = true;
-            if (await this.saveChanges('Lưu thành công')) {
-                this.isShow = false;
-            }
-            this.loading = false;
-        },
 
-        /**
-         * Xử lý xoá món
-         */
-        handleDeleteMenuItem() {
-            this.$commonFunction.showDialog({
-                Title: 'Xác nhận xoá khách hàng',
-                Message: `Bạn có chắc chắn muốn xoá khách hàng <b>${this.customer.CustomerName}</b> không?`,
-                ConfirmAction: async () => {
-                    this.customer.EditMode = this.$enumeration.EnumEditMode.Delete;
-                    if (await this.saveChanges('Xoá khách hàng thành công')) {
-                        this.isShow = false;
-                        this.removeSelectedRecord();
-                    }
-                }
-            });
-        },
+            this.record.PhoneNumber = this.record.PhoneNumber.replace(/\D/g, "");
+            
+            const actionResult:MLActionResult = await this.$service.CustomerService.saveChanges(this.record);
+            if (actionResult.Success) {
+                Object.assign(this.record, actionResult.Data);
 
-        /**
-         * Lưu thông tin khách hàng
-         * @param confirmMessage Câu thông báo khi lưu thành công
-         */
-        async saveChanges(confirmMessage: string):Promise<boolean> {
-            let result:MLActionResult|undefined = undefined;
-
-            try {
-                result = await this.$service.CustomerService.saveChanges(this.customer);
-            } catch (e) {
-                this.$commonFunction.handleException(e);
-            }
-
-            if (!result) return false;
-
-            if (result.Success) {
-                this.dataList[this.selectedIndex] = result.Data as Customer;
                 EventBus.emit(this.$eventName.ShowToastMessage, {
-                    Message: confirmMessage,
+                    Message: 'Lưu thành công.',
                     Type: 'success'
                 });
-            } else {
-                EventBus.emit(this.$eventName.ShowToastMessage, {
-                    Message: result.ErrorMsg,
-                    Type: 'error'
-                });
+
+                this.isShow = false;
             }
 
-            return result.Success;
-        }
+            this.loading = false;
+        },
     },
 
     data() {
@@ -181,8 +142,8 @@ export default {
             loading: <boolean>false,
             editMode: <EnumEditMode>EnumEditMode.Add,
 
-            customer: <Customer>{} as Customer,
-            oldCustomer: <Customer>{} as Customer
+            record: <Customer>{} as Customer,
+            oldRecord: <Customer>{} as Customer
         }
     },
 

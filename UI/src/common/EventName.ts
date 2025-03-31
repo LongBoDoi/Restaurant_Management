@@ -28,6 +28,12 @@ class EventName {
 
     // Chuyển tab form chi tiết order
     static SwitchTabFormOrderDetail = 'SwitchTabFormOrderDetail';
+
+    // Mở form chi tiết nhóm thực đơn
+    static ShowFormMenuCategoryDetail = 'ShowFormMenuCategoryDetail';
+
+    // Mở form thêm màu cho nhóm thực đơn
+    static ShowFormAddMenuCategoryColor = 'ShowFormAddMenuCategoryColor';
 };
 
 export default EventName;

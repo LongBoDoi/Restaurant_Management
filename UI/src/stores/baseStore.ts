@@ -41,7 +41,7 @@ export function createStoreOnBase<IMLEntity extends MLEntity>(storeID: string, s
 
             removeSelectedRecord() {
                 this._dataList.splice(this._selectedIndex, 1);
-                this._selectedIndex = 0;
+                this._selectedIndex = this._dataList.length - 1;
             },
 
             addNewRecord():IMLEntity {
@@ -55,8 +55,8 @@ export function createStoreOnBase<IMLEntity extends MLEntity>(storeID: string, s
                 return newRecord;
             },
 
-            async getDataPaging(page: number, itemsPerPage: number) {
-                const pagingData:PagingData<IMLEntity> = await service.getDataPaging(page, itemsPerPage);
+            async getDataPaging(page: number, itemsPerPage: number, search: string) {
+                const pagingData:PagingData<IMLEntity> = await service.getDataPaging(page, itemsPerPage, search);
                 
                 this._dataList = pagingData.Data;
                 this._totalCount = pagingData.TotalCount;

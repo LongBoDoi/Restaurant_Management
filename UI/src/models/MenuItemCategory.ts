@@ -7,7 +7,9 @@ interface MenuItemCategory extends MLEntity {
     Description: string,
     Inactive: boolean,
     SortOrder: number,
+    Color: string,
 
+    ItemCount: number,
     MenuItems: MenuItem[]
 }
 

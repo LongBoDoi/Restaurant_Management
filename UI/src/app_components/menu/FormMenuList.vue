@@ -2,15 +2,20 @@
 
 <template>
     <VSheet style="display: flex; flex-direction: column;" class="h-full pb-2">
-        <VBtn width="fit-content" class="bg-green-500 text-white ml-auto" prepend-icon="mdi-plus" @click="handleAddNewMenuItem" rounded>Thêm món mới</VBtn>
+        <VBtn width="fit-content" class="bg-green-500 hover:bg-green-600 hover:scale-105 mr-2 mt-1 text-white ml-auto" prepend-icon="mdi-plus" rounded @click="handleAddNewMenuItem">Thêm món mới</VBtn>
         <VCard style="width: 100% ; height: 100%;" color="rgb(249, 250, 251)" class="rounded-lg d-flex flex-column shadow-md border mt-6">
             <div className="flex items-center space-x-4 px-6 py-4 border-b">
                 <VTextField density="compact" variant="outlined" prepend-inner-icon="mdi-magnify" class="focus:outline-green-500" style="max-width: 320px;" hide-details placeholder="Tìm kiếm món ăn..."
                     :model-value="options.search"
-                    @keypress.enter="options.search = $event.target.value; getMenuItems()"
+                    @keypress.enter="options.search = $event.target.value;"
                 />
 
-                <VSelect density="compact" variant="outlined" hide-details class="ml-4" style="max-width: 160px;" />
+                <VSelect density="compact" variant="outlined" hide-details class="ml-4" style="max-width: 160px;"
+                    :items="lstItemCategory"
+                    item-title="MenuItemCategoryName"
+                    item-value="MenuItemCategoryID"
+                    v-model:model-value="options.categoryID"
+                />
             </div>
 
             <VDataTableServer
@@ -50,7 +55,11 @@
                 <template v-slot:item="{ item, index }">
                     <span v-if="loading">Đang tải dữ liệu</span>
                     <tr v-if="item !== null" style="cursor: pointer;" class="hover:bg-green-50 transition-colors duration-150" 
-                        :class="{'bg-gray-50' : index % 2 !== 0}" @click="setSelectedIndex(index)" @dblclick="handleOpenMenuDetail(item)"
+                        :class="[
+                            {'bg-gray-50' : index % 2 !== 0},
+                            {'bg-green-100' : selectedIndex === index}
+                        ]" 
+                        @click="setSelectedIndex(index)" @dblclick="handleOpenMenuDetail(item)"
                     >
                         <td class="py-4 px-6">{{ item.Name }}</td>
                         <td class="py-4 px-6" style="text-align: end;">{{ $commonFunction.formatThousands(item.Price) }} đ</td>
@@ -63,8 +72,8 @@
                         </td>
                         <td class="py-4 px-6">
                             <MLHbox>
-                                <VBtn icon="mdi-pencil-outline" variant="plain" color="rgb(37, 99, 235)" @click="handleOpenMenuDetail(item)" />
-                                <VBtn icon="mdi-trash-can-outline" variant="plain" color="rgb(220, 38, 38)" @click="handleDeleteMenuItem(item)" />
+                                <VBtn icon="mdi-pencil-outline" :width="40" variant="text" color="rgb(37, 99, 235)" @click="handleOpenMenuDetail(item)" />
+                                <VBtn icon="mdi-trash-can-outline" :width="40" variant="text" color="rgb(220, 38, 38)" @click="handleDeleteMenuItem(item)" />
                             </MLHbox>
                         </td>
                     </tr>
@@ -107,15 +116,18 @@
 </template>
 
 <script lang="ts">
-import { EnumMenuItemCategory } from '@/common/Enumeration';
 import EventBus from '@/common/EventBus';
-import { MenuItem } from '@/models';
+import { MenuItem, MenuItemCategory } from '@/models';
 import { menuItemStore } from '@/stores/menuItemStore';
 import { mapActions, mapState } from 'pinia';
 
 export default {
     created() {
         this.getMenuItems();
+
+        this.$service.MenuItemCategoryService.getAll().then((data: MenuItemCategory[]) => {
+            this.itemCategories = data;
+        });
     },
 
     data() {
@@ -125,8 +137,11 @@ export default {
             options: <any>{
                 page: 1,
                 itemsPerPage: 10,
-                search: ''
-            }
+                search: '',
+                categoryID: this.$commonValue.GuidEmpty
+            },
+
+            itemCategories: <MenuItemCategory[]>[]
         }
     },
 
@@ -156,21 +171,8 @@ export default {
          */
         async getMenuItems() {
             this.loading = true;
-            await this.getMenuItemPaging(this.options.page, this.options.itemsPerPage, this.options.search);
+            await this.getMenuItemPaging(this.options.page, this.options.itemsPerPage, this.options.search, this.options.categoryID);
             this.loading = false;
-        },
-
-        getMenuCategoryName(category: EnumMenuItemCategory) {
-            switch (category) {
-                case EnumMenuItemCategory.Appetizers:
-                    return 'Khai vị';
-                case EnumMenuItemCategory.Dessert:
-                    return 'Tráng miệng';
-                case EnumMenuItemCategory.MainCourse:
-                    return 'Món chính';
-                case EnumMenuItemCategory.Drink:
-                    return 'Đồ uống';
-            }
         },
 
         /**
@@ -192,6 +194,11 @@ export default {
                 ConfirmAction: async () => {
                     item.EditMode = this.$enumeration.EnumEditMode.Delete;
                     if ((await this.$service.MenuItemService.saveChanges(item)).Success) {
+                        EventBus.emit(this.$eventName.ShowToastMessage, {
+                            Message: 'Xoá thành công.',
+                            Type: 'success'
+                        });
+                        
                         this.dataList.splice(this.dataList.indexOf(item), 1);
                     }
                 }
@@ -227,6 +234,13 @@ export default {
             const startIndex:number = (this.options.page - 1) * (this.options.itemsPerPage) + 1;
             const endIndex:number = startIndex + Math.min(this.options.itemsPerPage, this.totalCount) - 1;
             return `Hiển thị ${startIndex}-${endIndex} trên ${this.totalCount} bản ghi`;
+        },
+
+        lstItemCategory() {
+            return [{
+                MenuItemCategoryID: this.$commonValue.GuidEmpty,
+                MenuItemCategoryName: 'Tất cả'
+            } as MenuItemCategory].concat(this.itemCategories);
         }
     }
 }

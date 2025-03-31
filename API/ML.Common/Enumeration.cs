@@ -53,23 +53,27 @@
     /// <summary>
     /// Enum quyền nhân viên
     /// </summary>
-    public enum EnumRole
+    public enum EnumEmployeeWorkStatus
     {
         /// <summary>
-        /// Administrator
+        /// Đang làm việc
         /// </summary>
-        Admin = 0,
+        Active = 0,
 
-        Manager = 1,
+        /// <summary>
+        /// Thử việc
+        /// </summary>
+        Probation = 1,
 
-        Cashier = 2,
+        /// <summary>
+        /// Đang nghỉ phép
+        /// </summary>
+        OnLeave = 2,
 
-        Waiter = 3
-    }
-
-    public enum EnumMenuItemCategory
-    {
-
+        /// <summary>
+        /// Nghỉ việc
+        /// </summary>
+        Terminated = 3
     }
 
     public enum EnumOrderStatus

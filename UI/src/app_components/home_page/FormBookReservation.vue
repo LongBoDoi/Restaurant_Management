@@ -13,7 +13,7 @@
                             <label htmlFor="name" class="block text-white font-medium">
                                 Họ tên
                             </label>
-                            <VTextField variant="outlined" style="color: white;" bg-color="rgba(52, 211, 153, 0.5)" placeholder="Nhập họ tên của bạn" v-model:model-value="reservation.CustomerName"
+                            <VTextField class="placeholder-emerald-700/50" bg-color="rgba(209, 250, 229, 0.9)" variant="outlined" placeholder="Nhập họ tên của bạn" v-model:model-value="reservation.CustomerName"
                                 :rules="[textFieldRequireRule]"
                              />
                         </div>
@@ -22,7 +22,7 @@
                             <label htmlFor="phone" class="block text-white font-medium">
                                 SĐT
                             </label>
-                            <VTextField variant="outlined" style="color: white;" bg-color="rgba(52, 211, 153, 0.5)" placeholder="Nhập số điện thoại của bạn" v-model:model-value="reservation.CustomerPhoneNumber"
+                            <VTextField variant="outlined" class="placeholder-emerald-700/50" bg-color="rgba(209, 250, 229, 0.9)" placeholder="Nhập số điện thoại của bạn" v-model:model-value="reservation.CustomerPhoneNumber"
                                 :rules="[textFieldRequireRule]"
                              />
                         </div>
@@ -33,14 +33,14 @@
                             <label htmlFor="date" class="block text-white font-medium">
                                 Ngày
                             </label>
-                            <MLDateField variant="outlined" style="color: white;" bg-color="rgba(52, 211, 153, 0.5)" v-model="reservation.ReservationDate" required />
+                            <MLDateField variant="outlined" class="placeholder-emerald-700/50" bg-color="rgba(209, 250, 229, 0.9)" v-model="reservation.ReservationDate" required />
                         </div>
 
                         <div class="space-y-2">
                             <label htmlFor="time" class="block text-white font-medium">
                                 Giờ
                             </label>
-                            <MLTimeField variant="outlined" style="color: white;" bg-color="rgba(52, 211, 153, 0.5)" v-model="reservation.ReservationDate" />
+                            <MLTimeField variant="outlined" class="placeholder-emerald-700/50" bg-color="rgba(209, 250, 229, 0.9)" v-model="reservation.ReservationDate" />
                         </div>
                     </div>
 
@@ -48,23 +48,18 @@
                         <label htmlFor="guests" class="block text-white font-medium">
                             Số lượng người
                         </label>
-                        <div class="flex items-center" style="width: 150px;">
-                            <VTextField :rules="[textFieldRequireRule]" class="text-center" type="number" variant="outlined" style="color: white;" bg-color="rgba(52, 211, 153, 0.5)" hide-spin-buttons v-model:model-value="reservation.GuestCount">
-                                <template #prepend>
-                                    <VIcon icon="mdi-minus" style="cursor: pointer;" @click="if(reservation.GuestCount > 1) { reservation.GuestCount--; }" />
-                                </template>
-                                <template #append>
-                                    <VIcon icon="mdi-plus" style="cursor: pointer;" @click="reservation.GuestCount++;" />
-                                </template>
-                            </VTextField>
+                        <div class="flex items-center space-x-3" style="width: 168px;">
+                            <VBtn :width="40" icon="mdi-minus" style="cursor: pointer; opacity: 1; background-color: rgb(52, 211, 153); color: white;" @click="if(reservation.GuestCount > 1) { reservation.GuestCount--; }" />
+                            <VTextField :rules="[textFieldRequireRule]" class="text-center placeholder-emerald-700/50" type="number" variant="outlined" bg-color="rgba(209, 250, 229, 0.9)" hide-spin-buttons v-model:model-value="reservation.GuestCount" hide-details />
+                            <VBtn :width="40" icon="mdi-plus" style="cursor: pointer; opacity: 1; background-color: rgb(52, 211, 153); color: white;" @click="reservation.GuestCount++;" />
                         </div>
                     </div>
 
-                    <div class="space-y-2">
+                    <div class="space-y-2 mt-4">
                         <label htmlFor="request" class="block text-white font-medium">
                             Yêu cầu
                         </label>
-                        <VTextarea variant="outlined" style="color: white;" bg-color="rgba(52, 211, 153, 0.5)" placeholder="Nhập các yêu cầu đặc biệt nếu có" no-resize v-model:model-value="reservation.Note" />
+                        <VTextarea class="placeholder-emerald-700/50" variant="outlined" bg-color="rgba(209, 250, 229, 0.9)" placeholder="Nhập các yêu cầu đặc biệt nếu có" no-resize v-model:model-value="reservation.Note" />
                     </div>
 
                     <div class="flex justify-end">
@@ -156,3 +151,12 @@ export default {
     }
 }
 </script>
+
+<style lang="scss" scoped>
+:deep() {
+    .v-input.placeholder-emerald-700\/50 .v-field__input::placeholder {
+        color: rgba(4, 120, 87, 0.7);
+        opacity: 1;
+    }
+}
+</style>

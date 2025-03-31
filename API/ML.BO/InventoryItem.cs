@@ -1,4 +1,5 @@
 ﻿using API.ML.BOBase;
+using API.ML.CustomAtrributes;
 using System.ComponentModel.DataAnnotations;
 
 namespace API.ML.BO
@@ -14,12 +15,18 @@ namespace API.ML.BO
         /// <summary>
         /// Tên NVL
         /// </summary>
+        [NameField]
         public string Name { get; set; } = string.Empty;
 
         /// <summary>
         /// Số lượng tồn kho
         /// </summary>
-        public int Quantity { get; set; }
+        public decimal Quantity { get; set; }
+
+        /// <summary>
+        /// Số lượng cảnh báo tồn kho
+        /// </summary>
+        public decimal WarningStockQuantity { get; set; }
 
         /// <summary>
         /// Đơn vị tính
@@ -27,8 +34,8 @@ namespace API.ML.BO
         public string Unit { get; set; } = string.Empty;
 
         /// <summary>
-        /// Số lượng tối thiểu để gợi ý đặt hàng
+        /// Dữ liệu thực đơn
         /// </summary>
-        public int ReorderLevel { get; set; }
+        public IEnumerable<MenuItemInventoryItem> MenuItemInventoryItems { get; set; } = [];
     }
 }

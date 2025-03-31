@@ -1,5 +1,6 @@
 ﻿using API.ML.BOBase;
 using API.ML.Common;
+using API.ML.CustomAtrributes;
 using System.ComponentModel.DataAnnotations;
 
 namespace API.ML.BO
@@ -15,22 +16,39 @@ namespace API.ML.BO
         /// <summary>
         /// Mã nhân viên
         /// </summary>
+        [NameField]
+        [StringLength(25)]
         public string EmployeeCode { get; set; } = string.Empty;
 
         /// <summary>
         /// Tên nhân viên
         /// </summary>
+        [NameField]
+        [StringLength(128)]
         public string EmployeeName { get; set; } = "";
 
         /// <summary>
         /// Số điện thoại
         /// </summary>
-        public string? PhoneNumber { get; set; }
+        [StringLength(50)]
+        public string? PhoneNumber { get; set; } = string.Empty;
 
         /// <summary>
-        /// Vai trò
+        /// Số điện thoại
         /// </summary>
-        public EnumRole Role { get; set; }
+        [StringLength(50)]
+        public string? Email { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Trạng thái làm việc
+        /// </summary>
+        public EnumEmployeeWorkStatus WorkStatus { get; set; }
+
+        /// <summary>
+        /// Ảnh đại diện
+        /// </summary>
+        [StringLength(128)]
+        public string? ImageUrl { get; set; }
 
         /// <summary>
         /// Lịch làm việc

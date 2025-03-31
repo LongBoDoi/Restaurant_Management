@@ -19,17 +19,17 @@
 
                 <VTabsWindow v-model:model-value="customerTab">
                     <VTabsWindowItem :value="0">
-                        <VForm ref="formCustomerLogin" class="space-y-6 mt-4 sm:mt-6" :disabled="customerLoading" >
+                        <VForm @keypress.enter="handleCustomerLogin" ref="formCustomerLogin" class="space-y-6 mt-4 sm:mt-6" :disabled="customerLoading" >
                             <VTextField 
-                                :rules="[textFieldRequireRule]" 
+                                :rules="[$commonValue.textFieldRequireRule]" 
                                 variant="outlined" 
                                 style="
                                     color: white;
                                 "
-                                label="Số điện thoại"
+                                label="Số điện thoại/Email"
                                 bg-color="rgba(52, 211, 153, 0.5)"
                                 hide-details
-                                v-model:model-value="customerUserLogin.Username"
+                                v-model:model-value="customerLoginData.Username"
                             />
                             <VTextField 
                                 type="password"
@@ -38,8 +38,8 @@
                                 bg-color="rgba(52, 211, 153, 0.5)"
                                 label="Mật khẩu"
                                 hide-details
-                                :rules="[textFieldRequireRule]"
-                                v-model:model-value="customerUserLogin.Password"
+                                :rules="[$commonValue.textFieldRequireRule]"
+                                v-model:model-value="customerLoginData.Password"
                             />
                             <VBtn 
                                 style="
@@ -58,11 +58,27 @@
                         </VForm>
                     </VTabsWindowItem>
                     <VTabsWindowItem :value="1">
-                        <VForm :disabled="customerLoading" ref="formCustomerRegister" class="mt-4 sm:mt-6">
-                            <VTextField ref="txtCustomerNameSignup" class="mt-2" :rules="[textFieldRequireRule]" style="color: white;" label="Họ tên" variant="outlined" bg-color="rgba(52, 211, 153, 0.5)" />
-                            <VTextField ref="txtCustomerPhoneSignup" bg-color="rgba(52, 211, 153, 0.5)" style="color: white;" :rules="[textFieldRequireRule]" :error="customerPhoneSignupError !== ''" :errorMessages="customerPhoneSignupError" label="Số điện thoại" variant="outlined" @update:modelValue="customerPhoneSignupError = ''" />
-                            <VTextField ref="txtCustomerPasswordSignup" bg-color="rgba(52, 211, 153, 0.5)" :rules="[textFieldRequireRule]" style="color: white;" type="password" label="Mật khẩu" variant="outlined" />
-                            <VTextField ref="txtCustomerConfirmPasswordSignup" bg-color="rgba(52, 211, 153, 0.5)" :rules="[textFieldRequireRule, confirmPasswordRule]" style="color: white;" type="password" label="Nhập lại mật khẩu" variant="outlined" />
+                        <VForm @keypress.enter="handleCustomerSignup" :disabled="customerLoading" ref="formCustomerRegister" class="mt-4 sm:mt-6">
+                            <VTextField v-model:model-value="customerSignupData.CustomerName" class="mt-2" :rules="[$commonValue.textFieldRequireRule]" style="color: white;" label="Họ tên" variant="outlined" bg-color="rgba(52, 211, 153, 0.5)" />
+                            <VTextField bg-color="rgba(52, 211, 153, 0.5)" style="color: white;" :rules="[$commonValue.textFieldRequireRule]" label="Số điện thoại" variant="outlined"
+                                v-mask="'0### ### ###'"
+                                v-on:update:model-value="(value: string) => {
+                                    customerSignupData.PhoneNumber = $commonFunction.getRealPhoneNumberValue(value);
+                                }"
+                            />
+                            <VTextField v-model:model-value="customerSignupData.Email" bg-color="rgba(52, 211, 153, 0.5)" style="color: white;" label="Email" variant="outlined" />
+
+                            <MLVbox v-if="customerSignupData.UserLogin !== undefined">
+                                <VTextField v-model:model-value="customerSignupData.UserLogin.Password" bg-color="rgba(52, 211, 153, 0.5)" :rules="[$commonValue.textFieldRequireRule]" style="color: white;" type="password" label="Mật khẩu" variant="outlined" />
+                                <VTextField bg-color="rgba(52, 211, 153, 0.5)" style="color: white;" type="password" label="Nhập lại mật khẩu" variant="outlined"
+                                    :rules="[
+                                        (v) => {
+                                            return v !== undefined && v !== '' && v === customerSignupData.UserLogin?.Password;
+                                        }
+                                    ]"
+                                />
+                            </MLVbox>
+                            
 
                             <VCardActions>
                                 <VBtn rounded :disabled="customerLoading" style="background-color: rgb(var(--v-theme-background)); color: rgb(var(--v-theme-primary)); margin-left: auto; width: 100%;" @click="handleCustomerSignup">Đăng ký</VBtn>
@@ -86,8 +102,8 @@
                 <h2 className="text-white text-2xl font-bold text-center mb-6">Dành cho nhân viên</h2>
 
                 <VForm @keypress.enter="handleEmployeeLogin" :disabled="employeeLoading" ref="formLoginCustomer" style="width: 100%;">
-                    <VTextField :rules="[textFieldRequireRule]" v-model="employeeLoginData.Username" label="Tên đăng nhập" variant="outlined" style="color: white;" bg-color="rgba(52, 211, 153, 0.5)" />
-                    <VTextField :rules="[textFieldRequireRule]" v-model="employeeLoginData.Password" ref="txtPasswordEmployee" type="password" label="Mật khẩu" variant="outlined" style="color: white;" bg-color="rgba(52, 211, 153, 0.5)" />
+                    <VTextField :rules="[$commonValue.textFieldRequireRule]" v-model="employeeLoginData.Username" label="Tên đăng nhập" variant="outlined" style="color: white;" bg-color="rgba(52, 211, 153, 0.5)" />
+                    <VTextField :rules="[$commonValue.textFieldRequireRule]" v-model="employeeLoginData.Password" ref="txtPasswordEmployee" type="password" label="Mật khẩu" variant="outlined" style="color: white;" bg-color="rgba(52, 211, 153, 0.5)" />
                 </VForm>
 
                 <VCardActions style="width: 100%; margin-top: 8px;">
@@ -107,7 +123,6 @@
 </template>
 
 <script lang="ts">
-import { EnumApplicationErrorCode } from '@/common/Enumeration';
 import EventBus from '@/common/EventBus';
 import { Customer, MLActionResult, UserLogin } from '@/models';
 
@@ -117,15 +132,12 @@ export default {
             customerLoading: <boolean>false,
             employeeLoading: <boolean>false,
 
-            employeeRequestStatus: <''|'success'|'error'>'',
-            employeeRequestMessage: <string>'',
-
             customerTab: <number>0,
 
-            customerPhoneSignupError: <string>'',
-
-            customerUserLogin: <UserLogin>{} as UserLogin,
-            customerLoginError: <string>'',
+            customerLoginData: <UserLogin>{} as UserLogin,
+            customerSignupData: <Customer>{
+                UserLogin: {} as UserLogin
+            } as Customer,
 
             employeeLoginData: <UserLogin>{} as UserLogin
         }
@@ -143,7 +155,7 @@ export default {
 
             let result:MLActionResult|undefined = undefined;
             try {
-                result = await this.$service.UserLoginService.loginCustomer(this.customerUserLogin);
+                result = await this.$service.UserLoginService.loginCustomer(this.customerLoginData);
             } catch (e) {
                 this.$commonFunction.handleException(e);
             } finally {
@@ -181,18 +193,13 @@ export default {
 
             this.customerLoading = true;
 
-            const customer = {
-                CustomerName: (this.$refs.txtCustomerNameSignup as any).value,
-                PhoneNumber: (this.$refs.txtCustomerPhoneSignup as any).value,
-                UserLogin: {
-                    Username: (this.$refs.txtCustomerPhoneSignup as any).value,
-                    Password: (this.$refs.txtCustomerPasswordSignup as any).value
-                } as UserLogin
-            } as Customer;
-
             let result:MLActionResult|undefined = undefined;
             try {
-                result = await this.$service.UserLoginService.registerNewCustomer(customer);
+                if (this.customerSignupData.UserLogin) {
+                    this.customerSignupData.UserLogin.Username = this.customerSignupData.PhoneNumber;
+                }
+
+                result = await this.$service.UserLoginService.registerNewCustomer(this.customerSignupData);
             } catch (e) {
                 this.$commonFunction.handleException(e);
             } finally {
@@ -209,12 +216,6 @@ export default {
                 setTimeout(() => {
                     window.location.reload();
                 }, 1000);
-            } else {
-                switch (result.ErrorCode) {
-                    case EnumApplicationErrorCode.DuplicateLoginInfo:
-                        this.customerPhoneSignupError = 'Số điện thoại đã được đăng ký.';
-                        break;
-                }
             }
         },
 
@@ -246,30 +247,10 @@ export default {
                 if (!this.$config.UseCookies) {
                     localStorage.setItem(this.$localStorageKey.AuthToken, result.Data);
                 }
-                this.employeeRequestMessage = 'Đăng nhập thành công';
-                this.employeeRequestStatus = 'success';
 
                 window.location.reload();
-            } else {
-                this.employeeRequestMessage = result.ErrorMsg ?? '';
-                this.employeeRequestStatus = 'error';
             }
         }
     },
-
-    computed: {
-        textFieldRequireRule() {
-            return (str:string|undefined) => {
-                return str === undefined || str !== '';
-            }
-        },
-
-        confirmPasswordRule() {
-            return (str:string) => {
-                const txtPassword = this.$refs.txtCustomerPasswordSignup as any
-                return str === txtPassword.value || 'Mật khẩu không trùng khớp.';
-            }
-        },
-    }
 }
 </script>

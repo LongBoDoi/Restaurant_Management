@@ -1,4 +1,5 @@
 ﻿using API.ML.BOBase;
+using API.ML.CustomAtrributes;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -16,6 +17,7 @@ namespace API.ML.BO
         /// Tên nhóm thực đơn
         /// </summary>
         [StringLength(128)]
+        [NameField]
 
         public string MenuItemCategoryName { get; set; } = string.Empty;
 
@@ -36,8 +38,20 @@ namespace API.ML.BO
         public int SortOrder { get; set; }
 
         /// <summary>
+        /// Màu hiển thị
+        /// </summary>
+        [StringLength(25)]
+        public string Color { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Số lượng món của thực đơn
+        /// </summary>
+        [NotMapped]
+        public int ItemCount { get; set; }
+
+        /// <summary>
         /// Danh sách món trong nhóm
         /// </summary>
-        public IEnumerable<MenuItem> MenuItems { get; set; } = [];
+        public List<MenuItem>? MenuItems { get; set; }
     }
 }

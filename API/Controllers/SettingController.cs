@@ -25,7 +25,7 @@ namespace API.Controllers
 
             try
             {
-                List<Setting> settings = _context.Setting.Where(s => CommonValue.CustomerScreenSettingKeys.Contains(s.SettingKey)).ToList();
+                List<Setting> settings = _context.Setting.ToList();
                 result.Data = settings;
             }
             catch (Exception ex)
@@ -57,6 +57,7 @@ namespace API.Controllers
                 {
                     List<MenuItem> lstMenuItems = [];
 
+                    // Lọc danh sách thực đơn trong thiết lập
                     switch (customerMenuItemDisplayType.Value)
                     {
                         case 0:
@@ -73,10 +74,12 @@ namespace API.Controllers
                             break;
                     }
 
+                    // Lọc theo từng nhóm thực đơn
                     if (lstMenuItems.Any())
                     {
-                        List<MenuItemCategory> lstCategories = _context.MenuItemCategory.OrderBy(mic => mic.SortOrder).ToList();
+                        List<MenuItemCategory> lstCategories = _context.MenuItemCategory.AsNoTracking().OrderBy(mic => mic.SortOrder).ToList();
 
+                        // Nhóm thực đơn
                         foreach (MenuItemCategory category in lstCategories)
                         {
                             List<MenuItem> categoryItems = lstMenuItems.Where(mi => mi.MenuItemCategoryID == category.MenuItemCategoryID).ToList();
@@ -87,11 +90,16 @@ namespace API.Controllers
                             }
                         }
 
-                        resultData.Add(new MenuItemCategory
+                        // Món không có nhóm -> Cho vào một nhóm "Khác"
+                        IEnumerable<MenuItem> lstItemNoCategory = lstMenuItems.Where(mi => !mi.MenuItemCategoryID.HasValue);
+                        if (lstItemNoCategory.Any())
                         {
-                            MenuItemCategoryName = "Khác",
-                            MenuItems = lstMenuItems.Where(mi => !mi.MenuItemCategoryID.HasValue)
-                        });
+                            resultData.Add(new MenuItemCategory
+                            {
+                                MenuItemCategoryName = "Khác",
+                                MenuItems = lstMenuItems.Where(mi => !mi.MenuItemCategoryID.HasValue).ToList()
+                            });
+                        }
                     }
                 }
                 

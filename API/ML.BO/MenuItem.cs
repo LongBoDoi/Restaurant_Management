@@ -47,12 +47,17 @@ namespace API.ML.BO
         /// <summary>
         /// Dữ liệu order detail
         /// </summary>
-        public IEnumerable<OrderDetail>? OrderDetails { get; set; }
+        public List<OrderDetail>? OrderDetails { get; set; }
 
         /// <summary>
         /// Dữ liệu nhóm thực đơn
         /// </summary>
         [ForeignKey("MenuItemCategoryID")]
         public MenuItemCategory? MenuItemCategory { get; set; }
+
+        /// <summary>
+        /// Dữ liệu nguyên liệu
+        /// </summary>
+        public List<MenuItemInventoryItem>? MenuItemInventoryItems { get; set; }
     }
 }

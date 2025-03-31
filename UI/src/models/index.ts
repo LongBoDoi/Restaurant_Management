@@ -10,3 +10,4 @@ export type { default as MenuItemCategory } from './MenuItemCategory';
 export type { default as InventoryItem } from './InventoryItem';
 export type { default as Order } from './Order';
 export type { default as Setting } from './Setting';
+export type { default as MenuItemInventoryItem } from './MenuItemInventoryItem';

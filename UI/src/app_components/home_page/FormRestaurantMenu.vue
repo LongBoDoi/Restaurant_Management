@@ -14,21 +14,21 @@
             </VCarousel>
 
             <MLVbox v-if="displayMenuType === 1" style="width: 100%; overflow-y: auto;" class="mt-10">
-                <MLVbox v-for="category in lstDisplayItems">
+                <MLVbox v-for="category in lstDisplayItems" class="mb-12">
                     <h3 className="text-2xl font-semibold text-emerald-600 mb-6 pb-2 border-b-2 border-emerald-200">
                         {{ category.MenuItemCategoryName }}
                     </h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-1 px-1">
                         <div v-for="menuItem in category.MenuItems" className="bg-white pa-3 md:p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 flex flex-col md:flex-row gap-3 md:gap-4 group">
                             <div className="w-full h-48 md:w-24 md:h-24 rounded-lg overflow-hidden flex-shrink-0">
-                                <div style="background-color: rgb(var(--v-theme-primary));" class="w-full h-full d-flex align-center justify-center">
+                                <img
+                                    v-if="menuItem.ImageUrl"
+                                    :src="$commonFunction.getImageUrl(menuItem.ImageUrl)"
+                                    className="w-full h-full object-cover hover:scale-110 transition-transform duration-500"
+                                />
+                                <div v-else style="background-color: rgb(var(--v-theme-primary));" class="w-full h-full d-flex align-center justify-center">
                                     <VIcon icon="mdi-food" size="40" color="white" />
                                 </div>
-                                <!-- <img
-                                    src="https://i.imgur.com/6JxRwDT.jpg"
-                                    alt="Gỏi cuốn tôm thịt"
-                                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                                /> -->
                             </div>
                             <div className="flex-1">
                                 <div className="flex justify-between items-start">

@@ -59,6 +59,9 @@ class CommonFunction {
      * Lấy đường dẫn file ảnh trên BE
      */
     static getImageUrl = (fileName: string) => {
+        if (!fileName) {
+            return '';
+        }
         return `${import.meta.env.VITE_API_URL}/uploads/${fileName}`;
     }
 
@@ -80,8 +83,32 @@ class CommonFunction {
      * Định dạng số theo hàng nghìn
      */
     static formatThousands = (number: number) => {
-        return number?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".") ?? '';
-    }
+        // return number?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".") ?? '';
+        return number?.toLocaleString('de-DE', { minimumFractionDigits: 0, maximumFractionDigits: 3 }) ?? '';
+    };
+
+    /**
+     * Định dạng số điện thoại
+     */
+    static formatPhoneNumber = (phoneNumber: string|undefined) => {
+        if (!phoneNumber) return "";
+        return phoneNumber.replace(/(\d{4})(\d{3})(\d{3})/, "$1 $2 $3");
+    };
+
+    /**
+     * Lấy giá trị SĐT
+     */
+    static getRealPhoneNumberValue = (phoneNumber: string) => {
+        if (!phoneNumber) return '';
+        return phoneNumber.replace(/\D/g, "");
+    };
+
+    /**
+     * Trả về dữ liệu số thực từ số bị format theo dạng ###.###,###
+     */
+    static getRealFloatValue = (number: number|undefined) => {
+        return parseFloat(number?.toString().replaceAll('.', '').replaceAll(',', '.') ?? '0');
+    };
 
     /**
      * Xử lý exception khi gọi service

@@ -60,20 +60,20 @@ export enum EnumReservationStatus {
 }
 
 /**
- * Enum vai trò nhân viên
+ * Enum trạng thái làm việc của nhân viên
  */
-export enum EnumRole {
-    /// Administrator
-    Admin = 0,
+export enum EnumEmployeeWorkStatus {
+    // Đang làm việc
+    Active = 0,
 
-    //Quản lý
-    Manager = 1,
+    // Thử việc
+    Probation = 1,
 
-    //Thu ngân
-    Cashier = 2,
+    // Nghỉ phép
+    OnLeave = 2,
 
-    //Nhân viên phục vụ
-    Waiter = 3
+    // Nghỉ việc
+    Terminated = 3
 }
 
 /**
@@ -129,9 +129,10 @@ class EnumerationInterface {
     EnumMenuItemCategory: typeof EnumMenuItemCategory = EnumMenuItemCategory;
     EnumEditMode: typeof EnumEditMode = EnumEditMode;
     EnumReservationStatus: typeof EnumReservationStatus = EnumReservationStatus;
-    EnumRole: typeof EnumRole = EnumRole;
+    EnumRole: typeof EnumEmployeeWorkStatus = EnumEmployeeWorkStatus;
     EnumOrderStatus: typeof EnumOrderStatus = EnumOrderStatus;
     EnumDayOfWeek: typeof EnumDayOfWeek = EnumDayOfWeek;
+    EnumEmployeeWorkStatus: typeof EnumEmployeeWorkStatus = EnumEmployeeWorkStatus;
 }
 
 export default EnumerationInterface;

@@ -23,7 +23,7 @@ namespace API.ML.Common
                 }
             }
 
-            return stringBuilder.ToString().Normalize(NormalizationForm.FormC);
+            return stringBuilder.ToString().Normalize(NormalizationForm.FormC).Replace('đ', 'd').Replace('Đ', 'D');
         }
     }
 }

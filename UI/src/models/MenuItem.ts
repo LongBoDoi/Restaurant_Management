@@ -1,4 +1,5 @@
 import MenuItemCategory from "./MenuItemCategory";
+import MenuItemInventoryItem from "./MenuItemInventoryItem";
 import MLEntity from "./MLEntity";
 
 interface MenuItem extends MLEntity {
@@ -10,7 +11,8 @@ interface MenuItem extends MLEntity {
     OutOfStock: boolean,
     ImageUrl: string,
 
-    MenuItemCategory?: MenuItemCategory
+    MenuItemCategory?: MenuItemCategory,
+    MenuItemInventoryItem: MenuItemInventoryItem[]
 };
 
 export default MenuItem;

@@ -1,6 +1,7 @@
 ﻿using API.ML.BO;
 using API.ML.Common;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 
 namespace API.ML.BOBase
 {
@@ -140,14 +141,15 @@ namespace API.ML.BOBase
             {
                 e.HasIndex(c => c.EmployeeCode).IsUnique();
                 e.HasData(
-                    new { EmployeeID = new Guid("d0929aef-1a5b-44f6-962d-01f7f9bb2b2b"), EmployeeCode = "admin", EmployeeName = "Admin", Role = EnumRole.Admin }
+                    new { EmployeeID = new Guid("d0929aef-1a5b-44f6-962d-01f7f9bb2b2b"), EmployeeCode = "admin", EmployeeName = "Admin", WorkStatus = EnumEmployeeWorkStatus.Active }
                 );
             });
 
             modelBuilder.Entity<UserLogin>(entity =>
             {
                 entity.HasOne(ul => ul.Employee).WithOne(e => e.UserLogin).HasForeignKey<UserLogin>(ul => ul.EmployeeID);
-                entity.HasOne(ul => ul.Customer).WithOne(c => c.UserLogin).HasForeignKey<UserLogin>(ul => ul.CustomerID);
+                entity.HasOne(ul => ul.Customer).WithOne(c => c.UserLogin).HasForeignKey<UserLogin>(ul => ul.CustomerID)
+                    .OnDelete(DeleteBehavior.Cascade);
                 entity.HasData(
                     new UserLogin { UserLoginID = new Guid("8b59dd9f-72d8-4d01-a971-03bc98c2262f"), EmployeeID = new Guid("d0929aef-1a5b-44f6-962d-01f7f9bb2b2b"), Username = "admin", Password = "123456" }
                 );
@@ -169,7 +171,8 @@ namespace API.ML.BOBase
                     new Setting { SettingID = new Guid("b9ea5327-bbda-4f44-ba55-ccf02ed1b7ff"), SettingKey = "DisplayMenuScreenByItemsForCustomerType", SettingValue = $"{(int)EnumDisplayMenuScreenByItemsForCustomerType.All}", DataType = EnumDataType.Integer },
                     new Setting { SettingID = new Guid("c5bfe361-32f5-4b12-ba50-fc877e88c1f9"), SettingKey = "ListMenuScreenForCustomerImages", SettingValue = "[]" },
                     new Setting { SettingID = new Guid("d69a097b-f337-4521-a302-d9ed9a876a5e"), SettingKey = "ListMenuScreenForCustomerItems", SettingValue = "[]" },
-                    new Setting { SettingID = new Guid("f10e0c45-17d3-4715-802e-30a5b5abc14c"), SettingKey = "DisplayBookingScreenForCustomer", SettingValue = "true", DataType = EnumDataType.Boolean }
+                    new Setting { SettingID = new Guid("f10e0c45-17d3-4715-802e-30a5b5abc14c"), SettingKey = "DisplayBookingScreenForCustomer", SettingValue = "true", DataType = EnumDataType.Boolean },
+                    new Setting { SettingID = new Guid("6c9b5da9-56a8-40ad-8fa9-866e5f4cbd50"), SettingKey = "MenuCategoryColors", SettingValue = $"{JsonConvert.SerializeObject(new string[] { "#EF4444", "#3B82F6", "#22C55E", "#F59E0B", "#A855F7", "#EC4899", "#6366F1", "#14B8A6" })}" }
                 );
             });
 
@@ -181,11 +184,24 @@ namespace API.ML.BOBase
             modelBuilder.Entity<MenuItemCategory>(mic =>
             {
                 mic.HasData(
-                    new MenuItemCategory { MenuItemCategoryID = new Guid("aa5e2d3f-4deb-4434-9ef2-19f5e51f21ad"), MenuItemCategoryName = "Khai vị", SortOrder = 0 },
-                    new MenuItemCategory { MenuItemCategoryID = new Guid("758296ed-75e6-45c6-8a1e-b075524027af"), MenuItemCategoryName = "Món chính", SortOrder = 1 },
-                    new MenuItemCategory { MenuItemCategoryID = new Guid("87de53a6-68e2-46a3-b998-7df936dfa1c5"), MenuItemCategoryName = "Tráng miệng", SortOrder = 2 },
-                    new MenuItemCategory { MenuItemCategoryID = new Guid("78ef8d8c-a68e-40c9-99ce-5bb496faef2b"), MenuItemCategoryName = "Đồ uống", SortOrder = 3 }
+                    new MenuItemCategory { MenuItemCategoryID = new Guid("aa5e2d3f-4deb-4434-9ef2-19f5e51f21ad"), MenuItemCategoryName = "Khai vị", Color = "#22C55E", SortOrder = 0 },
+                    new MenuItemCategory { MenuItemCategoryID = new Guid("758296ed-75e6-45c6-8a1e-b075524027af"), MenuItemCategoryName = "Món chính", Color = "#F59E0B", SortOrder = 1 },
+                    new MenuItemCategory { MenuItemCategoryID = new Guid("87de53a6-68e2-46a3-b998-7df936dfa1c5"), MenuItemCategoryName = "Tráng miệng", Color = "#3B82F6", SortOrder = 2 },
+                    new MenuItemCategory { MenuItemCategoryID = new Guid("78ef8d8c-a68e-40c9-99ce-5bb496faef2b"), MenuItemCategoryName = "Đồ uống", Color = "#A855F7", SortOrder = 3 }
                 );
+            });
+
+            modelBuilder.Entity<MenuItemInventoryItem>(miii =>
+            {
+                miii.HasKey(sc => new { sc.MenuItemID, sc.InventoryItemID });
+
+                miii.HasOne(sc => sc.MenuItem)
+                    .WithMany(s => s.MenuItemInventoryItems)
+                    .HasForeignKey(sc => sc.MenuItemID);
+
+                miii.HasOne(e => e.InventoryItem)
+                    .WithMany(e => e.MenuItemInventoryItems)
+                    .HasForeignKey(e => e.InventoryItemID);
             });
         }
 

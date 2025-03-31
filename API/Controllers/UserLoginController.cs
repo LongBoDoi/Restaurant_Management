@@ -44,19 +44,36 @@ namespace API.Controllers
 
             try
             {
-                if (customer.UserLogin != null)
-                {
-                    UserLogin? existUser = _context.UserLogin.FirstOrDefault(ul => ul.Username.Equals(customer.UserLogin.Username, StringComparison.OrdinalIgnoreCase));
-                    if (existUser != null)
-                    {
-                        result.Success = false;
-                        result.ErrorCode = EnumApplicationErrorCode.DuplicateLoginInfo;
-                        return result;
-                    }
+                Customer? dbCustomer = _context.Customer.FirstOrDefault(c =>
+                    (!string.IsNullOrEmpty(customer.PhoneNumber) && c.PhoneNumber == customer.PhoneNumber) ||
+                    (!string.IsNullOrEmpty(customer.Email) && c.Email == customer.Email)
+                );
 
+                if (dbCustomer != null)
+                {
+                    UserLogin? dbUserLogin = _context.UserLogin.FirstOrDefault(ul => ul.CustomerID == dbCustomer.CustomerID);
+                    if (dbUserLogin != null)
+                    {
+                        // Nếu đã có bản ghi Customer và cả bản ghi UserLogin tức là tài khoản khách hàng đã được tạo
+                        result.Success = false;
+                        result.ErrorMsg = "Số điện thoại hoặc email khách hàng đã tồn tại.";
+                        return result;
+                    } else
+                    {
+                        // Nếu chỉ có bản ghi Customer mà không có UserLogin (Tạo bởi nhân viên) thì cập nhật thêm UserLogin
+                        dbCustomer.CustomerName = customer.CustomerName;
+                        dbCustomer.PhoneNumber = customer.PhoneNumber;
+                        dbCustomer.Email = customer.Email;
+                        dbCustomer.UserLogin = customer.UserLogin;
+
+                        _context.Entry(dbCustomer).State = EntityState.Modified;
+                    }
+                } else
+                {
                     _context.Customer.Add(customer);
-                    result.Success = _context.SaveChanges() > 0;
                 }
+
+                result.Success = _context.SaveChanges() > 0;
             }
             catch (Exception ex)
             {
@@ -153,54 +170,67 @@ namespace API.Controllers
 
             try
             {
-                Customer? customer = _context.Customer.Include(x => x.UserLogin).FirstOrDefault(x => x.UserLogin != null &&
-                                                                                       userLogin.Username.Equals(x.UserLogin.Username, StringComparison.OrdinalIgnoreCase) &&
-                                                                                       userLogin.Password.Equals(x.UserLogin.Password));
-                if (customer != null && customer.UserLogin != null)
+                Customer? dbCustomer = _context.Customer.FirstOrDefault(c => c.PhoneNumber == userLogin.Username || c.Email == userLogin.Username);
+
+                if (dbCustomer != null)
                 {
-                    var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("da3d80f0-b79b-4179-b791-cc4e8bfdeb2b"));
-                    var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
-
-                    var claims = new[]
+                    UserLogin? dbUserLogin = _context.UserLogin.FirstOrDefault(ul => ul.CustomerID == dbCustomer.CustomerID);
+                    if (dbUserLogin == null)
                     {
-                        new Claim("UserID", customer.CustomerID.ToString()),
-                        new Claim("Username", customer.CustomerName),
-                        new Claim("UserType", ((int)EnumUserType.Customer).ToString())
-                    };
-
-                    var token = new JwtSecurityToken(
-                        issuer: "ml_issuer",
-                        audience: "ml_audience",
-                        claims: claims,
-                        expires: DateTime.UtcNow.AddDays(1),
-                        signingCredentials: credentials
-                    );
-
-                    string userToken = new JwtSecurityTokenHandler().WriteToken(token);
-
-                    if (Config.UseCookie)
-                    {
-                        var cookieOptions = new CookieOptions
-                        {
-                            HttpOnly = true,
-                            Secure = true,
-                            SameSite = SameSiteMode.None,
-                            Expires = DateTime.UtcNow.AddDays(1)
-                        };
-                        Response.Cookies.Append("AuthToken", userToken, cookieOptions);
+                        // Nếu như đã có bản ghi Customer mà chưa có bản ghi UserLogin (Tạo bởi nhân viên) tức là chưa thiết lập mật khẩu
+                        result.Success = false;
+                        result.ErrorMsg = "Bạn chưa thiết lập mật khẩu. Vui lòng đăng ký để tạo tài khoản.";
+                        return result;
                     } else
                     {
-                        Response.Cookies.Delete("AuthToken");
-                    }
+                        // Nếu đúng mật khẩu thì đăng nhập
+                        if (dbUserLogin.Password == userLogin.Password)
+                        {
+                            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("da3d80f0-b79b-4179-b791-cc4e8bfdeb2b"));
+                            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
-                    result.Data = userToken;
+                            var claims = new[]
+                            {
+                                new Claim("UserID", dbCustomer.CustomerID.ToString()),
+                                new Claim("Username", dbCustomer.CustomerName),
+                                new Claim("UserType", ((int)EnumUserType.Customer).ToString())
+                            };
+
+                            var token = new JwtSecurityToken(
+                                issuer: "ml_issuer",
+                                audience: "ml_audience",
+                                claims: claims,
+                                expires: DateTime.UtcNow.AddDays(1),
+                                signingCredentials: credentials
+                            );
+
+                            string userToken = new JwtSecurityTokenHandler().WriteToken(token);
+
+                            if (Config.UseCookie)
+                            {
+                                var cookieOptions = new CookieOptions
+                                {
+                                    HttpOnly = true,
+                                    Secure = true,
+                                    SameSite = SameSiteMode.None,
+                                    Expires = DateTime.UtcNow.AddDays(1)
+                                };
+                                Response.Cookies.Append("AuthToken", userToken, cookieOptions);
+                            }
+                            else
+                            {
+                                Response.Cookies.Delete("AuthToken");
+                            }
+
+                            result.Data = userToken;
+                            return result;
+                        }
+                    }
                 }
-                else
-                {
-                    result.Success = false;
-                    result.ErrorCode = EnumApplicationErrorCode.InvalidLoginInfo;
-                    result.ErrorMsg = "Tên đăng nhập hoặc mật khẩu không chinh xác";
-                }
+
+                result.Success = false;
+                result.ErrorMsg = "Tên đăng nhập hoặc mật khẩu không chinh xác";
+                return result;
             }
             catch (Exception ex)
             {
@@ -225,10 +255,7 @@ namespace API.Controllers
 
             try
             {
-                if (!Config.UseCookie)
-                {
-                    Response.Cookies.Delete("AuthToken");
-                }
+                Response.Cookies.Delete("AuthToken");
 
                 //Session.Token = string.Empty;
             }
@@ -253,7 +280,7 @@ namespace API.Controllers
                 // Lấy danh sách thiết lập
                 SessionInterface sessionInterface = new SessionInterface
                 {
-                    Settings = _context.Setting.Where(s => CommonValue.CustomerScreenSettingKeys.Contains(s.SettingKey)).ToList()
+                    Settings = _context.Setting.ToList()
                 };
                 result.Data = sessionInterface;
 

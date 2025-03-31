@@ -1,4 +1,5 @@
 ﻿using API.ML.BOBase;
+using API.ML.CustomAtrributes;
 using System.ComponentModel.DataAnnotations;
 
 namespace API.ML.BO
@@ -14,16 +15,27 @@ namespace API.ML.BO
         /// <summary>
         /// Tên khách hàng
         /// </summary>
+        [NameField]
+        [StringLength(128)]
         public string CustomerName { get; set; } = string.Empty;
 
         /// <summary>
         /// Số điện thoại khách hàng
         /// </summary>
+        [NameField]
+        [StringLength(50)]
         public string PhoneNumber { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Email khách hàng
+        /// </summary>
+        [StringLength(50)]
+        public string Email { get; set; } = string.Empty;
 
         /// <summary>
         /// Địa chỉ
         /// </summary>
+        [StringLength(255)]
         public string Address { get; set; } = string.Empty;
 
         /// <summary>

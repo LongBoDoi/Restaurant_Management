@@ -1,59 +1,64 @@
 <template>
-    <VDialog max-width="800" persistent :model-value="isShow">
-        <VCard :disabled="loading">
+    <VDialog width="500" persistent :model-value="isShow">
+        <VCard :disabled="loading" style="border-radius: 36px;">
             <template v-slot:loader>
                 <VProgressLinear v-if="loading" indeterminate color="primary" />
             </template>
-            <VCardTitle class="d-flex align-center">
-                Thông tin nguyên liệu
-                <VBtn variant="plain" class="ml-auto" icon="mdi-close" @click="handleCloseDialog" />
+
+            <!-- Header -->
+            <VCardTitle class="bg-gradient-to-r from-teal-600 to-green-500 px-6 py-4 d-flex justify-between items-center">
+                <h2 className="text-white text-xl font-bold">Nguyên liệu</h2>
+                <VBtn variant="plain" style="color: white; opacity: 1; width: 40px; height: 40px;" class="ml-auto" icon="mdi-close" @click="handleCloseDialog" />
             </VCardTitle>
 
-            <VCardItem>
-                <VForm ref="form"> 
-                <!-- Tên nguyên liệu -->
-                <VTextField class="mt-2" density="compact" variant="outlined" v-model:model-value="record.Name"
-                    :rules="[(v:string|undefined) => v !== undefined && v !== '']"
-                >
-                    <template v-slot:label>
-                        Tên nguyên liệu
-                        <span style="color: red;">*</span>
-                    </template>
-                </VTextField>
+            <!-- Body -->
+            <VCardItem class="pa-6">
+                <VForm ref="form">
+                    <!-- Tên nguyên liệu -->
+                    <div className="mb-4">
+                        <label className="block text-gray-700 text-sm font-medium">Tên nguyên liệu <span style="color: red;">*</span></label>
+                        
+                        <VTextField class="mt-2" density="compact" variant="outlined" v-model:model-value="record.Name" hide-details
+                            :rules="[(v:string|undefined) => v !== undefined && v !== '']"
+                        />
+                    </div>
 
-                <MLHbox>
-                    <!-- Số lượng tồn -->
-                    <VTextField width="40%" type="number" hide-spin-buttons density="compact" variant="outlined" v-model:model-value="record.Quantity"
-                        :rules="[(v:string|undefined) => v !== undefined && v !== '']"
-                    >
-                        <template v-slot:label>
-                            Số lượng tồn
-                            <span style="color: red;">*</span>
-                        </template>
-                    </VTextField>
+                    <div className="grid grid-cols-2 gap-4 mb-4">
+                        <!-- Số lượng tồn -->
+                        <div>
+                            <label className="block text-gray-700 text-sm font-medium">Số lượng tồn</label>
+                            <MLNumberField class="mt-2 text-right" hide-spin-buttons density="compact" variant="outlined" v-model:model-value="record.Quantity" hide-details />
+                        </div>
 
-                    <VSpacer style="width: 16px;" class="flex-shrink-0 flex-grow-0" />
+                        <!-- Đơn vị tính -->
+                        <div>
+                            <label className="block text-gray-700 text-sm font-medium">Đơn vị tính <span style="color: red;">*</span></label>
+                            <!-- Đơn vị tính -->
+                            <VTextField density="compact" variant="outlined" class="mt-2" v-model:model-value="record.Unit" hide-details
+                                :rules="[(v:string|undefined) => v !== undefined && v !== '']"
+                            />
+                        </div>
+                    </div>
 
-                    <!-- Đơn vị tính -->
-                    <VTextField width="60%" density="compact" variant="outlined" v-model:model-value="record.Unit"
-                        :rules="[(v:string|undefined) => v !== undefined && v !== '']"
-                    >
-                        <template v-slot:label>
-                            Đơn vị tính
-                            <span style="color: red;">*</span>
-                        </template>
-                    </VTextField>
-                </MLHbox>
+                    <div className="mb-4">
+                        <label className="block text-gray-700 text-sm font-medium">
+                            Số lượng tồn kho cảnh báo
+                        </label>
+                        <div className="flex items-center mt-2">
+                            <MLNumberField class="text-right w-full" hide-spin-buttons density="compact" variant="outlined" v-model:model-value="record.WarningStockQuantity" hide-details />
+                            <div className="ml-2 text-gray-500 text-sm">
+                                <i>Nguyên liệu sẽ được đánh dấu là "Sắp hết hàng" khi tồn kho ít hơn số lượng này.</i>
+                            </div>
+                        </div>
+                    </div>
                 </VForm>
             </VCardItem>
 
-            <VCardActions>
-                <VBtn v-if="editMode === $enumeration.EnumEditMode.Edit" prepend-icon="mdi-trash-can-outline" color="error" @click="handleDeleteRecord">Xoá nguyên liệu</VBtn>
-
+            <VCardActions class="px-6 py-4 bg-gray-50 border-t flex justify-end space-x-3">
                 <VSpacer />
 
-                <VBtn @click="handleCloseDialog">Huỷ</VBtn>
-                <VBtn variant="tonal" style="background-color: rgb(var(--v-theme-primary)); color: rgb(var(--v-theme-on-primary));" @click="handleSaveClick">Lưu</VBtn>
+                <VBtn class="border-gray-300 text-gray-700" variant="outlined" rounded @click="handleCloseDialog">Huỷ</VBtn>
+                <VBtn variant="tonal" class="bg-green-500 hover:bg-green-600 text-white ml-1" rounded @click="handleSaveClick">Lưu</VBtn>
             </VCardActions>
         </VCard>
     </VDialog>
@@ -62,7 +67,7 @@
 <script lang="ts">
 import { EnumEditMode } from '@/common/Enumeration';
 import EventBus from '@/common/EventBus';
-import { Customer, InventoryItem, MLActionResult } from '@/models';
+import { InventoryItem, MLActionResult } from '@/models';
 import { inventoryItemStore } from '@/stores/inventoryItemStore';
 import { mapActions, mapState } from 'pinia';
 import { VMoney } from 'v-money';
@@ -84,14 +89,14 @@ export default {
         /**
          * Xử lý mở form
          */
-        handleShowDialog(inventoryItem: InventoryItem) {
-            if (inventoryItem) {
-                if (inventoryItem.EditMode !== undefined) {
-                    this.editMode = inventoryItem.EditMode;
+        handleShowDialog(record: InventoryItem) {
+            if (record) {
+                if (record.EditMode !== undefined) {
+                    this.editMode = record.EditMode;
                 }
 
-                this.record = inventoryItem;
-                this.oldRecord = JSON.parse(JSON.stringify(this.record));
+                this.record = record;
+                Object.assign(this.oldRecord, this.record);
                 this.isShow = true;
             }
         },
@@ -102,7 +107,7 @@ export default {
                     this.removeSelectedRecord();
                     break;
                 case this.$enumeration.EnumEditMode.Edit:
-                    this.dataList[this.selectedIndex] = this.oldRecord;
+                    Object.assign(this.record, this.oldRecord);
                     break;
             }
             this.isShow = false;
@@ -118,58 +123,20 @@ export default {
             if (!formValid) return;
 
             this.loading = true;
-            if (await this.saveChanges('Lưu thành công')) {
-                this.isShow = false;
-            }
-            this.loading = false;
-        },
+            
+            const actionResult:MLActionResult = await this.$service.InventoryItemService.saveChanges(this.record);
+            if (actionResult.Success) {
+                Object.assign(this.record, actionResult.Data);
 
-        /**
-         * Xử lý xoá món
-         */
-        handleDeleteRecord() {
-            this.$commonFunction.showDialog({
-                Title: 'Xác nhận xoá nguyên liệu',
-                Message: `Bạn có chắc chắn muốn xoá nguyên liệu <b>${this.record.Name}</b> không?`,
-                ConfirmAction: async () => {
-                    this.record.EditMode = this.$enumeration.EnumEditMode.Delete;
-                    if (await this.saveChanges('Xoá nguyên liệu thành công')) {
-                        this.isShow = false;
-                        this.removeSelectedRecord();
-                    }
-                }
-            });
-        },
-
-        /**
-         * Lưu thông tin khách hàng
-         * @param confirmMessage Câu thông báo khi lưu thành công
-         */
-        async saveChanges(confirmMessage: string):Promise<boolean> {
-            let result:MLActionResult|undefined = undefined;
-
-            try {
-                result = await this.$service.InventoryItemService.saveChanges(this.record);
-            } catch (e) {
-                this.$commonFunction.handleException(e);
-            }
-
-            if (!result) return false;
-
-            if (result.Success) {
-                this.dataList[this.selectedIndex] = result.Data as Customer;
                 EventBus.emit(this.$eventName.ShowToastMessage, {
-                    Message: confirmMessage,
+                    Message: 'Lưu thành công.',
                     Type: 'success'
                 });
-            } else {
-                EventBus.emit(this.$eventName.ShowToastMessage, {
-                    Message: result.ErrorMsg,
-                    Type: 'error'
-                });
+
+                this.isShow = false;
             }
 
-            return result.Success;
+            this.loading = false;
         }
     },
 

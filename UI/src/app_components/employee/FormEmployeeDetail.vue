@@ -1,123 +1,132 @@
 <template>
-    <VDialog max-width="800" persistent :model-value="isShow">
-        <VCard :disabled="loading">
+    <VDialog width="600" max-height="90vh" persistent :model-value="isShow">
+        <VCard :disabled="loading" style="border-radius: 36px;">
             <template v-slot:loader>
                 <VProgressLinear v-if="loading" indeterminate color="primary" />
             </template>
-            <VCardTitle class="d-flex align-center">
-                Thông tin nhân viên
-                <VBtn variant="plain" class="ml-auto" icon="mdi-close" @click="handleCloseDialog" />
+
+            <!-- Header -->
+            <VCardTitle class="bg-gradient-to-r from-teal-600 to-green-500 px-6 py-4 d-flex justify-between items-center">
+                <h2 className="text-white text-xl font-bold">Nhân viên</h2>
+                <VBtn variant="plain" style="color: white; opacity: 1; width: 40px; height: 40px;" class="ml-auto" icon="mdi-close" @click="handleCloseDialog" />
             </VCardTitle>
 
-            <VCardItem>
-                <VForm ref="form"> 
+            <!-- Body -->
+            <VCardItem class="pa-6">
+                <VForm ref="form">
+                    <!-- Ảnh nhân viên -->
+                    <div className="mb-6 flex items-center justify-center">
+                        <div className="relative">
+                            <div style="width: 96px; height: 96px; border: 4px solid rgb(220 252 231);" className="rounded-full bg-gray-200 flex items-center justify-center overflow-hidden border-4 border-green-100">
+                                <img v-if="imageUrl" :src="imageUrl" >
+                                <VIcon v-else class="text-gray-400" icon="mdi-account-outline" style="font-size: 48px;" />
+                            </div>
 
-                <MLHbox class="mt-2">
-                    <!-- Mã nhân viên -->
-                    <VTextField density="compact" variant="outlined" v-model:model-value="record.EmployeeCode"
-                        width="40%"
-                        :rules="[(v:string|undefined) => v !== undefined && v !== '']"
-                    >
-                        <template v-slot:label>
-                            Mã nhân viên
-                            <span style="color: red;">*</span>
-                        </template>
-                    </VTextField>
+                            <VBtn 
+                                style="width: fit-content !important; height: fit-content !important; padding: 8px !important; font-size: 10px !important;"
+                                class="absolute bottom-0 right-0 bg-green-500 text-white hover:bg-green-600 transition-all duration-200 transform hover:scale-105"
+                                icon="mdi-pencil-outline" 
+                                @click="selectImage"
+                            />
 
-                    <VSpacer style="width: 16px;" class="flex-shrink-0 flex-grow-0" />
+                            <VFileInput
+                                ref="imageSelector"
+                                v-show="false"
+                                accept="image/*"
+                                v-model:model-value="imageFile"
+                                v-on:update:model-value="getImageUrls"
+                            />
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <!-- Mã nhân viên -->
+                            <label className="block text-sm font-medium text-gray-700">Mã nhân viên <span style="color: red;">*</span></label>
+                            <VTextField class="mt-1" density="compact" variant="outlined" v-model:model-value="record.EmployeeCode" hide-details
+                                :rules="[$commonValue.textFieldRequireRule]"
+                            />
+                        </div>
 
-                    <!-- Đơn vị tính -->
-                    <VTextField width="60%" density="compact" variant="outlined" v-model:model-value="record.EmployeeName"
-                        :rules="[(v:string|undefined) => v !== undefined && v !== '']"
-                    >
-                        <template v-slot:label>
-                            Tên nhân viên
-                            <span style="color: red;">*</span>
-                        </template>
-                    </VTextField>
-                </MLHbox>
+                        <div>
+                            <!-- Họ tên -->
+                            <label className="block text-sm font-medium text-gray-700">Họ tên <span style="color: red;">*</span></label>
+                            <VTextField class="mt-1" density="compact" variant="outlined" v-model:model-value="record.EmployeeName" hide-details
+                                :rules="[$commonValue.textFieldRequireRule]"
+                            />
+                        </div>
+                    </div>
 
-                <MLHbox>
-                    <!-- Số điện thoại -->
-                    <VTextField width="50%" density="compact" variant="outlined" v-model:model-value="record.PhoneNumber"
-                        :rules="[(v:string|undefined) => v !== undefined && v !== '']"
-                    >
-                        <template v-slot:label>
-                            Số điện thoại
-                            <span style="color: red;">*</span>
-                        </template>
-                    </VTextField>
+                    <div class="grid grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <!-- Email -->
+                            <label className="block text-sm font-medium text-gray-700">Email</label>
+                            <VTextField class="mt-1" density="compact" variant="outlined" v-model:model-value="record.Email" hide-details />
+                        </div>
 
-                    <VSpacer style="width: 16px;" class="flex-shrink-0 flex-grow-0" />
+                        <div>
+                            <!-- Số điện thoại -->
+                            <label className="block text-sm font-medium text-gray-700">Số điện thoại</label>
+                            <VTextField class="mt-1" density="compact" variant="outlined" hide-details
+                                v-mask="'0### ### ###'"
+                                v-on:update:model-value="record.PhoneNumber = $commonFunction.getRealPhoneNumberValue($event);"
+                            />
+                        </div>
+                    </div>
 
-                    <!-- Vai trò -->
-                    <VSelect
-                        :return-object="false"
-                        v-model:model-value="record.Role"
-                        ref="cbMenuCategory"
-                        label="Vai trò"
-                        width="50%"
-                        variant="outlined"
-                        density="compact"
-                        :items="listRole"
-                        item-title="Text"
-                        item-value="Value"
-                    />
-                </MLHbox>
+                    <div class="grid gap-4 mb-4">
+                        <div>
+                            <!-- Trạng thái -->
+                            <label className="block text-sm font-medium text-gray-700">Trạng thái làm việc</label>
+                            <VSelect
+                                :items="lstWorkStatus"
+                                item-title="Text"
+                                item-value="Value"
+                                :return-object="false"
+                                hide-details
+                                v-model:model-value="record.WorkStatus"
 
-                <VCheckbox v-if="editMode === $enumeration.EnumEditMode.Edit && record.UserLogin" color="primary" label="Đổi mật khẩu" v-model:model-value="record.UserLogin.IsChangePassword" />
+                                density="compact"
+                                variant="outlined"
+                                class="mt-1"
+                            />
+                        </div>
+                    </div>
 
-                <MLVbox v-if="record.UserLogin && ((editMode === $enumeration.EnumEditMode.Add) || (editMode === $enumeration.EnumEditMode.Edit && record.UserLogin.IsChangePassword))">
-                    <MLHbox v-if="editMode === $enumeration.EnumEditMode.Edit">
-                        <!-- Mật khẩu -->
-                        <VTextField width="50%" type="password" density="compact" variant="outlined" v-model:model-value="record.UserLogin.OldPassword"
-                            :rules="[(v:string|undefined) => v !== undefined && v !== '']"
-                        >
-                            <template v-slot:label>
-                                Mật khẩu cũ
-                                <span style="color: red;">*</span>
-                            </template>
-                        </VTextField>
+                    <div v-if="editMode === $enumeration.EnumEditMode.Add" class="grid grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <!-- Mật khẩu -->
+                            <label className="block text-sm font-medium text-gray-700">Mật khẩu</label>
+                            <VTextField type="password" class="mt-1" density="compact" variant="outlined" hide-details
+                                :rules="[$commonValue.textFieldRequireRule]"
+                                v-on:update:model-value="(value: string) => {
+                                    if (record.UserLogin) {
+                                        record.UserLogin.Password = value;
+                                    }
+                                }"
+                            />
+                        </div>
 
-                        <VSpacer style="width: 50%; margin-left: 8px;" class="flex-shrink-0 flex-grow-1" />
-                    </MLHbox>
-                    <MLHbox>
-                        <!-- Mật khẩu -->
-                        <VTextField width="50%" type="password" density="compact" variant="outlined" v-model:model-value="record.UserLogin.Password"
-                            :rules="[(v:string|undefined) => v !== undefined && v !== '']"
-                        >
-                            <template v-slot:label>
-                                Mật khẩu
-                                <span style="color: red;">*</span>
-                            </template>
-                        </VTextField>
-
-                        <VSpacer style="width: 16px;" class="flex-shrink-0 flex-grow-0" />
-
-                        <!-- Xác nhận mật khẩu -->
-                        <VTextField width="50%" type="password" density="compact" variant="outlined"
-                            :rules="[
-                                (v:string|undefined) => v !== undefined && v !== '',
-                                (v:string) => v === record.UserLogin?.Password || 'Mật khẩu không trùng khớp.'
-                            ]"
-                        >
-                            <template v-slot:label>
-                                Xác nhận mật khẩu
-                                <span style="color: red;">*</span>
-                            </template>
-                        </VTextField>
-                    </MLHbox>
-                </MLVbox>
+                        <div>
+                            <!-- Xác nhận mật khẩu -->
+                            <label className="block text-sm font-medium text-gray-700">Xác nhận mật khẩu</label>
+                            <VTextField type="password" class="mt-1" density="compact" variant="outlined" hide-details
+                                :rules="[
+                                    (v) => {
+                                        return v !== undefined && v !== '' && v === record.UserLogin?.Password;
+                                    }
+                                ]"
+                            />
+                        </div>
+                    </div>
                 </VForm>
             </VCardItem>
 
-            <VCardActions>
-                <VBtn v-if="editMode === $enumeration.EnumEditMode.Edit" prepend-icon="mdi-trash-can-outline" color="error" @click="handleDeleteRecord">Xoá nhân viên</VBtn>
-
+            <VCardActions class="px-6 py-4 bg-gray-50 border-t flex justify-end space-x-3">
                 <VSpacer />
 
-                <VBtn @click="handleCloseDialog">Huỷ</VBtn>
-                <VBtn variant="tonal" style="background-color: rgb(var(--v-theme-primary)); color: rgb(var(--v-theme-on-primary));" @click="handleSaveClick">Lưu</VBtn>
+                <VBtn class="border-gray-300 text-gray-700" variant="outlined" rounded @click="handleCloseDialog">Huỷ</VBtn>
+                <VBtn variant="tonal" class="bg-green-500 hover:bg-green-600 text-white ml-1" rounded @click="handleSaveClick">Lưu</VBtn>
             </VCardActions>
         </VCard>
     </VDialog>
@@ -126,7 +135,7 @@
 <script lang="ts">
 import { EnumEditMode } from '@/common/Enumeration';
 import EventBus from '@/common/EventBus';
-import { Customer, Employee, MLActionResult, UserLogin } from '@/models';
+import { Employee, MLActionResult } from '@/models';
 import { employeeStore } from '@/stores/employeeStore';
 import { mapActions, mapState } from 'pinia';
 import { VMoney } from 'v-money';
@@ -145,26 +154,19 @@ export default {
     methods: {
         ...mapActions(employeeStore as any, ['removeSelectedRecord']),
 
-        /**
+       /**
          * Xử lý mở form
          */
-        handleShowDialog(employee: Employee) {
-            if (employee) {
-                if (employee.EditMode !== undefined) {
-                    this.editMode = employee.EditMode;
-                }
-                if (!employee.UserLogin) {
-                    employee.UserLogin = {
-                        Username: '',
-                        Password: ''
-                    } as UserLogin;
+         handleShowDialog(record: Employee) {
+            if (record) {
+                if (record.EditMode !== undefined) {
+                    this.editMode = record.EditMode;
                 }
 
-                if (employee.EditMode === this.$enumeration.EnumEditMode.Add) {
-                    employee.Role = this.$enumeration.EnumRole.Waiter;
-                }
-                this.record = employee;
-                this.oldRecord = JSON.parse(JSON.stringify(this.record));
+                this.imageUrl = this.$commonFunction.getImageUrl(record.ImageUrl);
+
+                this.record = record;
+                Object.assign(this.oldRecord, this.record);
                 this.isShow = true;
             }
         },
@@ -175,7 +177,7 @@ export default {
                     this.removeSelectedRecord();
                     break;
                 case this.$enumeration.EnumEditMode.Edit:
-                    this.dataList[this.selectedIndex] = this.oldRecord;
+                    Object.assign(this.record, this.oldRecord);
                     break;
             }
             this.isShow = false;
@@ -191,65 +193,45 @@ export default {
             if (!formValid) return;
 
             this.loading = true;
+
+            this.record.PhoneNumber = this.record.PhoneNumber?.replace(/\D/g, "") ?? '';
+
             if (this.record.UserLogin) {
                 this.record.UserLogin.Username = this.record.EmployeeCode;
             }
-            const success = await this.saveChanges('Lưu thành công');
-            if (success) {
+            
+            const actionResult:MLActionResult = await this.$service.EmployeeService.updateEmployee(this.record, this.imageFile);
+            if (actionResult.Success) {
+                Object.assign(this.record, actionResult.Data);
+
+                EventBus.emit(this.$eventName.ShowToastMessage, {
+                    Message: 'Lưu thành công.',
+                    Type: 'success'
+                });
+                
                 this.isShow = false;
             }
+
             this.loading = false;
         },
 
-        /**
-         * Xử lý xoá món
-         */
-        handleDeleteRecord() {
-            this.$commonFunction.showDialog({
-                Title: 'Xác nhận xoá nhân viên',
-                Message: `Bạn có chắc chắn muốn xoá nhân viên <b>${this.record.EmployeeCode}</b> không?`,
-                ConfirmAction: async () => {
-                    this.record.EditMode = this.$enumeration.EnumEditMode.Delete;
-                    const success = await this.saveChanges('Xoá nhân viên thành công');
+        selectImage() {
+            const imageSelector = (this.$refs.imageSelector as any);
 
-                    if (success) {
-                        this.isShow = false;
-                        this.removeSelectedRecord();
-                    }
-                }
-            });
+            const input = imageSelector.$el.querySelector('input[type=file]');
+            input.click();
         },
 
-        /**
-         * Lưu thông tin khách hàng
-         * @param confirmMessage Câu thông báo khi lưu thành công
-         */
-        async saveChanges(confirmMessage: string):Promise<boolean> {
-            let result:MLActionResult|undefined = undefined;
-
-            try {
-                result = await this.$service.EmployeeService.saveChanges(this.record);
-            } catch (e) {
-                this.$commonFunction.handleException(e);
+        getImageUrls(file:File|File[]) {
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    this.imageFile = file as File;
+                    this.imageUrl = e.target?.result as string;
+                };
+                reader.readAsDataURL(file as File);
             }
-
-            if (!result) return false;
-
-            if (result.Success) {
-                this.dataList[this.selectedIndex] = result.Data as Customer;
-                EventBus.emit(this.$eventName.ShowToastMessage, {
-                    Message: confirmMessage,
-                    Type: 'success'
-                });
-            } else {
-                EventBus.emit(this.$eventName.ShowToastMessage, {
-                    Message: result.ErrorMsg,
-                    Type: 'error'
-                });
-            };
-
-            return result.Success;
-        }
+        },
     },
 
     data() {
@@ -259,26 +241,33 @@ export default {
             editMode: <EnumEditMode>EnumEditMode.Add,
 
             record: <Employee>{} as Employee,
-            oldRecord: <Employee>{} as Employee
+            oldRecord: <Employee>{} as Employee,
+
+            imageFile: <File|undefined>undefined,
+            imageUrl: <string>''
         }
     },
 
     computed: {
         ...mapState(employeeStore, ['dataList', 'selectedIndex']),
 
-        listRole() {
+        lstWorkStatus() {
             return [
                 {
-                    Text: 'Quản lý',
-                    Value: this.$enumeration.EnumRole.Manager
+                    Text: 'Chính thức',
+                    Value: this.$enumeration.EnumEmployeeWorkStatus.Active
                 },
                 {
-                    Text: 'Thu ngân',
-                    Value: this.$enumeration.EnumRole.Cashier
+                    Text: 'Thử việc',
+                    Value: this.$enumeration.EnumEmployeeWorkStatus.Probation
                 },
                 {
-                    Text: 'Phục vụ',
-                    Value: this.$enumeration.EnumRole.Waiter
+                    Text: 'Nghỉ phép',
+                    Value: this.$enumeration.EnumEmployeeWorkStatus.OnLeave
+                },
+                {
+                    Text: 'Nghỉ việc',
+                    Value: this.$enumeration.EnumEmployeeWorkStatus.Terminated
                 }
             ]
         }

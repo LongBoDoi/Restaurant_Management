@@ -1,5 +1,5 @@
 <template>
-    <VContainer>
+    <VContainer style="padding: unset;">
         <MLVbox style="height: 100%;">
             <MLHbox>
                 <VLabel class="flex-shrink-0" style="font-weight: bold; font-size: 24px;">Thiết lập</VLabel>
@@ -7,7 +7,7 @@
                 <VBtn rounded style="text-transform: none; font-size: 16px; color: white;" prepend-icon="mdi-content-save-outline" class="ml-auto bg-green-500 hover:scale-105" @click="saveSettings">Lưu thay đổi</VBtn>
             </MLHbox>
 
-            <VTabs color="primary" v-model:model-value="tab" style="flex-shrink: 0;">
+            <VTabs class="mt-4" color="primary" v-model:model-value="tab" style="flex-shrink: 0;">
                 <VTab value="customerScreen">Màn hình của khách hàng</VTab>
             </VTabs>
 

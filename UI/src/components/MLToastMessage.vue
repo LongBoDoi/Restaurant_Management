@@ -5,10 +5,11 @@
       :color="color"
       location="bottom"
       elevation="2"
+      class="rounded-lg"
     >
       {{ message }}
       <template #actions>
-        <VBtn icon @click="visible = false">
+        <VBtn style="width: 40px; height: 40px;" icon @click="visible = false">
           <VIcon icon="mdi-close" />
         </VBtn>
       </template>
@@ -29,9 +30,13 @@ export default {
 
     methods: {
         handleShowToastMessage(data:any) {
+          this.visible = false;
+
+          this.$nextTick().then(() => {
             this.message = data.Message;
             this.color = data.Type;
             this.visible = true;
+          });
         }
     },
 
@@ -44,3 +49,11 @@ export default {
     }
 }
 </script>
+
+<style lang="scss" scoped>
+:deep() {
+  .v-snackbar__wrapper {
+    border-radius: 24px;
+  }
+}
+</style>

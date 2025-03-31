@@ -6,18 +6,18 @@
             </template>
             <VCardTitle class="bg-gradient-to-r from-teal-600 to-green-500 px-6 py-4 d-flex justify-between items-center">
                 <h2 className="text-white text-xl font-bold">Thông tin món</h2>
-                <VBtn variant="plain" style="color: white; opacity: 1;" class="ml-auto" icon="mdi-close" @click="handleCloseDialog" />
+                <VBtn variant="plain" style="color: white; opacity: 1; width: 40px; height: 40px;" class="ml-auto" icon="mdi-close" @click="handleCloseDialog" />
             </VCardTitle>
 
             <VCardItem class="pa-6">
                 <VForm ref="form">
-                    <div className="grid grid-cols-2 gap-4 mb-6">
+                    <div className="grid grid-cols-2 gap-4">
                         <div className="col-span-2">
                             <label className="block text-sm font-medium text-gray-700">Tên món <span style="color: red;">*</span></label>
                             <!-- Tên món -->
                             <VTextField 
                                 density="compact"
-                                class="mt-1 flex-grow-1 flex-shrink-0" 
+                                class="mt-2 flex-grow-1 flex-shrink-0" 
                                 variant="outlined" 
                                 v-model:model-value="menuItem.Name"
                                 hide-details
@@ -32,7 +32,7 @@
                         <div>
                             <!-- Giá món -->
                             <label className="block text-sm font-medium text-gray-700">Giá món</label>
-                            <VTextField class="w-full mt-1" v-money="moneyConfig" density="compact" variant="outlined" suffix="đ" v-model:model-value="menuItem.Price" hide-details />
+                            <VTextField class="w-full mt-2" v-money="$commonValue.moneyConfig" density="compact" variant="outlined" suffix="đ" v-model:model-value="menuItem.Price" hide-details />
                         </div>
 
                         <div>
@@ -40,9 +40,10 @@
 
                             <!-- Nhóm thực đơn -->
                             <VCombobox
-                                class="mt-1"
+                                class="mt-2"
                                 :return-object="false"
                                 v-model:model-value="menuItem.MenuItemCategoryID"
+                                @update:model-value="onSelectCategory"
                                 ref="cbMenuCategory"
                                 variant="outlined"
                                 density="compact"
@@ -56,13 +57,13 @@
                         <div className="col-span-2">
                             <!-- Mô tả -->
                             <label className="block text-sm font-medium text-gray-700">Mô tả</label>
-                            <VTextarea no-resize class="mt-1" variant="outlined" v-model:model-value="menuItem.Description" hide-details />
+                            <VTextarea no-resize class="mt-2" variant="outlined" v-model:model-value="menuItem.Description" hide-details />
                         </div>
 
                         <div className="col-span-2">
                             <!-- Ảnh món -->
                             <label className="block text-sm font-medium text-gray-700 mb-1">Ảnh món</label>
-                            <div class="intro-image-box mt-1">
+                            <div class="intro-image-box mt-2">
                                 <template v-if="itemImageUrl">
                                     <VImg :src="itemImageUrl" />
                                     <VIcon class="close-icon" icon="mdi-close" color="red" @click="onRemoveMenuItemImage" />
@@ -84,6 +85,12 @@
                             </div>
                         </div>
 
+                        <div className="col-span-2" v-if="false">
+                            <!-- Nguyên liệu -->
+                            <label className="block text-sm font-medium text-gray-700">Nguyên liệu</label>
+                            <TableMenuItemInventoryItem class="mt-2" :menu-item="menuItem" />
+                        </div>
+
                         <div className="col-span-2">
                             <!-- Hết hàng -->
                             <VCheckbox color="primary" class="text-gray-700" style="opacity: 1;" label="Hết hàng" v-model:model-value="menuItem.OutOfStock" hide-details />
@@ -94,7 +101,6 @@
                             <label className="block text-sm font-medium text-gray-700 mb-1">Nguyên liệu</label>
                             <VCombobox
                                 class="mt-1"
-                                :return-object="false"
                                 ref="cbMenuCategory"
                                 variant="outlined"
                                 density="compact"
@@ -113,7 +119,7 @@
                 <VSpacer />
 
                 <VBtn class="border-gray-300 text-gray-700" variant="outlined" rounded @click="handleCloseDialog">Huỷ</VBtn>
-                <VBtn variant="tonal" class="bg-green-500 text-white ml-1" rounded @click="handleSaveClick">Lưu thay đổi</VBtn>
+                <VBtn variant="tonal" class="bg-green-500 hover:bg-green-600 text-white ml-1" rounded @click="handleSaveClick">Lưu thay đổi</VBtn>
             </VCardActions>
         </VCard>
     </VDialog>
@@ -133,10 +139,6 @@ export default {
 
     async created() {
         EventBus.on(this.$eventName.ShowFormMenuDetail, this.handleShowDialog as any);
-
-        this.loading = true;
-        this.lstMenuItemCategory = await this.$service.MenuItemCategoryService.getAll();
-        this.loading = false;
     },
 
     beforeUnmount() {
@@ -149,8 +151,12 @@ export default {
         /**
          * Xử lý mở form
          */
-        handleShowDialog(menuItem: MenuItem) {
+        async handleShowDialog(menuItem: MenuItem) {
             if (menuItem) {
+                this.loading = true;
+                this.lstMenuItemCategory = await this.$service.MenuItemCategoryService.getAll();
+                this.loading = false;
+
                 if (menuItem.EditMode !== undefined) {
                     this.editMode = menuItem.EditMode;
                 }
@@ -160,9 +166,7 @@ export default {
 
                 this.menuItem = menuItem;
                 
-                if (menuItem.ImageUrl) {
-                    this.itemImageUrl = this.$commonFunction.getImageUrl(menuItem.ImageUrl);
-                }
+                this.itemImageUrl = this.$commonFunction.getImageUrl(menuItem.ImageUrl);
 
                 this.oldMenuItem = JSON.parse(JSON.stringify(this.menuItem));
                 this.isShow = true;
@@ -192,7 +196,7 @@ export default {
 
             this.loading = true;
 
-            this.menuItem.Price = parseFloat(this.menuItem.Price.toString().replaceAll('.', '').replaceAll(',', ''));
+            this.menuItem.Price = this.$commonFunction.getRealFloatValue(this.menuItem.Price);
 
             if ((await this.saveChanges('Lưu thành công')).Success) {
                 this.isShow = false;
@@ -248,6 +252,11 @@ export default {
             this.itemImage = undefined;
             this.itemImageUrl = '';
             this.menuItem.ImageUrl = '';
+        },
+
+        onSelectCategory(menuItemCategoryID: string) {
+            const menuItemCategory:MenuItemCategory|undefined = this.lstMenuItemCategory.find(mic => mic.MenuItemCategoryID === menuItemCategoryID);
+            this.menuItem.MenuItemCategory = menuItemCategory;
         }
     },
 
@@ -269,14 +278,6 @@ export default {
 
     computed: {
         ...mapState(menuItemStore, ['dataList', 'selectedIndex']),
-
-        moneyConfig() {
-            return {
-                decimal: ',',
-                thousands: '.',
-                precision: 0
-            }
-        }
     }
 }
 </script>

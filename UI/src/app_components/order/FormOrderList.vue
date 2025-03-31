@@ -117,7 +117,7 @@
 </template>
 
 <script lang="ts">
-import { EnumOrderStatus, EnumRole } from '@/common/Enumeration';
+import { EnumOrderStatus } from '@/common/Enumeration';
 import EventBus from '@/common/EventBus';
 import { Order } from '@/models';
 import { orderStore } from '@/stores/orderStore';
@@ -172,17 +172,6 @@ export default {
             selectedRecord.EditMode = this.$enumeration.EnumEditMode.Edit;
             
             EventBus.emit(this.$eventName.ShowFormOrderDetail, selectedRecord);
-        },
-
-        getRoleName(role: EnumRole) {
-            switch (role) {
-                case EnumRole.Manager:
-                    return 'Quản lý';
-                case EnumRole.Cashier:
-                    return 'Thu ngân';
-                case EnumRole.Waiter:
-                    return 'Phục vụ';
-            }
         },
 
         getOrderServingTime(orderDate: Date) {

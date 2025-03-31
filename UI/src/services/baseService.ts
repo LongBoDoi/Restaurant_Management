@@ -75,7 +75,7 @@ abstract class BaseService<IMLEntity> {
    * @param page Số trang
    * @param itemsPerPage Kích thước trang
    */
-  public async getDataPaging(page: number, itemsPerPage: number) : Promise<PagingData<IMLEntity>> {
+  public async getDataPaging(page: number, itemsPerPage: number, search?: string) : Promise<PagingData<IMLEntity>> {
     var result:PagingData<IMLEntity> = {
       Data: [],
       TotalCount: 0
@@ -85,7 +85,8 @@ abstract class BaseService<IMLEntity> {
       const response = await this.api.get('/GetDataPaging', {
         params: {
           page: page,
-          itemsPerPage: itemsPerPage
+          itemsPerPage: itemsPerPage,
+          search: search
         }
       });
       const actionResult = response.data as MLActionResult;
@@ -120,6 +121,15 @@ abstract class BaseService<IMLEntity> {
    */
   public async saveChanges(entity: IMLEntity) : Promise<MLActionResult> {
     const result = await this.api.post('/SaveChanges', entity);
+    return result.data as MLActionResult;
+  }
+
+  /**
+   * Cập nhật nhiều bản ghi
+   * @param entity Bản ghi
+   */
+  public async saveChangesMultiple(entities: IMLEntity[]) : Promise<MLActionResult> {
+    const result = await this.api.post('/SaveChangesMultiple', entities);
     return result.data as MLActionResult;
   }
 }

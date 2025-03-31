@@ -23,7 +23,7 @@ namespace API.Controllers
         /// <returns></returns>
         [Authorize]
         [HttpGet("GetMenuItemPaging")]
-        public MLActionResult GetMenuItemPaging(int page, int itemsPerPage, string? search)
+        public MLActionResult GetMenuItemPaging(int page, int itemsPerPage, string? search, string? categoryID)
         {
             MLActionResult result = new()
             {
@@ -32,20 +32,24 @@ namespace API.Controllers
 
             try
             {
-                IEnumerable<MenuItem> allData = _entities.ToList();
+                IEnumerable<MenuItem> allData = _entities.AsNoTracking().ToList();
 
-                if (!string.IsNullOrEmpty(search))
+                string? normalizedSearchTerm = search?.RemoveDiacritics().ToLower();
+                Guid.TryParse(categoryID, out Guid gCategoryID);
+
+                allData = allData.Where(e => (string.IsNullOrEmpty(normalizedSearchTerm) || e.Name.RemoveDiacritics().ToLower().Contains(normalizedSearchTerm))
+                    && (gCategoryID == Guid.Empty || e.MenuItemCategoryID == gCategoryID)
+                ).Select(mi =>
                 {
-                    string normalizedSearchTerm = search.RemoveDiacritics().ToLower();
-
-                    allData = allData.Where(e => e.Name.RemoveDiacritics().ToLower().Contains(normalizedSearchTerm));
-                }
+                    mi.MenuItemCategory = _context.MenuItemCategory.FirstOrDefault(mic => mic.MenuItemCategoryID == mi.MenuItemCategoryID);
+                    return mi;
+                });
 
                 int totalCount = allData.Count();
 
                 result.Data = new
                 {
-                    Data = allData.Skip((page - 1) * itemsPerPage).Take(itemsPerPage),
+                    Data = allData.OrderByDescending(e => e.CreatedDate).Skip((page - 1) * itemsPerPage).Take(itemsPerPage),
                     TotalCount = totalCount
                 };
             }
@@ -58,7 +62,7 @@ namespace API.Controllers
         }
 
         /// <summary>
-        /// Lấy dữ liệu theo phân trang
+        /// Lưu món
         /// </summary>
         /// <param name="page">Số trang</param>
         /// <param name="itemsPerPage">Kích thước trang</param>
@@ -88,6 +92,7 @@ namespace API.Controllers
                         }
                     }
 
+                    objMenuItem.MenuItemCategory = null;
                     result = SaveChanges(objMenuItem);
                 }
             }

@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace API.Migrations
 {
     [DbContext(typeof(ApplicationDBContext))]
-    [Migration("20250322130918_AddMenuItemCategoryTable")]
-    partial class AddMenuItemCategoryTable
+    [Migration("20250331043632_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -93,14 +93,21 @@ namespace API.Migrations
 
                     b.Property<string>("Address")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)");
 
                     b.Property<DateTime?>("CreatedDate")
                         .HasColumnType("datetime(6)");
 
                     b.Property<string>("CustomerName")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasMaxLength(128)
+                        .HasColumnType("varchar(128)");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)");
 
                     b.Property<int>("LoyaltyPoint")
                         .HasColumnType("int");
@@ -110,7 +117,8 @@ namespace API.Migrations
 
                     b.Property<string>("PhoneNumber")
                         .IsRequired()
-                        .HasColumnType("varchar(255)");
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)");
 
                     b.Property<string>("Preferences")
                         .HasColumnType("longtext");
@@ -132,25 +140,32 @@ namespace API.Migrations
                     b.Property<DateTime?>("CreatedDate")
                         .HasColumnType("datetime(6)");
 
+                    b.Property<string>("Email")
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)");
+
                     b.Property<string>("EmployeeCode")
                         .IsRequired()
-                        .HasColumnType("varchar(255)");
+                        .HasMaxLength(25)
+                        .HasColumnType("varchar(25)");
 
                     b.Property<string>("EmployeeName")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasMaxLength(128)
+                        .HasColumnType("varchar(128)");
 
                     b.Property<DateTime?>("ModifiedDate")
                         .HasColumnType("datetime(6)");
 
                     b.Property<string>("PhoneNumber")
-                        .HasColumnType("longtext");
-
-                    b.Property<int>("Role")
-                        .HasColumnType("int");
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)");
 
                     b.Property<string>("Schedule")
                         .HasColumnType("longtext");
+
+                    b.Property<int>("WorkStatus")
+                        .HasColumnType("int");
 
                     b.HasKey("EmployeeID");
 
@@ -165,7 +180,7 @@ namespace API.Migrations
                             EmployeeID = new Guid("d0929aef-1a5b-44f6-962d-01f7f9bb2b2b"),
                             EmployeeCode = "admin",
                             EmployeeName = "Admin",
-                            Role = 0
+                            WorkStatus = 0
                         });
                 });
 
@@ -185,15 +200,15 @@ namespace API.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<int>("Quantity")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ReorderLevel")
-                        .HasColumnType("int");
+                    b.Property<decimal>("Quantity")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("Unit")
                         .IsRequired()
                         .HasColumnType("longtext");
+
+                    b.Property<decimal>("WarningStockQuantity")
+                        .HasColumnType("decimal(18,2)");
 
                     b.HasKey("InventoryItemID");
 
@@ -211,6 +226,11 @@ namespace API.Migrations
 
                     b.Property<string>("Description")
                         .HasColumnType("longtext");
+
+                    b.Property<string>("ImageUrl")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("varchar(128)");
 
                     b.Property<Guid?>("MenuItemCategoryID")
                         .HasColumnType("char(36)");
@@ -240,6 +260,11 @@ namespace API.Migrations
                     b.Property<Guid>("MenuItemCategoryID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("char(36)");
+
+                    b.Property<string>("Color")
+                        .IsRequired()
+                        .HasMaxLength(25)
+                        .HasColumnType("varchar(25)");
 
                     b.Property<DateTime?>("CreatedDate")
                         .HasColumnType("datetime(6)");
@@ -271,6 +296,7 @@ namespace API.Migrations
                         new
                         {
                             MenuItemCategoryID = new Guid("aa5e2d3f-4deb-4434-9ef2-19f5e51f21ad"),
+                            Color = "#22C55E",
                             Description = "",
                             Inactive = false,
                             MenuItemCategoryName = "Khai vị",
@@ -279,6 +305,7 @@ namespace API.Migrations
                         new
                         {
                             MenuItemCategoryID = new Guid("758296ed-75e6-45c6-8a1e-b075524027af"),
+                            Color = "#F59E0B",
                             Description = "",
                             Inactive = false,
                             MenuItemCategoryName = "Món chính",
@@ -287,6 +314,7 @@ namespace API.Migrations
                         new
                         {
                             MenuItemCategoryID = new Guid("87de53a6-68e2-46a3-b998-7df936dfa1c5"),
+                            Color = "#3B82F6",
                             Description = "",
                             Inactive = false,
                             MenuItemCategoryName = "Tráng miệng",
@@ -295,11 +323,30 @@ namespace API.Migrations
                         new
                         {
                             MenuItemCategoryID = new Guid("78ef8d8c-a68e-40c9-99ce-5bb496faef2b"),
+                            Color = "#A855F7",
                             Description = "",
                             Inactive = false,
                             MenuItemCategoryName = "Đồ uống",
                             SortOrder = 3
                         });
+                });
+
+            modelBuilder.Entity("API.ML.BO.MenuItemInventoryItem", b =>
+                {
+                    b.Property<Guid>("MenuItemID")
+                        .HasColumnType("char(36)");
+
+                    b.Property<Guid>("InventoryItemID")
+                        .HasColumnType("char(36)");
+
+                    b.Property<decimal>("Quantity")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("MenuItemID", "InventoryItemID");
+
+                    b.HasIndex("InventoryItemID");
+
+                    b.ToTable("MenuItemInventoryItem");
                 });
 
             modelBuilder.Entity("API.ML.BO.Order", b =>
@@ -549,6 +596,13 @@ namespace API.Migrations
                             DataType = 3,
                             SettingKey = "DisplayBookingScreenForCustomer",
                             SettingValue = "true"
+                        },
+                        new
+                        {
+                            SettingID = new Guid("6c9b5da9-56a8-40ad-8fa9-866e5f4cbd50"),
+                            DataType = 1,
+                            SettingKey = "MenuCategoryColors",
+                            SettingValue = "[\"#EF4444\",\"#3B82F6\",\"#22C55E\",\"#F59E0B\",\"#A855F7\",\"#EC4899\",\"#6366F1\",\"#14B8A6\"]"
                         });
                 });
 
@@ -632,6 +686,25 @@ namespace API.Migrations
                     b.Navigation("MenuItemCategory");
                 });
 
+            modelBuilder.Entity("API.ML.BO.MenuItemInventoryItem", b =>
+                {
+                    b.HasOne("API.ML.BO.InventoryItem", "InventoryItem")
+                        .WithMany("MenuItemInventoryItems")
+                        .HasForeignKey("InventoryItemID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("API.ML.BO.MenuItem", "MenuItem")
+                        .WithMany("MenuItemInventoryItems")
+                        .HasForeignKey("MenuItemID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("InventoryItem");
+
+                    b.Navigation("MenuItem");
+                });
+
             modelBuilder.Entity("API.ML.BO.Order", b =>
                 {
                     b.HasOne("API.ML.BO.Customer", "Customer")
@@ -673,7 +746,8 @@ namespace API.Migrations
                 {
                     b.HasOne("API.ML.BO.Customer", "Customer")
                         .WithOne("UserLogin")
-                        .HasForeignKey("API.ML.BO.UserLogin", "CustomerID");
+                        .HasForeignKey("API.ML.BO.UserLogin", "CustomerID")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("API.ML.BO.Employee", "Employee")
                         .WithOne("UserLogin")
@@ -705,8 +779,15 @@ namespace API.Migrations
                     b.Navigation("UserLogin");
                 });
 
+            modelBuilder.Entity("API.ML.BO.InventoryItem", b =>
+                {
+                    b.Navigation("MenuItemInventoryItems");
+                });
+
             modelBuilder.Entity("API.ML.BO.MenuItem", b =>
                 {
+                    b.Navigation("MenuItemInventoryItems");
+
                     b.Navigation("OrderDetails");
                 });
 

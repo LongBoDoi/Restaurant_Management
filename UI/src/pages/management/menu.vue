@@ -13,6 +13,9 @@
             <VTabsWindowItem :value="0" class="h-full">
                 <FormMenuList class="h-full" />
             </VTabsWindowItem>
+            <VTabsWindowItem :value="1" class="h-full">
+                <FormMenuCategoryList class="h-full" />
+            </VTabsWindowItem>
         </VTabsWindow>
     </VContainer>
 

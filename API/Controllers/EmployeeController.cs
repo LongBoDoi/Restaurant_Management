@@ -5,20 +5,22 @@ using API.ML.Utility;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 
 namespace API.Controllers
 {
     public class EmployeeController(ApplicationDBContext context) : MLBaseController<Employee>(context)
     {
         /// <summary>
-        /// Lấy dữ liệu theo phân trang
+        /// Lưu món
         /// </summary>
         /// <param name="page">Số trang</param>
         /// <param name="itemsPerPage">Kích thước trang</param>
         /// <returns></returns>
         [Authorize]
-        [HttpGet("GetDataPaging")]
-        public override MLActionResult GetDataPaging(int page, int itemsPerPage)
+        [HttpPost("UpdateEmployee")]
+        [ApiExplorerSettings(IgnoreApi = true)]
+        public MLActionResult UpdateEmployee([FromForm] string employee, [FromForm] IFormFile? image)
         {
             MLActionResult result = new()
             {
@@ -27,20 +29,21 @@ namespace API.Controllers
 
             try
             {
-                var listData = _entities.AsNoTracking().Where(e => e.Role != EnumRole.Admin);
-                result.Data = new
+                Employee? objEmployee = JsonConvert.DeserializeObject<Employee>(employee);
+
+                if (objEmployee != null)
                 {
-                    Data = listData.Skip((page - 1) * itemsPerPage).Take(itemsPerPage).ToList().Select(e =>
+                    if (objEmployee.EditMode != EnumEditMode.Delete && image != null)
                     {
-                        e.UserLogin = _context.UserLogin.AsNoTracking().FirstOrDefault(ul => ul.EmployeeID == e.EmployeeID);
-                        if (e.UserLogin != null)
+                        string imageUrl = CommonFunction.SaveImage(image);
+                        if (!string.IsNullOrEmpty(imageUrl))
                         {
-                            e.UserLogin.Password = string.Empty;
+                            objEmployee.ImageUrl = imageUrl;
                         }
-                        return e;
-                    }),
-                    TotalCount = listData.Count()
-                };
+                    }
+
+                    result = SaveChanges(objEmployee);
+                }
             }
             catch (Exception ex)
             {
@@ -52,6 +55,7 @@ namespace API.Controllers
 
         protected override bool BeforeSave(Employee employee, MLActionResult result)
         {
+            // Kiểm tra mật khẩu cũ khi đổi mật khẩu
             if (employee.EditMode == EnumEditMode.Edit && employee.UserLogin != null && employee.UserLogin.IsChangePassword)
             {
                 string? oldPassword = _entities.AsNoTracking().Include(e => e.UserLogin).FirstOrDefault(e => e.EmployeeID == employee.EmployeeID)?.UserLogin?.Password;
@@ -61,7 +65,8 @@ namespace API.Controllers
                     result.Success = false;
 
                     return false;
-                } else
+                }
+                else
                 {
                     _context.Entry(employee.UserLogin).State = EntityState.Modified;
                 }

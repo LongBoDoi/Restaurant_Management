@@ -1,5 +1,9 @@
 <template>
-    <FormInventoryItemList />
+    <VContainer style="padding: unset;" class="flex flex-column">
+        <h2 className="text-2xl font-bold text-gray-800">Nguyên liệu</h2>
 
-    <FormInventoryItemDetail />
+        <FormInventoryItemList class="h-full" />
+
+        <FormInventoryItemDetail class="h-full" />
+    </VContainer>
 </template>

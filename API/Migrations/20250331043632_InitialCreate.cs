@@ -18,9 +18,10 @@ namespace API.Migrations
                 columns: table => new
                 {
                     CustomerID = table.Column<Guid>(type: "char(36)", nullable: false),
-                    CustomerName = table.Column<string>(type: "longtext", nullable: false),
-                    PhoneNumber = table.Column<string>(type: "varchar(255)", nullable: false),
-                    Address = table.Column<string>(type: "longtext", nullable: false),
+                    CustomerName = table.Column<string>(type: "varchar(128)", maxLength: 128, nullable: false),
+                    PhoneNumber = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: false),
+                    Email = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: false),
+                    Address = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false),
                     Preferences = table.Column<string>(type: "longtext", nullable: true),
                     LoyaltyPoint = table.Column<int>(type: "int", nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "datetime(6)", nullable: true),
@@ -37,10 +38,11 @@ namespace API.Migrations
                 columns: table => new
                 {
                     EmployeeID = table.Column<Guid>(type: "char(36)", nullable: false),
-                    EmployeeCode = table.Column<string>(type: "varchar(255)", nullable: false),
-                    EmployeeName = table.Column<string>(type: "longtext", nullable: false),
-                    PhoneNumber = table.Column<string>(type: "longtext", nullable: true),
-                    Role = table.Column<int>(type: "int", nullable: false),
+                    EmployeeCode = table.Column<string>(type: "varchar(25)", maxLength: 25, nullable: false),
+                    EmployeeName = table.Column<string>(type: "varchar(128)", maxLength: 128, nullable: false),
+                    PhoneNumber = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: true),
+                    Email = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: true),
+                    WorkStatus = table.Column<int>(type: "int", nullable: false),
                     Schedule = table.Column<string>(type: "longtext", nullable: true),
                     CreatedDate = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     ModifiedDate = table.Column<DateTime>(type: "datetime(6)", nullable: true)
@@ -57,9 +59,9 @@ namespace API.Migrations
                 {
                     InventoryItemID = table.Column<Guid>(type: "char(36)", nullable: false),
                     Name = table.Column<string>(type: "longtext", nullable: false),
-                    Quantity = table.Column<int>(type: "int", nullable: false),
+                    Quantity = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    WarningStockQuantity = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     Unit = table.Column<string>(type: "longtext", nullable: false),
-                    ReorderLevel = table.Column<int>(type: "int", nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     ModifiedDate = table.Column<DateTime>(type: "datetime(6)", nullable: true)
                 },
@@ -70,21 +72,21 @@ namespace API.Migrations
                 .Annotation("Relational:Collation", "utf8mb4_0900_ai_ci");
 
             migrationBuilder.CreateTable(
-                name: "MenuItem",
+                name: "MenuItemCategory",
                 columns: table => new
                 {
-                    MenuItemID = table.Column<Guid>(type: "char(36)", nullable: false),
-                    Name = table.Column<string>(type: "longtext", nullable: false),
-                    Description = table.Column<string>(type: "longtext", nullable: true),
-                    Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    Category = table.Column<int>(type: "int", nullable: false),
-                    OutOfStock = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    MenuItemCategoryID = table.Column<Guid>(type: "char(36)", nullable: false),
+                    MenuItemCategoryName = table.Column<string>(type: "varchar(128)", maxLength: 128, nullable: false),
+                    Description = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false),
+                    Inactive = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    SortOrder = table.Column<int>(type: "int", nullable: false),
+                    Color = table.Column<string>(type: "varchar(25)", maxLength: 25, nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     ModifiedDate = table.Column<DateTime>(type: "datetime(6)", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_MenuItem", x => x.MenuItemID);
+                    table.PrimaryKey("PK_MenuItemCategory", x => x.MenuItemCategoryID);
                 })
                 .Annotation("Relational:Collation", "utf8mb4_0900_ai_ci");
 
@@ -200,12 +202,38 @@ namespace API.Migrations
                         name: "FK_UserLogin_Customer_CustomerID",
                         column: x => x.CustomerID,
                         principalTable: "Customer",
-                        principalColumn: "CustomerID");
+                        principalColumn: "CustomerID",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_UserLogin_Employee_EmployeeID",
                         column: x => x.EmployeeID,
                         principalTable: "Employee",
                         principalColumn: "EmployeeID");
+                })
+                .Annotation("Relational:Collation", "utf8mb4_0900_ai_ci");
+
+            migrationBuilder.CreateTable(
+                name: "MenuItem",
+                columns: table => new
+                {
+                    MenuItemID = table.Column<Guid>(type: "char(36)", nullable: false),
+                    Name = table.Column<string>(type: "longtext", nullable: false),
+                    Description = table.Column<string>(type: "longtext", nullable: true),
+                    Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    MenuItemCategoryID = table.Column<Guid>(type: "char(36)", nullable: true),
+                    OutOfStock = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    ImageUrl = table.Column<string>(type: "varchar(128)", maxLength: 128, nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "datetime(6)", nullable: true),
+                    ModifiedDate = table.Column<DateTime>(type: "datetime(6)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_MenuItem", x => x.MenuItemID);
+                    table.ForeignKey(
+                        name: "FK_MenuItem_MenuItemCategory_MenuItemCategoryID",
+                        column: x => x.MenuItemCategoryID,
+                        principalTable: "MenuItemCategory",
+                        principalColumn: "MenuItemCategoryID");
                 })
                 .Annotation("Relational:Collation", "utf8mb4_0900_ai_ci");
 
@@ -229,6 +257,32 @@ namespace API.Migrations
                         column: x => x.ConversationID,
                         principalTable: "ChatbotConversation",
                         principalColumn: "ConversationID",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("Relational:Collation", "utf8mb4_0900_ai_ci");
+
+            migrationBuilder.CreateTable(
+                name: "MenuItemInventoryItem",
+                columns: table => new
+                {
+                    MenuItemID = table.Column<Guid>(type: "char(36)", nullable: false),
+                    InventoryItemID = table.Column<Guid>(type: "char(36)", nullable: false),
+                    Quantity = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_MenuItemInventoryItem", x => new { x.MenuItemID, x.InventoryItemID });
+                    table.ForeignKey(
+                        name: "FK_MenuItemInventoryItem_InventoryItem_InventoryItemID",
+                        column: x => x.InventoryItemID,
+                        principalTable: "InventoryItem",
+                        principalColumn: "InventoryItemID",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_MenuItemInventoryItem_MenuItem_MenuItemID",
+                        column: x => x.MenuItemID,
+                        principalTable: "MenuItem",
+                        principalColumn: "MenuItemID",
                         onDelete: ReferentialAction.Cascade);
                 })
                 .Annotation("Relational:Collation", "utf8mb4_0900_ai_ci");
@@ -266,8 +320,19 @@ namespace API.Migrations
 
             migrationBuilder.InsertData(
                 table: "Employee",
-                columns: new[] { "EmployeeID", "CreatedDate", "EmployeeCode", "EmployeeName", "ModifiedDate", "PhoneNumber", "Role", "Schedule" },
-                values: new object[] { new Guid("d0929aef-1a5b-44f6-962d-01f7f9bb2b2b"), null, "admin", "Admin", null, null, 0, null });
+                columns: new[] { "EmployeeID", "CreatedDate", "Email", "EmployeeCode", "EmployeeName", "ModifiedDate", "PhoneNumber", "Schedule", "WorkStatus" },
+                values: new object[] { new Guid("d0929aef-1a5b-44f6-962d-01f7f9bb2b2b"), null, null, "admin", "Admin", null, null, null, 0 });
+
+            migrationBuilder.InsertData(
+                table: "MenuItemCategory",
+                columns: new[] { "MenuItemCategoryID", "Color", "CreatedDate", "Description", "Inactive", "MenuItemCategoryName", "ModifiedDate", "SortOrder" },
+                values: new object[,]
+                {
+                    { new Guid("758296ed-75e6-45c6-8a1e-b075524027af"), "#F59E0B", null, "", false, "Món chính", null, 1 },
+                    { new Guid("78ef8d8c-a68e-40c9-99ce-5bb496faef2b"), "#A855F7", null, "", false, "Đồ uống", null, 3 },
+                    { new Guid("87de53a6-68e2-46a3-b998-7df936dfa1c5"), "#3B82F6", null, "", false, "Tráng miệng", null, 2 },
+                    { new Guid("aa5e2d3f-4deb-4434-9ef2-19f5e51f21ad"), "#22C55E", null, "", false, "Khai vị", null, 0 }
+                });
 
             migrationBuilder.InsertData(
                 table: "Setting",
@@ -276,11 +341,16 @@ namespace API.Migrations
                 {
                     { new Guid("06005218-029d-4040-9332-62e2e5dcb597"), null, 1, null, "IntroImageUrl", "" },
                     { new Guid("0b10c89c-7b7c-4f98-8828-1d07dffd2f73"), null, 1, null, "RestaurantName", "" },
+                    { new Guid("3ca30af9-1538-4339-91d5-cd90a8ef44e4"), null, 1, null, "SocialMediaUrls", "[]" },
                     { new Guid("3f07e912-5330-405d-9679-1d17f9b2eff4"), null, 1, null, "RestaurantAddress", "" },
                     { new Guid("401ef8c2-370c-470e-ad71-9924a85d18ff"), null, 1, null, "RestaurantSlogan", "" },
                     { new Guid("43e2553a-5a18-4258-8c14-1852564fb309"), null, 3, null, "DisplayMenuScreenForCustomer", "true" },
+                    { new Guid("4e5050c5-1a3c-482f-8169-e902fcca464f"), null, 1, null, "RestaurantPhoneNumber", "" },
                     { new Guid("5ac03c72-3e46-4f70-9b5f-3160c9ee2327"), null, 2, null, "DisplayMenuScreenForCustomerType", "0" },
+                    { new Guid("69a4356b-1f0a-40d5-ab4d-a75a2f0e16fb"), null, 1, null, "OpeningTimes", "[]" },
+                    { new Guid("6c9b5da9-56a8-40ad-8fa9-866e5f4cbd50"), null, 1, null, "MenuCategoryColors", "[\"#EF4444\",\"#3B82F6\",\"#22C55E\",\"#F59E0B\",\"#A855F7\",\"#EC4899\",\"#6366F1\",\"#14B8A6\"]" },
                     { new Guid("b9ea5327-bbda-4f44-ba55-ccf02ed1b7ff"), null, 2, null, "DisplayMenuScreenByItemsForCustomerType", "0" },
+                    { new Guid("c5bfe361-32f5-4b12-ba50-fc877e88c1f9"), null, 1, null, "ListMenuScreenForCustomerImages", "[]" },
                     { new Guid("d69a097b-f337-4521-a302-d9ed9a876a5e"), null, 1, null, "ListMenuScreenForCustomerItems", "[]" },
                     { new Guid("f10e0c45-17d3-4715-802e-30a5b5abc14c"), null, 3, null, "DisplayBookingScreenForCustomer", "true" }
                 });
@@ -311,6 +381,16 @@ namespace API.Migrations
                 table: "Employee",
                 column: "EmployeeCode",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_MenuItem_MenuItemCategoryID",
+                table: "MenuItem",
+                column: "MenuItemCategoryID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_MenuItemInventoryItem_InventoryItemID",
+                table: "MenuItemInventoryItem",
+                column: "InventoryItemID");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Order_CustomerID",
@@ -358,7 +438,7 @@ namespace API.Migrations
                 name: "ChatbotConversationDetail");
 
             migrationBuilder.DropTable(
-                name: "InventoryItem");
+                name: "MenuItemInventoryItem");
 
             migrationBuilder.DropTable(
                 name: "OrderDetail");
@@ -376,6 +456,9 @@ namespace API.Migrations
                 name: "ChatbotConversation");
 
             migrationBuilder.DropTable(
+                name: "InventoryItem");
+
+            migrationBuilder.DropTable(
                 name: "MenuItem");
 
             migrationBuilder.DropTable(
@@ -383,6 +466,9 @@ namespace API.Migrations
 
             migrationBuilder.DropTable(
                 name: "Employee");
+
+            migrationBuilder.DropTable(
+                name: "MenuItemCategory");
 
             migrationBuilder.DropTable(
                 name: "Customer");

@@ -236,10 +236,7 @@ export default {
 
     async created() {
         // Lấy toàn bộ danh sách món để gán vào combobox
-        const data:any = await this.$service.MenuItemService.getDataPaging(-1, -1);
-        if (data && data.Data && data.Data.length) {
-            this.allMenuItems = data.Data as MenuItem[];
-        }
+        this.allMenuItems = await this.$service.MenuItemService.getAll();
 
         // Lấy url ảnh giới thiệu
         const introImageUrlSetting = this.lstSettings.find(s => s.SettingKey === 'IntroImageUrl');
@@ -361,7 +358,7 @@ export default {
             await this.$nextTick();
 
             const menuItemTableBody:any = (this.$refs.menuItemTable as any).$el.querySelector('table tbody').lastElementChild;
-            menuItemTableBody.scrollIntoView({ behavior: "smooth" });;
+            menuItemTableBody.scrollIntoView({ behavior: "smooth" });
         },
 
         removeMenuItem() {

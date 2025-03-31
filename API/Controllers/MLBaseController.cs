@@ -2,6 +2,7 @@
 using API.ML.BO;
 using API.ML.BOBase;
 using API.ML.Common;
+using API.ML.CustomAtrributes;
 using API.ML.Utility;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -61,7 +62,7 @@ namespace API.Controllers
         /// <returns></returns>
         [Authorize]
         [HttpGet("GetDataPaging")]
-        public virtual MLActionResult GetDataPaging(int page, int itemsPerPage)
+        public virtual MLActionResult GetDataPaging(int page, int itemsPerPage, string? search)
         {
             MLActionResult result = new()
             {
@@ -70,10 +71,34 @@ namespace API.Controllers
 
             try
             {
+                IEnumerable<IMLEntity> data = _entities.ToList();
+
+                string? normalizedSearchTerm = search?.RemoveDiacritics().ToLower();
+                if (!string.IsNullOrEmpty(normalizedSearchTerm))
+                {
+
+                    IEnumerable<PropertyInfo> nameFields = typeof(IMLEntity).GetProperties().Where(p => p.GetCustomAttribute<NameField>() != null);
+                    if (nameFields.Any())
+                    {
+                        data = data.Where(e =>
+                        {
+                            foreach (PropertyInfo nameField in nameFields)
+                            {
+                                string? nameFieldValue = nameField.GetValue(e)?.ToString();
+                                if (!string.IsNullOrEmpty(nameFieldValue) && nameFieldValue.RemoveDiacritics().ToLower().Contains(normalizedSearchTerm))
+                                {
+                                    return true;
+                                }
+                            }
+                            return false;
+                        });
+                    }
+                }
+
                 result.Data = new
                 {
-                    Data = itemsPerPage == -1 ? [.. _entities] : _entities.Skip((page - 1) * itemsPerPage).Take(itemsPerPage).ToList(),
-                    TotalCount = _entities.Count()
+                    Data = data.OrderByDescending(e => (e as MLEntity)?.CreatedDate).Skip((page - 1) * itemsPerPage).Take(itemsPerPage).ToList(),
+                    TotalCount = data.Count()
                 };
             }
             catch (Exception ex)
@@ -120,6 +145,74 @@ namespace API.Controllers
         /// </summary>
         /// <returns></returns>
         [Authorize]
+        [HttpPost("SaveChangesMultiple")]
+        public MLActionResult SaveChangesMultiple(List<IMLEntity> entities)
+        {
+            MLActionResult result = new();
+
+            try
+            {
+                foreach (IMLEntity entity in entities)
+                {
+                    if (!BeforeSave(entity, result))
+                    {
+                        entities.Remove(entity);
+                    }
+                }
+
+                if (!entities.Any())
+                {
+                    result.Success = false;
+                    result.ErrorMsg = "Không có bản ghi nào để xử lý";
+                    return result;
+                }
+
+                foreach (IMLEntity entity in entities)
+                {
+                    EnumEditMode? editMode = (EnumEditMode?)typeof(IMLEntity).GetProperty("EditMode")?.GetValue(entity);
+                    if (editMode.HasValue)
+                    {
+                        switch (editMode)
+                        {
+                            case EnumEditMode.Add:
+                                var keyProperty = typeof(IMLEntity).GetProperties()
+                                                                    .FirstOrDefault(prop => prop.GetCustomAttribute<KeyAttribute>() != null);
+                                keyProperty?.SetValue(entity, Guid.NewGuid());
+                                _entities.Add(entity);
+                                break;
+                            case EnumEditMode.Edit:
+                                _context.Entry(entity).State = EntityState.Modified;
+                                break;
+                            case EnumEditMode.Delete:
+                                _context.Entry(entity).State = EntityState.Deleted;
+                                break;
+                        }
+                    }
+                }
+
+                result.Success = _context.SaveChanges() > 0;
+                if (result.Success)
+                {
+                    foreach (IMLEntity entity in entities)
+                    {
+                        this.AfterSaveSuccess(entity);
+                    }
+                    result.Data = entities;
+                }
+            }
+            catch (Exception ex)
+            {
+                CommonFunction.HandleException(ex, result, _context);
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Cập nhật bản ghi
+        /// </summary>
+        /// <returns></returns>
+        [Authorize]
         [HttpPost("SaveChanges")]
         public MLActionResult SaveChanges(IMLEntity entity)
         {
@@ -127,12 +220,6 @@ namespace API.Controllers
 
             try
             {
-                if (entity is not MLEntity)
-                {
-                    result.ErrorMsg = "Bảng không tồn tại trong DB.";
-                    return result;
-                }
-
                 if (!BeforeSave(entity, result))
                 {
                     return result;
@@ -162,9 +249,6 @@ namespace API.Controllers
                 if (result.Success)
                 {
                     this.AfterSaveSuccess(entity);
-                }
-                if (editMode != EnumEditMode.Delete)
-                {
                     result.Data = entity;
                 }
             }

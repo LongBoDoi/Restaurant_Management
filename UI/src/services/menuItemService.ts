@@ -11,7 +11,7 @@ class MenuItemService extends BaseService<MenuItem> {
       this.configApi();
   }
 
-  public async getMenuItemPaging(page: number, itemsPerPage: number, search: string) : Promise<PagingData<MenuItem>> {
+  public async getMenuItemPaging(page: number, itemsPerPage: number, search: string, categoryID: string) : Promise<PagingData<MenuItem>> {
     var result:PagingData<MenuItem> = {
       Data: [],
       TotalCount: 0
@@ -22,7 +22,8 @@ class MenuItemService extends BaseService<MenuItem> {
         params: {
           page: page,
           itemsPerPage: itemsPerPage,
-          search: search
+          search: search,
+          categoryID: categoryID
         }
       });
       const actionResult = response.data as MLActionResult;
