@@ -1,7 +1,7 @@
 <!-- Màn danh sách thực đơn -->
 
 <template>
-    <VSheet style="display: flex; flex-direction: column;" class="h-full pb-2">
+    <VSheet style="display: flex; flex-direction: column; overflow: hidden;" class="h-full pb-2">
         <VBtn width="fit-content" class="bg-green-500 hover:bg-green-600 hover:scale-105 mr-2 mt-1 text-white ml-auto" prepend-icon="mdi-plus" rounded @click="handleAddNewMenuItem">Thêm món mới</VBtn>
         <VCard style="width: 100% ; height: 100%;" color="rgb(249, 250, 251)" class="rounded-lg d-flex flex-column shadow-md border mt-6">
             <div className="flex items-center space-x-4 px-6 py-4 border-b">
@@ -20,13 +20,14 @@
 
             <VDataTableServer
                 sticky
+                fixed-header
                 :items-length="totalCount"
                 :loading="loading"
                 loading-text="Đang tải dữ liệu..." 
                 no-data-text="Không có dữ liệu" 
                 items-per-page-text="Số bản ghi"
                 :items="(dataList as MenuItem[])"
-                style="height: 100%;"
+                style="flex-grow: 1; overflow: hidden;"
                 hide-default-footer
             >
                 <template #loader>
@@ -34,13 +35,13 @@
                 </template>
 
                 <template #headers>
-                    <tr class="bg-gray-50">
-                        <th class="py-3 px-6 text-left font-medium text-gray-500" style="min-width: 150px;">Tên món</th>
-                        <th class="py-3 px-6 text-right font-medium text-gray-500" style="width: 200px;">Giá món</th>
-                        <th class="py-3 px-6 text-left font-medium text-gray-500" style="width: 250px;">Nhóm thực đơn</th>
-                        <th class="py-3 px-6 text-left font-medium text-gray-500" style="width: 400px;">Mô tả</th>
-                        <th class="py-3 px-6 text-left font-medium text-gray-500" style="width: 128px;">Hết hàng</th>
-                        <th class="py-3 px-6 text-left font-medium text-gray-500" style="width: 128px;">Thao tác</th>
+                    <tr>
+                        <th class="py-3 px-6 text-left font-medium text-gray-500" style="min-width: 250px;">Tên món</th>
+                        <th class="py-3 px-6 text-right font-medium text-gray-500" style="min-width: 150px;">Giá món</th>
+                        <th class="py-3 px-6 text-left font-medium text-gray-500" style="min-width: 250px;">Nhóm thực đơn</th>
+                        <th class="py-3 px-6 text-left font-medium text-gray-500" style="min-width: 400px; width: 100%;">Mô tả</th>
+                        <th class="py-3 px-6 text-left font-medium text-gray-500" style="min-width: 128px;">Ngừng hoạt động</th>
+                        <th class="py-3 px-6 text-left font-medium text-gray-500" style="min-width: 128px;">Thao tác</th>
                     </tr>
                 </template>
 
@@ -67,7 +68,7 @@
                         <td class="py-4 px-6 text-sm text-gray-600">{{ item.Description }}</td>
                         <td class="py-4 px-6">
                             <MLVbox class="align-center">
-                                <VCheckboxBtn color="primary" v-model:model-value="item.OutOfStock" readonly />
+                                <VCheckboxBtn color="primary" v-model:model-value="item.Inactive" readonly />
                             </MLVbox>
                         </td>
                         <td class="py-4 px-6">

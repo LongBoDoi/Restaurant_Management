@@ -8,11 +8,26 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace API.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class init : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.CreateTable(
+                name: "Area",
+                columns: table => new
+                {
+                    AreaID = table.Column<Guid>(type: "char(36)", nullable: false),
+                    AreaName = table.Column<string>(type: "longtext", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "datetime(6)", nullable: true),
+                    ModifiedDate = table.Column<DateTime>(type: "datetime(6)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Area", x => x.AreaID);
+                })
+                .Annotation("Relational:Collation", "utf8mb4_0900_ai_ci");
+
             migrationBuilder.CreateTable(
                 name: "Customer",
                 columns: table => new
@@ -43,6 +58,7 @@ namespace API.Migrations
                     PhoneNumber = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: true),
                     Email = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: true),
                     WorkStatus = table.Column<int>(type: "int", nullable: false),
+                    ImageUrl = table.Column<string>(type: "varchar(128)", maxLength: 128, nullable: true),
                     Schedule = table.Column<string>(type: "longtext", nullable: true),
                     CreatedDate = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     ModifiedDate = table.Column<DateTime>(type: "datetime(6)", nullable: true)
@@ -54,20 +70,18 @@ namespace API.Migrations
                 .Annotation("Relational:Collation", "utf8mb4_0900_ai_ci");
 
             migrationBuilder.CreateTable(
-                name: "InventoryItem",
+                name: "InventoryItemCategory",
                 columns: table => new
                 {
-                    InventoryItemID = table.Column<Guid>(type: "char(36)", nullable: false),
-                    Name = table.Column<string>(type: "longtext", nullable: false),
-                    Quantity = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    WarningStockQuantity = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    Unit = table.Column<string>(type: "longtext", nullable: false),
+                    InventoryItemCategoryID = table.Column<Guid>(type: "char(36)", nullable: false),
+                    InventoryItemCategoryName = table.Column<string>(type: "varchar(128)", maxLength: 128, nullable: false),
+                    Inactive = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     ModifiedDate = table.Column<DateTime>(type: "datetime(6)", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_InventoryItem", x => x.InventoryItemID);
+                    table.PrimaryKey("PK_InventoryItemCategory", x => x.InventoryItemCategoryID);
                 })
                 .Annotation("Relational:Collation", "utf8mb4_0900_ai_ci");
 
@@ -108,6 +122,29 @@ namespace API.Migrations
                 .Annotation("Relational:Collation", "utf8mb4_0900_ai_ci");
 
             migrationBuilder.CreateTable(
+                name: "Table",
+                columns: table => new
+                {
+                    TableID = table.Column<Guid>(type: "char(36)", nullable: false),
+                    TableName = table.Column<string>(type: "longtext", nullable: false),
+                    SeatCount = table.Column<int>(type: "int", nullable: false),
+                    Status = table.Column<int>(type: "int", nullable: false),
+                    AreaID = table.Column<Guid>(type: "char(36)", nullable: true),
+                    CreatedDate = table.Column<DateTime>(type: "datetime(6)", nullable: true),
+                    ModifiedDate = table.Column<DateTime>(type: "datetime(6)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Table", x => x.TableID);
+                    table.ForeignKey(
+                        name: "FK_Table_Area_AreaID",
+                        column: x => x.AreaID,
+                        principalTable: "Area",
+                        principalColumn: "AreaID");
+                })
+                .Annotation("Relational:Collation", "utf8mb4_0900_ai_ci");
+
+            migrationBuilder.CreateTable(
                 name: "ChatbotConversation",
                 columns: table => new
                 {
@@ -130,17 +167,46 @@ namespace API.Migrations
                 .Annotation("Relational:Collation", "utf8mb4_0900_ai_ci");
 
             migrationBuilder.CreateTable(
+                name: "CustomMenuRequest",
+                columns: table => new
+                {
+                    CustomMenuRequestID = table.Column<Guid>(type: "char(36)", nullable: false),
+                    CustomerID = table.Column<Guid>(type: "char(36)", nullable: false),
+                    CustomerName = table.Column<string>(type: "varchar(128)", maxLength: 128, nullable: false),
+                    MenuItemName = table.Column<string>(type: "varchar(128)", maxLength: 128, nullable: false),
+                    Note = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false),
+                    Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Status = table.Column<int>(type: "int", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "datetime(6)", nullable: true),
+                    ModifiedDate = table.Column<DateTime>(type: "datetime(6)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CustomMenuRequest", x => x.CustomMenuRequestID);
+                    table.ForeignKey(
+                        name: "FK_CustomMenuRequest_Customer_CustomerID",
+                        column: x => x.CustomerID,
+                        principalTable: "Customer",
+                        principalColumn: "CustomerID",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("Relational:Collation", "utf8mb4_0900_ai_ci");
+
+            migrationBuilder.CreateTable(
                 name: "Order",
                 columns: table => new
                 {
                     OrderID = table.Column<Guid>(type: "char(36)", nullable: false),
                     CustomerID = table.Column<Guid>(type: "char(36)", nullable: true),
                     CustomerName = table.Column<string>(type: "longtext", nullable: false),
-                    OrderName = table.Column<string>(type: "longtext", nullable: false),
                     OrderDate = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     TotalAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    NetAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    TipAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     Status = table.Column<int>(type: "int", nullable: false),
+                    PaymentMethod = table.Column<int>(type: "int", nullable: false),
                     SpecialRequest = table.Column<string>(type: "longtext", nullable: true),
+                    TableName = table.Column<string>(type: "longtext", nullable: true),
                     CreatedDate = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     ModifiedDate = table.Column<DateTime>(type: "datetime(6)", nullable: true)
                 },
@@ -213,15 +279,40 @@ namespace API.Migrations
                 .Annotation("Relational:Collation", "utf8mb4_0900_ai_ci");
 
             migrationBuilder.CreateTable(
+                name: "InventoryItem",
+                columns: table => new
+                {
+                    InventoryItemID = table.Column<Guid>(type: "char(36)", nullable: false),
+                    Name = table.Column<string>(type: "longtext", nullable: false),
+                    Quantity = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    WarningStockQuantity = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Unit = table.Column<string>(type: "longtext", nullable: false),
+                    InventoryItemCategoryID = table.Column<Guid>(type: "char(36)", nullable: true),
+                    Inactive = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "datetime(6)", nullable: true),
+                    ModifiedDate = table.Column<DateTime>(type: "datetime(6)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_InventoryItem", x => x.InventoryItemID);
+                    table.ForeignKey(
+                        name: "FK_InventoryItem_InventoryItemCategory_InventoryItemCategoryID",
+                        column: x => x.InventoryItemCategoryID,
+                        principalTable: "InventoryItemCategory",
+                        principalColumn: "InventoryItemCategoryID");
+                })
+                .Annotation("Relational:Collation", "utf8mb4_0900_ai_ci");
+
+            migrationBuilder.CreateTable(
                 name: "MenuItem",
                 columns: table => new
                 {
                     MenuItemID = table.Column<Guid>(type: "char(36)", nullable: false),
-                    Name = table.Column<string>(type: "longtext", nullable: false),
-                    Description = table.Column<string>(type: "longtext", nullable: true),
+                    Name = table.Column<string>(type: "varchar(128)", maxLength: 128, nullable: false),
+                    Description = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: true),
                     Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     MenuItemCategoryID = table.Column<Guid>(type: "char(36)", nullable: true),
-                    OutOfStock = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    Inactive = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     ImageUrl = table.Column<string>(type: "varchar(128)", maxLength: 128, nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     ModifiedDate = table.Column<DateTime>(type: "datetime(6)", nullable: true)
@@ -233,7 +324,8 @@ namespace API.Migrations
                         name: "FK_MenuItem_MenuItemCategory_MenuItemCategoryID",
                         column: x => x.MenuItemCategoryID,
                         principalTable: "MenuItemCategory",
-                        principalColumn: "MenuItemCategoryID");
+                        principalColumn: "MenuItemCategoryID",
+                        onDelete: ReferentialAction.SetNull);
                 })
                 .Annotation("Relational:Collation", "utf8mb4_0900_ai_ci");
 
@@ -257,6 +349,87 @@ namespace API.Migrations
                         column: x => x.ConversationID,
                         principalTable: "ChatbotConversation",
                         principalColumn: "ConversationID",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("Relational:Collation", "utf8mb4_0900_ai_ci");
+
+            migrationBuilder.CreateTable(
+                name: "OrderTable",
+                columns: table => new
+                {
+                    OrderTableID = table.Column<Guid>(type: "char(36)", nullable: false),
+                    OrderID = table.Column<Guid>(type: "char(36)", nullable: false),
+                    TableID = table.Column<Guid>(type: "char(36)", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "datetime(6)", nullable: true),
+                    ModifiedDate = table.Column<DateTime>(type: "datetime(6)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_OrderTable", x => x.OrderTableID);
+                    table.ForeignKey(
+                        name: "FK_OrderTable_Order_OrderID",
+                        column: x => x.OrderID,
+                        principalTable: "Order",
+                        principalColumn: "OrderID",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_OrderTable_Table_TableID",
+                        column: x => x.TableID,
+                        principalTable: "Table",
+                        principalColumn: "TableID",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("Relational:Collation", "utf8mb4_0900_ai_ci");
+
+            migrationBuilder.CreateTable(
+                name: "ReservationTable",
+                columns: table => new
+                {
+                    ReservationTableID = table.Column<Guid>(type: "char(36)", nullable: false),
+                    ReservationID = table.Column<Guid>(type: "char(36)", nullable: false),
+                    TableID = table.Column<Guid>(type: "char(36)", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "datetime(6)", nullable: true),
+                    ModifiedDate = table.Column<DateTime>(type: "datetime(6)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ReservationTable", x => x.ReservationTableID);
+                    table.ForeignKey(
+                        name: "FK_ReservationTable_Reservation_ReservationID",
+                        column: x => x.ReservationID,
+                        principalTable: "Reservation",
+                        principalColumn: "ReservationID",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_ReservationTable_Table_TableID",
+                        column: x => x.TableID,
+                        principalTable: "Table",
+                        principalColumn: "TableID",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("Relational:Collation", "utf8mb4_0900_ai_ci");
+
+            migrationBuilder.CreateTable(
+                name: "CustomMenuRequestInventoryItem",
+                columns: table => new
+                {
+                    CustomMenuRequestsCustomMenuRequestID = table.Column<Guid>(type: "char(36)", nullable: false),
+                    InventoryItemsInventoryItemID = table.Column<Guid>(type: "char(36)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CustomMenuRequestInventoryItem", x => new { x.CustomMenuRequestsCustomMenuRequestID, x.InventoryItemsInventoryItemID });
+                    table.ForeignKey(
+                        name: "FK_CustomMenuRequestInventoryItem_CustomMenuRequest_CustomMenuR~",
+                        column: x => x.CustomMenuRequestsCustomMenuRequestID,
+                        principalTable: "CustomMenuRequest",
+                        principalColumn: "CustomMenuRequestID",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_CustomMenuRequestInventoryItem_InventoryItem_InventoryItemsI~",
+                        column: x => x.InventoryItemsInventoryItemID,
+                        principalTable: "InventoryItem",
+                        principalColumn: "InventoryItemID",
                         onDelete: ReferentialAction.Cascade);
                 })
                 .Annotation("Relational:Collation", "utf8mb4_0900_ai_ci");
@@ -293,9 +466,11 @@ namespace API.Migrations
                 {
                     OrderDetailID = table.Column<Guid>(type: "char(36)", nullable: false),
                     OrderID = table.Column<Guid>(type: "char(36)", nullable: false),
-                    MenuItemID = table.Column<Guid>(type: "char(36)", nullable: false),
+                    MenuItemID = table.Column<Guid>(type: "char(36)", nullable: true),
+                    MenuItemName = table.Column<string>(type: "longtext", nullable: false),
                     Quantity = table.Column<int>(type: "int", nullable: false),
                     Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Amount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     Note = table.Column<string>(type: "longtext", nullable: true),
                     CreatedDate = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     ModifiedDate = table.Column<DateTime>(type: "datetime(6)", nullable: true)
@@ -307,8 +482,7 @@ namespace API.Migrations
                         name: "FK_OrderDetail_MenuItem_MenuItemID",
                         column: x => x.MenuItemID,
                         principalTable: "MenuItem",
-                        principalColumn: "MenuItemID",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "MenuItemID");
                     table.ForeignKey(
                         name: "FK_OrderDetail_Order_OrderID",
                         column: x => x.OrderID,
@@ -320,8 +494,8 @@ namespace API.Migrations
 
             migrationBuilder.InsertData(
                 table: "Employee",
-                columns: new[] { "EmployeeID", "CreatedDate", "Email", "EmployeeCode", "EmployeeName", "ModifiedDate", "PhoneNumber", "Schedule", "WorkStatus" },
-                values: new object[] { new Guid("d0929aef-1a5b-44f6-962d-01f7f9bb2b2b"), null, null, "admin", "Admin", null, null, null, 0 });
+                columns: new[] { "EmployeeID", "CreatedDate", "Email", "EmployeeCode", "EmployeeName", "ImageUrl", "ModifiedDate", "PhoneNumber", "Schedule", "WorkStatus" },
+                values: new object[] { new Guid("d0929aef-1a5b-44f6-962d-01f7f9bb2b2b"), null, null, "admin", "Admin", null, null, null, null, 0 });
 
             migrationBuilder.InsertData(
                 table: "MenuItemCategory",
@@ -377,10 +551,25 @@ namespace API.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_CustomMenuRequest_CustomerID",
+                table: "CustomMenuRequest",
+                column: "CustomerID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CustomMenuRequestInventoryItem_InventoryItemsInventoryItemID",
+                table: "CustomMenuRequestInventoryItem",
+                column: "InventoryItemsInventoryItemID");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Employee_EmployeeCode",
                 table: "Employee",
                 column: "EmployeeCode",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_InventoryItem_InventoryItemCategoryID",
+                table: "InventoryItem",
+                column: "InventoryItemCategoryID");
 
             migrationBuilder.CreateIndex(
                 name: "IX_MenuItem_MenuItemCategoryID",
@@ -408,15 +597,40 @@ namespace API.Migrations
                 column: "OrderID");
 
             migrationBuilder.CreateIndex(
+                name: "IX_OrderTable_OrderID",
+                table: "OrderTable",
+                column: "OrderID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_OrderTable_TableID",
+                table: "OrderTable",
+                column: "TableID");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Reservation_CustomerID",
                 table: "Reservation",
                 column: "CustomerID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ReservationTable_ReservationID",
+                table: "ReservationTable",
+                column: "ReservationID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ReservationTable_TableID",
+                table: "ReservationTable",
+                column: "TableID");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Setting_SettingKey",
                 table: "Setting",
                 column: "SettingKey",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Table_AreaID",
+                table: "Table",
+                column: "AreaID");
 
             migrationBuilder.CreateIndex(
                 name: "IX_UserLogin_CustomerID",
@@ -438,13 +652,19 @@ namespace API.Migrations
                 name: "ChatbotConversationDetail");
 
             migrationBuilder.DropTable(
+                name: "CustomMenuRequestInventoryItem");
+
+            migrationBuilder.DropTable(
                 name: "MenuItemInventoryItem");
 
             migrationBuilder.DropTable(
                 name: "OrderDetail");
 
             migrationBuilder.DropTable(
-                name: "Reservation");
+                name: "OrderTable");
+
+            migrationBuilder.DropTable(
+                name: "ReservationTable");
 
             migrationBuilder.DropTable(
                 name: "Setting");
@@ -456,6 +676,9 @@ namespace API.Migrations
                 name: "ChatbotConversation");
 
             migrationBuilder.DropTable(
+                name: "CustomMenuRequest");
+
+            migrationBuilder.DropTable(
                 name: "InventoryItem");
 
             migrationBuilder.DropTable(
@@ -465,13 +688,25 @@ namespace API.Migrations
                 name: "Order");
 
             migrationBuilder.DropTable(
+                name: "Reservation");
+
+            migrationBuilder.DropTable(
+                name: "Table");
+
+            migrationBuilder.DropTable(
                 name: "Employee");
+
+            migrationBuilder.DropTable(
+                name: "InventoryItemCategory");
 
             migrationBuilder.DropTable(
                 name: "MenuItemCategory");
 
             migrationBuilder.DropTable(
                 name: "Customer");
+
+            migrationBuilder.DropTable(
+                name: "Area");
         }
     }
 }

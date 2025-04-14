@@ -3,6 +3,7 @@ import EventBus from "./EventBus";
 import EventName from "./EventName";
 import Config from "./Config";
 import { session } from "./Session";
+import { useDisplay } from "vuetify";
 
 class CommonFunction {
     /**
@@ -51,6 +52,14 @@ class CommonFunction {
         return moment(date).format('YYYY-MM-DD');
     };
 
+    /**
+     * Lấy giờ UTC
+     */
+    static getUTCDate = (date: Date) => {
+        const utcDate = moment(date).utc().format();
+        return utcDate;
+    };
+
     static showDialog = (dialogData:any) => {
         EventBus.emit(EventName.ShowDialog, dialogData);
     };
@@ -58,7 +67,7 @@ class CommonFunction {
     /**
      * Lấy đường dẫn file ảnh trên BE
      */
-    static getImageUrl = (fileName: string) => {
+    static getImageUrl = (fileName: string|undefined) => {
         if (!fileName) {
             return '';
         }
@@ -82,7 +91,10 @@ class CommonFunction {
     /**
      * Định dạng số theo hàng nghìn
      */
-    static formatThousands = (number: number) => {
+    static formatThousands = (number: number|undefined) => {
+        if (number === undefined) {
+            return '';
+        }
         // return number?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".") ?? '';
         return number?.toLocaleString('de-DE', { minimumFractionDigits: 0, maximumFractionDigits: 3 }) ?? '';
     };
@@ -98,7 +110,7 @@ class CommonFunction {
     /**
      * Lấy giá trị SĐT
      */
-    static getRealPhoneNumberValue = (phoneNumber: string) => {
+    static getRealPhoneNumberValue = (phoneNumber: string|undefined) => {
         if (!phoneNumber) return '';
         return phoneNumber.replace(/\D/g, "");
     };
@@ -109,6 +121,19 @@ class CommonFunction {
     static getRealFloatValue = (number: number|undefined) => {
         return parseFloat(number?.toString().replaceAll('.', '').replaceAll(',', '.') ?? '0');
     };
+
+    /**
+     * Lấy code kích thước màn hình
+     * xs
+     * sm
+     * md
+     * lg
+     * xl
+     */
+    static getScreenCode = ():string => {
+        const { name } = useDisplay();
+        return name.value;
+    }
 
     /**
      * Xử lý exception khi gọi service

@@ -15,7 +15,7 @@ namespace API.ML.BO
         /// <summary>
         /// Tên NVL
         /// </summary>
-        [NameField]
+        [SearchField]
         public string Name { get; set; } = string.Empty;
 
         /// <summary>
@@ -34,8 +34,29 @@ namespace API.ML.BO
         public string Unit { get; set; } = string.Empty;
 
         /// <summary>
+        /// Nhóm nguyên liệu
+        /// </summary>
+        public Guid? InventoryItemCategoryID { get; set; }
+
+        /// <summary>
+        /// Ngừng hoạt động
+        /// </summary>
+        public bool Inactive { get; set; }
+
+        /// <summary>
         /// Dữ liệu thực đơn
         /// </summary>
-        public IEnumerable<MenuItemInventoryItem> MenuItemInventoryItems { get; set; } = [];
+        public IEnumerable<MenuItemInventoryItem>? MenuItemInventoryItems { get; set; }
+
+        /// <summary>
+        /// Dữ liệu nhóm nguyên liệu
+        /// </summary>
+        [GetDataPagingInclude]
+        public InventoryItemCategory? InventoryItemCategory { get; set; }
+
+        /// <summary>
+        /// Dữ liệu tạo món custom
+        /// </summary>
+        public IEnumerable<CustomMenuRequest>? CustomMenuRequests { get; set; }
     }
 }

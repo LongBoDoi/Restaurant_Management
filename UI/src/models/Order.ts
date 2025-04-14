@@ -1,7 +1,8 @@
-import { EnumOrderStatus } from "@/common/Enumeration";
+import { EnumOrderStatus, EnumPaymentMethod } from "@/common/Enumeration";
 import OrderDetail from "./OrderDetail";
 import MLEntity from "./MLEntity";
 import Customer from "./Customer";
+import OrderTable from "./OrderTable";
 
 interface Order extends MLEntity {
     OrderID: string,
@@ -10,11 +11,16 @@ interface Order extends MLEntity {
     CustomerName: string,
     OrderDate: Date,
     TotalAmount: number,
+    NetAmount: number,
+    TipAmount: number,
     Status: EnumOrderStatus,
     SpecialRequest: string,
+    PaymentMethod: EnumPaymentMethod,
+    TableName: string,
 
     OrderDetails: OrderDetail[],
-    Customer: Customer|undefined
+    Customer: Customer|undefined,
+    OrderTables?: OrderTable[]
 };
 
 export default Order;

@@ -1,6 +1,7 @@
 ﻿using API.ML.BO;
 using API.ML.BOBase;
 using API.ML.Common;
+using API.ML.Extensions;
 using API.ML.Utility;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -92,7 +93,10 @@ namespace API.Controllers
                         }
                     }
 
-                    objMenuItem.MenuItemCategory = null;
+                    if (objMenuItem.MenuItemCategory != null)
+                    {
+                        _context.Entry(objMenuItem.MenuItemCategory).State = EntityState.Unchanged;
+                    }
                     result = SaveChanges(objMenuItem);
                 }
             }

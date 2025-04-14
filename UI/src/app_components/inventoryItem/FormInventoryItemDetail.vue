@@ -18,7 +18,7 @@
                     <div className="mb-4">
                         <label className="block text-gray-700 text-sm font-medium">Tên nguyên liệu <span style="color: red;">*</span></label>
                         
-                        <VTextField class="mt-2" density="compact" variant="outlined" v-model:model-value="record.Name" hide-details
+                        <VTextField color="primary" class="mt-2" density="compact" variant="outlined" v-model:model-value="record.Name" hide-details
                             :rules="[(v:string|undefined) => v !== undefined && v !== '']"
                         />
                     </div>
@@ -27,14 +27,14 @@
                         <!-- Số lượng tồn -->
                         <div>
                             <label className="block text-gray-700 text-sm font-medium">Số lượng tồn</label>
-                            <MLNumberField class="mt-2 text-right" hide-spin-buttons density="compact" variant="outlined" v-model:model-value="record.Quantity" hide-details />
+                            <MLNumberField color="primary" class="mt-2 text-right" hide-spin-buttons density="compact" variant="outlined" v-model:model-value="record.Quantity" hide-details />
                         </div>
 
                         <!-- Đơn vị tính -->
                         <div>
                             <label className="block text-gray-700 text-sm font-medium">Đơn vị tính <span style="color: red;">*</span></label>
                             <!-- Đơn vị tính -->
-                            <VTextField density="compact" variant="outlined" class="mt-2" v-model:model-value="record.Unit" hide-details
+                            <VTextField color="primary" density="compact" variant="outlined" class="mt-2" v-model:model-value="record.Unit" hide-details
                                 :rules="[(v:string|undefined) => v !== undefined && v !== '']"
                             />
                         </div>
@@ -45,11 +45,36 @@
                             Số lượng tồn kho cảnh báo
                         </label>
                         <div className="flex items-center mt-2">
-                            <MLNumberField class="text-right w-full" hide-spin-buttons density="compact" variant="outlined" v-model:model-value="record.WarningStockQuantity" hide-details />
+                            <MLNumberField color="primary" class="text-right w-full" hide-spin-buttons density="compact" variant="outlined" v-model:model-value="record.WarningStockQuantity" hide-details />
                             <div className="ml-2 text-gray-500 text-sm">
                                 <i>Nguyên liệu sẽ được đánh dấu là "Sắp hết hàng" khi tồn kho ít hơn số lượng này.</i>
                             </div>
                         </div>
+                    </div>
+
+                    <div className="mb-4">
+                        <label className="block text-gray-700 text-sm font-medium">
+                            Nhóm nguyên liệu
+                        </label>
+                        
+                        <VSelect
+                            color="primary"
+                            :items="lstInventoryItemCategories"
+                            item-title="InventoryItemCategoryName"
+                            item-value="InventoryItemCategoryID"
+                            v-model:model-value="record.InventoryItemCategoryID"
+                            v-on:update:model-value="(value: string) => {
+                                const inventoryItemCategory = lstInventoryItemCategories.find(x => x.InventoryItemCategoryID === value);
+                                if (inventoryItemCategory) {
+                                    record.InventoryItemCategory = inventoryItemCategory;
+                                }
+                            }"
+
+                            density="compact"
+                            variant="outlined"
+                            hide-details
+                            class="mt-2"
+                        />
                     </div>
                 </VForm>
             </VCardItem>
@@ -68,6 +93,7 @@
 import { EnumEditMode } from '@/common/Enumeration';
 import EventBus from '@/common/EventBus';
 import { InventoryItem, MLActionResult } from '@/models';
+import InventoryItemCategory from '@/models/InventoryItemCategory';
 import { inventoryItemStore } from '@/stores/inventoryItemStore';
 import { mapActions, mapState } from 'pinia';
 import { VMoney } from 'v-money';
@@ -77,6 +103,8 @@ export default {
 
     created() {
         EventBus.on(this.$eventName.ShowFormInventoryItemDetail, this.handleShowDialog as any);
+
+
     },
 
     beforeUnmount() {
@@ -94,6 +122,10 @@ export default {
                 if (record.EditMode !== undefined) {
                     this.editMode = record.EditMode;
                 }
+
+                this.$service.InventoryItemCategoryService.getAll().then((data: InventoryItemCategory[]) => {
+                    this.lstInventoryItemCategories = data.filter(x => !x.Inactive);
+                });
 
                 this.record = record;
                 Object.assign(this.oldRecord, this.record);
@@ -147,7 +179,9 @@ export default {
             editMode: <EnumEditMode>EnumEditMode.Add,
 
             record: <InventoryItem>{} as InventoryItem,
-            oldRecord: <InventoryItem>{} as InventoryItem
+            oldRecord: <InventoryItem>{} as InventoryItem,
+
+            lstInventoryItemCategories: <InventoryItemCategory[]>[]
         }
     },
 

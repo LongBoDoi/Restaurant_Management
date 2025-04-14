@@ -1,0 +1,3 @@
+<template>
+    <FormBookReservation />
+</template>

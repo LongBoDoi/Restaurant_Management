@@ -1,6 +1,7 @@
 ﻿using API.ML.BO;
 using API.ML.BOBase;
 using API.ML.Common;
+using API.ML.Extensions;
 using API.ML.Utility;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -17,8 +18,8 @@ namespace API.Controllers
         /// <param name="itemsPerPage">Kích thước trang</param>
         /// <returns></returns>
         [Authorize]
-        [HttpGet("GetOrdersByStatus")]
-        public MLActionResult GetOrdersByStatus(EnumOrderStatus status, int page, int itemsPerPage)
+        [HttpGet("GetOrderDetail")]
+        public MLActionResult GetOrderDetail(string orderID)
         {
             MLActionResult result = new()
             {
@@ -27,25 +28,53 @@ namespace API.Controllers
 
             try
             {
-                var allOrders = _entities.AsNoTracking().Where(o => o.Status == status);
-                if (itemsPerPage != -1)
+                if (Guid.TryParse(orderID, out Guid gOrderID))
                 {
-                    allOrders = allOrders.Skip((page - 1) * itemsPerPage).Take(itemsPerPage);
-                }
-                result.Data = new
-                {
-                    Data = allOrders.ToList().Select(o =>
+                    Order? order = _context.Order.AsNoTracking()
+                        .Include(o => o.OrderDetails).ThenInclude(od => od.MenuItem)
+                        .Include(o => o.Customer)
+                        .Include(o => o.OrderTables).ThenInclude(ot => ot.Table)
+                        .FirstOrDefault(o => o.OrderID.Equals(gOrderID));
+                    if (order != null)
                     {
-                        o.OrderDetails = _context.OrderDetail.AsNoTracking().Where(od => od.OrderID == o.OrderID).ToList().Select(od =>
-                        {
-                            od.MenuItem = _context.MenuItem.AsNoTracking().FirstOrDefault(mi => mi.MenuItemID == od.MenuItemID);
-                            return od;
-                        });
-                        o.Customer = _context.Customer.AsNoTracking().FirstOrDefault(c => c.CustomerID == o.CustomerID);
-                        return o;
-                    }),
-                    TotalCount = _entities.Count()
-                };
+                        order.RemoveCircularReferences();
+
+                        result.Data = order;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                CommonFunction.HandleException(ex, result, _context);
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Lấy dữ liệu theo phân trang
+        /// </summary>
+        /// <param name="page">Số trang</param>
+        /// <param name="itemsPerPage">Kích thước trang</param>
+        /// <returns></returns>
+        [Authorize]
+        [HttpGet("GetActiveOrderByCustomerID")]
+        public MLActionResult GetActiveOrderByCustomerID(string customerID)
+        {
+            MLActionResult result = new()
+            {
+                Success = true
+            };
+
+            try
+            {
+                if (Guid.TryParse(customerID, out Guid gCustomerID))
+                {
+                    Order? order = _context.Order.AsNoTracking()
+                        .FirstOrDefault(o => o.CustomerID.Equals(gCustomerID) && o.Status == EnumOrderStatus.Active);
+
+                    result.Data = order;
+                }
             }
             catch (Exception ex)
             {
@@ -58,29 +87,77 @@ namespace API.Controllers
         protected override bool BeforeSave(Order order, MLActionResult result)
         {
             order.Customer = null;
-            if (order.EditMode == ML.Common.EnumEditMode.Add)
+            order.OrderDetails.RemoveAllReferences();
+            order.OrderTables.RemoveAllReferences();
+
+            switch (order.EditMode)
             {
-                order.OrderDate = DateTime.UtcNow;
-                foreach (var orderDetail in order.OrderDetails)
-                {
-                    orderDetail.MenuItem = null;
-                    orderDetail.Order = null;
-                }
+                case EnumEditMode.Add:
+                    order.OrderDate = DateTime.UtcNow;
+
+                    // Nếu là tạo order mới thì gán tất cả bàn sang trạng thái "Hết chỗ"
+                    if (order.OrderTables != null && order.OrderTables.Any())
+                    {
+                        foreach (OrderTable orderTable in order.OrderTables)
+                        {
+                            Table saveTable = new Table { TableID = orderTable.TableID, Status = EnumTableStatus.Occupied };
+                            _context.Attach(saveTable);
+                            _context.Entry(saveTable).Property(t => t.Status).IsModified = true;
+                        }
+                    }
+                    break;
+                case EnumEditMode.Edit:
+                    //Nếu là thanh toán hoặc huỷ order thì trả tất cả bàn trong order về trạng thái available
+                    if (order.Status == EnumOrderStatus.Paid || order.Status == EnumOrderStatus.Canceled)
+                    {
+                        if (order.OrderTables != null && order.OrderTables.Any())
+                        {
+                            foreach (OrderTable orderTable in order.OrderTables)
+                            {
+                                Table saveTable = new Table { TableID = orderTable.TableID, Status = EnumTableStatus.Available };
+                                _context.Attach(saveTable);
+                                _context.Entry(saveTable).Property(t => t.Status).IsModified = true;
+                            }
+                        }
+
+                        return true;
+                    }
+
+                    // Nếu là đổi bàn cho order, nếu bàn nào mới thì gán trạng thái "Hết chỗ", nếu bàn nào bỏ thì gán trạng thái "Còn trống"
+                    IEnumerable<OrderTable> dbOrderTables = _context.OrderTable.Where(rt => rt.OrderID.Equals(order.OrderID)).Include(rt => rt.Table);
+
+                    var incomings = order.OrderTables?.Select(ab => ab.TableID).ToHashSet() ?? [];
+                    var existings = dbOrderTables.Select(ab => ab.TableID).ToHashSet();
+
+                    // Những bản ghi bị xoá, bàn sẽ được trả về trạng thái Available
+                    var toRemove = dbOrderTables.Where(rt => !incomings.Contains(rt.TableID)).ToList();
+                    if (toRemove.Any())
+                    {
+                        _context.OrderTable.RemoveRange(toRemove);
+                        foreach (OrderTable orderTable in toRemove)
+                        {
+                            Table saveTable = new Table { TableID = orderTable.TableID, Status = EnumTableStatus.Available };
+                            _context.Attach(saveTable);
+                            _context.Entry(saveTable).Property(t => t.Status).IsModified = true;
+                        }
+                    }
+
+                    // Những bản ghi được thêm mới, bàn bị gán là hết chỗ
+                    var toAdd = order.OrderTables?.Where(rt => !existings.Contains(rt.TableID)).ToList() ?? [];
+                    if (toAdd.Any())
+                    {
+                        _context.OrderTable.AddRange(toAdd);
+                        foreach (OrderTable orderTable in toAdd)
+                        {
+                            Table saveTable = new Table { TableID = orderTable.TableID, Status = EnumTableStatus.Occupied };
+                            _context.Attach(saveTable);
+                            _context.Entry(saveTable).Property(t => t.Status).IsModified = true;
+                        }
+                    }
+                    break;
             }
 
             return true;
-        }
-
-        /// <summary>
-        /// Xử lý sau khi save thành công
-        /// </summary>
-        protected override void AfterSaveSuccess(Order order)
-        {
-            foreach (var orderDetail in order.OrderDetails)
-            {
-                orderDetail.MenuItem = null;
-                orderDetail.Order = null;
-            }
         }
     }
 }

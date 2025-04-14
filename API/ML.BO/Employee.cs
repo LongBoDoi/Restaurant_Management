@@ -16,14 +16,14 @@ namespace API.ML.BO
         /// <summary>
         /// Mã nhân viên
         /// </summary>
-        [NameField]
+        [SearchField]
         [StringLength(25)]
         public string EmployeeCode { get; set; } = string.Empty;
 
         /// <summary>
         /// Tên nhân viên
         /// </summary>
-        [NameField]
+        [SearchField]
         [StringLength(128)]
         public string EmployeeName { get; set; } = "";
 

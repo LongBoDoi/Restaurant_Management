@@ -21,11 +21,11 @@
     /// </summary>
     public enum EnumEditMode
     {
-        Add = 0,
+        Add = 1,
 
-        Edit = 1,
+        Edit = 2,
 
-        Delete = 2
+        Delete = 3
     }
 
     /// <summary>
@@ -80,7 +80,9 @@
     {
         Active = 1,
         
-        Paid = 2
+        Paid = 2,
+
+        Canceled = 3
     }
 
     /// <summary>
@@ -107,17 +109,22 @@
         /// <summary>
         /// Chờ xác nhận
         /// </summary>
-        Pending = 0,
+        Pending = 1,
 
         /// <summary>
         /// Đã xác nhận
         /// </summary>
-        Active = 1,
+        Confirmed = 2,
 
         /// <summary>
-        /// Đã đóng
+        /// Đã huỷ
         /// </summary>
-        Closed = 2
+        Cancelled = 3,
+
+        /// <summary>
+        /// Đã nhận bàn
+        /// </summary>
+        Received = 4
     }
 
     /// <summary>
@@ -150,5 +157,56 @@
         /// Tuỳ chọn
         /// </summary>
         Custom = 1
+    }
+
+    /// <summary>
+    /// Enum hình thức thanh toán
+    /// </summary>
+    public enum EnumPaymentMethod
+    {
+        /// <summary>
+        /// Tiền mặt
+        /// </summary>
+        Cash = 0,
+
+        /// <summary>
+        /// Chuyển khoản
+        /// </summary>
+        Transaction = 1,
+
+        /// <summary>
+        /// Thẻ
+        /// </summary>
+        Card = 2
+    }
+
+    public enum EnumTableStatus
+    {
+        /// <summary>
+        /// Còn trống
+        /// </summary>
+        Available = 0,
+
+        /// <summary>
+        /// Hết chỗ
+        /// </summary>
+        Occupied = 1,
+
+        /// <summary>
+        /// Đã được đặt chỗ
+        /// </summary>
+        Reserved = 2
+    }
+
+    /// <summary>
+    /// Enum trạng thái yêu cầu tạo món custom
+    /// </summary>
+    public enum EnumCustomMenuRequestStatus
+    {
+        Pending = 0,
+
+        Approved = 1,
+
+        Rejected = 2
     }
 }

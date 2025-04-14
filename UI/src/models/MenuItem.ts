@@ -8,7 +8,7 @@ interface MenuItem extends MLEntity {
     Description: string,
     Price: number,
     MenuItemCategoryID: string,
-    OutOfStock: boolean,
+    Inactive: boolean,
     ImageUrl: string,
 
     MenuItemCategory?: MenuItemCategory,

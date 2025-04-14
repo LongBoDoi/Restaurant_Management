@@ -67,6 +67,36 @@ namespace API.ML.BOBase
         /// Bảng nhóm thực đơn
         /// </summary>
         public DbSet<MenuItemCategory> MenuItemCategory { get; set; }
+
+        /// <summary>
+        /// Bảng bàn
+        /// </summary>
+        public DbSet<Table> Table { get; set; }
+
+        /// <summary>
+        /// Bảng khu vực
+        /// </summary>
+        public DbSet<Area> Area { get; set; }
+
+        /// <summary>
+        /// Bảng nhóm nguyên liệu
+        /// </summary>
+        public DbSet<InventoryItemCategory> InventoryItemCategory { get; set; }
+
+        /// <summary>
+        /// Bảng liên kết Đặt chỗ và Bàn
+        /// </summary>
+        public DbSet<ReservationTable> ReservationTable { get; set; }
+
+        /// <summary>
+        /// Bảng liên kết Order và bàn
+        /// </summary>
+        public DbSet<OrderTable> OrderTable { get; set; }
+
+        /// <summary>
+        /// Bảng yêu cầu tạo món custom
+        /// </summary>
+        public DbSet<CustomMenuRequest> CustomMenuRequest { get; set; }
         #endregion
 
         public ApplicationDBContext(DbContextOptions<ApplicationDBContext> options)
@@ -178,7 +208,7 @@ namespace API.ML.BOBase
 
             modelBuilder.Entity<MenuItem>(mi =>
             {
-                mi.HasOne(mi => mi.MenuItemCategory).WithMany(mic => mic.MenuItems).HasForeignKey(mi => mi.MenuItemCategoryID);
+                mi.HasOne(mi => mi.MenuItemCategory).WithMany(mic => mic.MenuItems).HasForeignKey(mi => mi.MenuItemCategoryID).OnDelete(DeleteBehavior.SetNull);
             });
 
             modelBuilder.Entity<MenuItemCategory>(mic =>
@@ -189,6 +219,11 @@ namespace API.ML.BOBase
                     new MenuItemCategory { MenuItemCategoryID = new Guid("87de53a6-68e2-46a3-b998-7df936dfa1c5"), MenuItemCategoryName = "Tráng miệng", Color = "#3B82F6", SortOrder = 2 },
                     new MenuItemCategory { MenuItemCategoryID = new Guid("78ef8d8c-a68e-40c9-99ce-5bb496faef2b"), MenuItemCategoryName = "Đồ uống", Color = "#A855F7", SortOrder = 3 }
                 );
+            });
+
+            modelBuilder.Entity<InventoryItem>(mi =>
+            {
+                mi.HasOne(mi => mi.InventoryItemCategory).WithMany(mic => mic.InventoryItems).HasForeignKey(mi => mi.InventoryItemCategoryID);
             });
 
             modelBuilder.Entity<MenuItemInventoryItem>(miii =>
@@ -202,6 +237,39 @@ namespace API.ML.BOBase
                 miii.HasOne(e => e.InventoryItem)
                     .WithMany(e => e.MenuItemInventoryItems)
                     .HasForeignKey(e => e.InventoryItemID);
+            });
+
+            modelBuilder.Entity<ReservationTable>(rt =>
+            {
+                rt.HasOne(rt => rt.Reservation)
+                    .WithMany(r => r.ReservationTables)
+                    .HasForeignKey(rt => rt.ReservationID);
+
+                rt.HasOne(e => e.Table)
+                    .WithMany(e => e.ReservationTables)
+                    .HasForeignKey(e => e.TableID);
+            });
+
+            modelBuilder.Entity<OrderTable>(ot =>
+            {
+                ot.HasOne(ot => ot.Order)
+                    .WithMany(o => o.OrderTables)
+                    .HasForeignKey(ot => ot.OrderID);
+
+                ot.HasOne(ot => ot.Table)
+                    .WithMany(t => t.OrderTables)
+                    .HasForeignKey(e => e.TableID);
+            });
+
+            modelBuilder.Entity<Table>(t =>
+            {
+                t.HasOne(t => t.Area).WithMany(a => a.Tables).HasForeignKey(t => t.AreaID);
+            });
+
+            modelBuilder.Entity<CustomMenuRequest>(entity =>
+            {
+                entity.HasOne(cmr => cmr.Customer).WithMany(c => c.CustomMenuRequests).HasForeignKey(cmr => cmr.CustomerID);
+                entity.HasMany(cmr => cmr.InventoryItems).WithMany(ii => ii.CustomMenuRequests);
             });
         }
 
@@ -217,11 +285,7 @@ namespace API.ML.BOBase
             {
                 if (entityEntry.Entity is IMLEntity entity)
                 {
-                    if (!entity.ModifiedDate.HasValue)
-                    {
-                        entity.ModifiedDate = DateTime.UtcNow;
-                    }
-
+                    entity.ModifiedDate = DateTime.UtcNow;
 
                     if (entityEntry.State == EntityState.Added)
                     {

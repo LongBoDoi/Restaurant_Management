@@ -1,5 +1,7 @@
 ﻿using API.ML.BOBase;
 using API.ML.Common;
+using API.ML.CustomAtrributes;
+using System.ComponentModel.DataAnnotations;
 
 namespace API.ML.BO
 {
@@ -8,6 +10,7 @@ namespace API.ML.BO
         /// <summary>
         /// Khoá chính
         /// </summary>
+        [Key]
         public Guid OrderID { get; set; }
 
         /// <summary>
@@ -18,12 +21,8 @@ namespace API.ML.BO
         /// <summary>
         /// Tên khách hàng
         /// </summary>
+        [SearchField]
         public string CustomerName { get; set; } = string.Empty;
-
-        /// <summary>
-        /// Tên order
-        /// </summary>
-        public string OrderName { get; set; } = string.Empty;
 
         /// <summary>
         /// Ngày tạo order
@@ -36,9 +35,24 @@ namespace API.ML.BO
         public decimal TotalAmount { get; set; }
 
         /// <summary>
+        /// Tiền hàng
+        /// </summary>
+        public decimal NetAmount { get; set; }
+
+        /// <summary>
+        /// Tiền tip
+        /// </summary>
+        public decimal TipAmount { get; set; }
+
+        /// <summary>
         /// Trạng thái order
         /// </summary>
         public EnumOrderStatus Status { get; set; }
+
+        /// <summary>
+        /// Hình thức thanh toán
+        /// </summary>
+        public EnumPaymentMethod PaymentMethod { get; set; }
 
         /// <summary>
         /// Yêu cầu đặc biệt
@@ -46,13 +60,24 @@ namespace API.ML.BO
         public string? SpecialRequest {  get; set; }
 
         /// <summary>
+        /// Tên bàn
+        /// </summary>
+        public string? TableName { get; set; }
+
+        /// <summary>
         /// Danh sách OrderDetail
         /// </summary>
-        public IEnumerable<OrderDetail> OrderDetails { get; set; } = [];
+        public List<OrderDetail> OrderDetails { get; set; } = new List<OrderDetail>();
 
         /// <summary>
         /// Dữ liệu khách hàng
         /// </summary>
         public Customer? Customer { get; set; }
+
+        /// <summary>
+        /// Dữ liệu bàn trong order
+        /// </summary>
+        [GetDataPagingInclude]
+        public IEnumerable<OrderTable> OrderTables { get; set; } = new List<OrderTable>();
     }
 }

@@ -1,5 +1,6 @@
 ﻿using API.ML.BOBase;
 using API.ML.Common;
+using API.ML.CustomAtrributes;
 using System.ComponentModel.DataAnnotations;
 
 namespace API.ML.BO
@@ -20,11 +21,13 @@ namespace API.ML.BO
         /// <summary>
         /// Tên khách hàng
         /// </summary>
+        [SearchField]
         public string CustomerName { get; set; } = string.Empty;
 
         /// <summary>
         /// SĐT khách hàng
         /// </summary>
+        [SearchField]
         public string CustomerPhoneNumber { get; set; } = string.Empty;
 
         /// <summary>
@@ -56,5 +59,11 @@ namespace API.ML.BO
         /// Dữ liệu bản ghi khách hàng
         /// </summary>
         public Customer? Customer { get; set; }
+
+        /// <summary>
+        /// Dữ liệu bàn
+        /// </summary>
+        [GetDetail]
+        public IEnumerable<ReservationTable> ReservationTables { get; set; } = new List<ReservationTable>();
     }
 }

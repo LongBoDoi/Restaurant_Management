@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace API.Migrations
 {
     [DbContext(typeof(ApplicationDBContext))]
-    [Migration("20250331051659_AddImageForEmployee")]
-    partial class AddImageForEmployee
+    [Migration("20250414092331_init")]
+    partial class init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -23,6 +23,27 @@ namespace API.Migrations
                 .HasAnnotation("MySql:CharSet", "utf8mb4")
                 .HasAnnotation("ProductVersion", "8.0.6")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
+
+            modelBuilder.Entity("API.ML.BO.Area", b =>
+                {
+                    b.Property<Guid>("AreaID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("AreaName")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTime?>("CreatedDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<DateTime?>("ModifiedDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.HasKey("AreaID");
+
+                    b.ToTable("Area");
+                });
 
             modelBuilder.Entity("API.ML.BO.ChatbotConversation", b =>
                 {
@@ -83,6 +104,49 @@ namespace API.Migrations
                     b.HasIndex("ConversationID");
 
                     b.ToTable("ChatbotConversationDetail");
+                });
+
+            modelBuilder.Entity("API.ML.BO.CustomMenuRequest", b =>
+                {
+                    b.Property<Guid>("CustomMenuRequestID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
+
+                    b.Property<DateTime?>("CreatedDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<Guid>("CustomerID")
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("CustomerName")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("varchar(128)");
+
+                    b.Property<string>("MenuItemName")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("varchar(128)");
+
+                    b.Property<DateTime?>("ModifiedDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Note")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.HasKey("CustomMenuRequestID");
+
+                    b.HasIndex("CustomerID");
+
+                    b.ToTable("CustomMenuRequest");
                 });
 
             modelBuilder.Entity("API.ML.BO.Customer", b =>
@@ -197,6 +261,12 @@ namespace API.Migrations
                     b.Property<DateTime?>("CreatedDate")
                         .HasColumnType("datetime(6)");
 
+                    b.Property<bool>("Inactive")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<Guid?>("InventoryItemCategoryID")
+                        .HasColumnType("char(36)");
+
                     b.Property<DateTime?>("ModifiedDate")
                         .HasColumnType("datetime(6)");
 
@@ -216,7 +286,34 @@ namespace API.Migrations
 
                     b.HasKey("InventoryItemID");
 
+                    b.HasIndex("InventoryItemCategoryID");
+
                     b.ToTable("InventoryItem");
+                });
+
+            modelBuilder.Entity("API.ML.BO.InventoryItemCategory", b =>
+                {
+                    b.Property<Guid>("InventoryItemCategoryID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
+
+                    b.Property<DateTime?>("CreatedDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<bool>("Inactive")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("InventoryItemCategoryName")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("varchar(128)");
+
+                    b.Property<DateTime?>("ModifiedDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.HasKey("InventoryItemCategoryID");
+
+                    b.ToTable("InventoryItemCategory");
                 });
 
             modelBuilder.Entity("API.ML.BO.MenuItem", b =>
@@ -229,12 +326,16 @@ namespace API.Migrations
                         .HasColumnType("datetime(6)");
 
                     b.Property<string>("Description")
-                        .HasColumnType("longtext");
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)");
 
                     b.Property<string>("ImageUrl")
                         .IsRequired()
                         .HasMaxLength(128)
                         .HasColumnType("varchar(128)");
+
+                    b.Property<bool>("Inactive")
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<Guid?>("MenuItemCategoryID")
                         .HasColumnType("char(36)");
@@ -244,10 +345,8 @@ namespace API.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<bool>("OutOfStock")
-                        .HasColumnType("tinyint(1)");
+                        .HasMaxLength(128)
+                        .HasColumnType("varchar(128)");
 
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(18,2)");
@@ -372,18 +471,26 @@ namespace API.Migrations
                     b.Property<DateTime?>("ModifiedDate")
                         .HasColumnType("datetime(6)");
 
+                    b.Property<decimal>("NetAmount")
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<DateTime>("OrderDate")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<string>("OrderName")
-                        .IsRequired()
-                        .HasColumnType("longtext");
+                    b.Property<int>("PaymentMethod")
+                        .HasColumnType("int");
 
                     b.Property<string>("SpecialRequest")
                         .HasColumnType("longtext");
 
                     b.Property<int>("Status")
                         .HasColumnType("int");
+
+                    b.Property<string>("TableName")
+                        .HasColumnType("longtext");
+
+                    b.Property<decimal>("TipAmount")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal>("TotalAmount")
                         .HasColumnType("decimal(18,2)");
@@ -401,11 +508,18 @@ namespace API.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("char(36)");
 
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<DateTime?>("CreatedDate")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<Guid>("MenuItemID")
+                    b.Property<Guid?>("MenuItemID")
                         .HasColumnType("char(36)");
+
+                    b.Property<string>("MenuItemName")
+                        .IsRequired()
+                        .HasColumnType("longtext");
 
                     b.Property<DateTime?>("ModifiedDate")
                         .HasColumnType("datetime(6)");
@@ -429,6 +543,33 @@ namespace API.Migrations
                     b.HasIndex("OrderID");
 
                     b.ToTable("OrderDetail");
+                });
+
+            modelBuilder.Entity("API.ML.BO.OrderTable", b =>
+                {
+                    b.Property<Guid>("OrderTableID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
+
+                    b.Property<DateTime?>("CreatedDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<DateTime?>("ModifiedDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<Guid>("OrderID")
+                        .HasColumnType("char(36)");
+
+                    b.Property<Guid>("TableID")
+                        .HasColumnType("char(36)");
+
+                    b.HasKey("OrderTableID");
+
+                    b.HasIndex("OrderID");
+
+                    b.HasIndex("TableID");
+
+                    b.ToTable("OrderTable");
                 });
 
             modelBuilder.Entity("API.ML.BO.Reservation", b =>
@@ -476,6 +617,33 @@ namespace API.Migrations
                     b.HasIndex("CustomerID");
 
                     b.ToTable("Reservation");
+                });
+
+            modelBuilder.Entity("API.ML.BO.ReservationTable", b =>
+                {
+                    b.Property<Guid>("ReservationTableID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
+
+                    b.Property<DateTime?>("CreatedDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<DateTime?>("ModifiedDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<Guid>("ReservationID")
+                        .HasColumnType("char(36)");
+
+                    b.Property<Guid>("TableID")
+                        .HasColumnType("char(36)");
+
+                    b.HasKey("ReservationTableID");
+
+                    b.HasIndex("ReservationID");
+
+                    b.HasIndex("TableID");
+
+                    b.ToTable("ReservationTable");
                 });
 
             modelBuilder.Entity("API.ML.BO.Setting", b =>
@@ -610,6 +778,38 @@ namespace API.Migrations
                         });
                 });
 
+            modelBuilder.Entity("API.ML.BO.Table", b =>
+                {
+                    b.Property<Guid>("TableID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
+
+                    b.Property<Guid?>("AreaID")
+                        .HasColumnType("char(36)");
+
+                    b.Property<DateTime?>("CreatedDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<DateTime?>("ModifiedDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<int>("SeatCount")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<string>("TableName")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.HasKey("TableID");
+
+                    b.HasIndex("AreaID");
+
+                    b.ToTable("Table");
+                });
+
             modelBuilder.Entity("API.ML.BO.UserLogin", b =>
                 {
                     b.Property<Guid>("UserLoginID")
@@ -661,6 +861,21 @@ namespace API.Migrations
                         });
                 });
 
+            modelBuilder.Entity("CustomMenuRequestInventoryItem", b =>
+                {
+                    b.Property<Guid>("CustomMenuRequestsCustomMenuRequestID")
+                        .HasColumnType("char(36)");
+
+                    b.Property<Guid>("InventoryItemsInventoryItemID")
+                        .HasColumnType("char(36)");
+
+                    b.HasKey("CustomMenuRequestsCustomMenuRequestID", "InventoryItemsInventoryItemID");
+
+                    b.HasIndex("InventoryItemsInventoryItemID");
+
+                    b.ToTable("CustomMenuRequestInventoryItem");
+                });
+
             modelBuilder.Entity("API.ML.BO.ChatbotConversation", b =>
                 {
                     b.HasOne("API.ML.BO.Customer", "Customer")
@@ -681,11 +896,32 @@ namespace API.Migrations
                     b.Navigation("ChatbotConversation");
                 });
 
+            modelBuilder.Entity("API.ML.BO.CustomMenuRequest", b =>
+                {
+                    b.HasOne("API.ML.BO.Customer", "Customer")
+                        .WithMany("CustomMenuRequests")
+                        .HasForeignKey("CustomerID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Customer");
+                });
+
+            modelBuilder.Entity("API.ML.BO.InventoryItem", b =>
+                {
+                    b.HasOne("API.ML.BO.InventoryItemCategory", "InventoryItemCategory")
+                        .WithMany("InventoryItems")
+                        .HasForeignKey("InventoryItemCategoryID");
+
+                    b.Navigation("InventoryItemCategory");
+                });
+
             modelBuilder.Entity("API.ML.BO.MenuItem", b =>
                 {
                     b.HasOne("API.ML.BO.MenuItemCategory", "MenuItemCategory")
                         .WithMany("MenuItems")
-                        .HasForeignKey("MenuItemCategoryID");
+                        .HasForeignKey("MenuItemCategoryID")
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("MenuItemCategory");
                 });
@@ -722,9 +958,7 @@ namespace API.Migrations
                 {
                     b.HasOne("API.ML.BO.MenuItem", "MenuItem")
                         .WithMany("OrderDetails")
-                        .HasForeignKey("MenuItemID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("MenuItemID");
 
                     b.HasOne("API.ML.BO.Order", "Order")
                         .WithMany("OrderDetails")
@@ -737,6 +971,25 @@ namespace API.Migrations
                     b.Navigation("Order");
                 });
 
+            modelBuilder.Entity("API.ML.BO.OrderTable", b =>
+                {
+                    b.HasOne("API.ML.BO.Order", "Order")
+                        .WithMany("OrderTables")
+                        .HasForeignKey("OrderID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("API.ML.BO.Table", "Table")
+                        .WithMany("OrderTables")
+                        .HasForeignKey("TableID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Order");
+
+                    b.Navigation("Table");
+                });
+
             modelBuilder.Entity("API.ML.BO.Reservation", b =>
                 {
                     b.HasOne("API.ML.BO.Customer", "Customer")
@@ -744,6 +997,34 @@ namespace API.Migrations
                         .HasForeignKey("CustomerID");
 
                     b.Navigation("Customer");
+                });
+
+            modelBuilder.Entity("API.ML.BO.ReservationTable", b =>
+                {
+                    b.HasOne("API.ML.BO.Reservation", "Reservation")
+                        .WithMany("ReservationTables")
+                        .HasForeignKey("ReservationID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("API.ML.BO.Table", "Table")
+                        .WithMany("ReservationTables")
+                        .HasForeignKey("TableID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Reservation");
+
+                    b.Navigation("Table");
+                });
+
+            modelBuilder.Entity("API.ML.BO.Table", b =>
+                {
+                    b.HasOne("API.ML.BO.Area", "Area")
+                        .WithMany("Tables")
+                        .HasForeignKey("AreaID");
+
+                    b.Navigation("Area");
                 });
 
             modelBuilder.Entity("API.ML.BO.UserLogin", b =>
@@ -762,6 +1043,26 @@ namespace API.Migrations
                     b.Navigation("Employee");
                 });
 
+            modelBuilder.Entity("CustomMenuRequestInventoryItem", b =>
+                {
+                    b.HasOne("API.ML.BO.CustomMenuRequest", null)
+                        .WithMany()
+                        .HasForeignKey("CustomMenuRequestsCustomMenuRequestID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("API.ML.BO.InventoryItem", null)
+                        .WithMany()
+                        .HasForeignKey("InventoryItemsInventoryItemID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("API.ML.BO.Area", b =>
+                {
+                    b.Navigation("Tables");
+                });
+
             modelBuilder.Entity("API.ML.BO.ChatbotConversation", b =>
                 {
                     b.Navigation("ChatbotConversationDetails");
@@ -770,6 +1071,8 @@ namespace API.Migrations
             modelBuilder.Entity("API.ML.BO.Customer", b =>
                 {
                     b.Navigation("ChatbotConversations");
+
+                    b.Navigation("CustomMenuRequests");
 
                     b.Navigation("Orders");
 
@@ -788,6 +1091,11 @@ namespace API.Migrations
                     b.Navigation("MenuItemInventoryItems");
                 });
 
+            modelBuilder.Entity("API.ML.BO.InventoryItemCategory", b =>
+                {
+                    b.Navigation("InventoryItems");
+                });
+
             modelBuilder.Entity("API.ML.BO.MenuItem", b =>
                 {
                     b.Navigation("MenuItemInventoryItems");
@@ -803,6 +1111,20 @@ namespace API.Migrations
             modelBuilder.Entity("API.ML.BO.Order", b =>
                 {
                     b.Navigation("OrderDetails");
+
+                    b.Navigation("OrderTables");
+                });
+
+            modelBuilder.Entity("API.ML.BO.Reservation", b =>
+                {
+                    b.Navigation("ReservationTables");
+                });
+
+            modelBuilder.Entity("API.ML.BO.Table", b =>
+                {
+                    b.Navigation("OrderTables");
+
+                    b.Navigation("ReservationTables");
                 });
 #pragma warning restore 612, 618
         }

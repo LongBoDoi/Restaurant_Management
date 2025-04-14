@@ -11,3 +11,6 @@ export type { default as InventoryItem } from './InventoryItem';
 export type { default as Order } from './Order';
 export type { default as Setting } from './Setting';
 export type { default as MenuItemInventoryItem } from './MenuItemInventoryItem';
+export type { default as Table } from './Table';
+export type { default as Area } from './Area';
+export type { default as CustomMenuRequest } from './CustomMenuRequest';

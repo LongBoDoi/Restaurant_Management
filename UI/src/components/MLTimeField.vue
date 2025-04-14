@@ -8,8 +8,9 @@
         placeholder="HH:MM"
         append-inner-icon="mdi-clock-outline"
         :bg-color="bgColor"
+        :color="color"
         v-model:model-value="txtValue"
-        :rules="validationRules"
+        :error="invalid"
         ref="txtFieldRef"
         :hide-details="hideDetails"
         @click:append-inner="showTimePicker = true"
@@ -63,6 +64,16 @@ export default {
         bgColor: {
             type: String
         },
+        color: {
+            type: String
+        },
+        rules: {
+            type: Object as PropType<((v:string) => boolean)[]>,
+            default: []
+        },
+        minDate: {
+            type: Date
+        }
     },
 
     created() {
@@ -76,36 +87,28 @@ export default {
             showTimePicker: <boolean>false,
 
             hour: <number>0,
-            minute: <number>0
+            minute: <number>0,
+
+            invalid: <boolean>false,
         }
     },
 
     methods: {
         handleSelectHour(hour: number) {
-            this.dateValue.setHours(hour);
-
-            this.$emit('update:modelValue', moment(this.dateValue).utc().format());
+            this.txtValue = `${String(hour).padStart(2, '0')}:${String(this.dateValue.getMinutes()).padStart(2, '0')}`;
         },
 
         handleUpdateFromPicker() {
-            const match = this.txtValue.match(this.timeRegex);
-            if (!match) return false;
-
-            const hour = match[1];
-            const minute = match[2];
-
-            this.dateValue.setHours(parseInt(hour));
-            this.dateValue.setMinutes(parseInt(minute));
-
-            this.$emit('update:modelValue', moment(this.dateValue).utc().format());
         },
 
         /**
          * Config các biến để hiển thị từ giá trị Date truyền vào
          */
         configVariablesFromModelValue() {
-            this.dateValue = (moment.utc(this.modelValue).local() as any)._d as Date;
-            this.txtValue = this.$commonFunction.formatTime(this.dateValue, true);
+            if (this.modelValue) {
+                this.dateValue = (moment.utc(this.modelValue).local() as any)._d as Date;
+                this.txtValue = this.$commonFunction.formatTime(this.dateValue, true);
+            }
         }
     },
 
@@ -114,32 +117,47 @@ export default {
             return /^(\d{2}):(\d{2})$/;
         },
 
-        validationRules() {
-            return [
-                (str:string) => {
-                    const match = str.match(this.timeRegex);
-                    if (!match) return false;
-
-                    const hour = match[1];
-                    const minute = match[2];
-
-                    return !isNaN(new Date(`2000-01-01 ${hour}:${minute}`) as any);
-                }
-            ]
-        },
-
         txtFieldRef():any {
             return this.$refs.txtFieldRef;
         },
-
-        timeZone() {
-            return Intl.DateTimeFormat().resolvedOptions().timeZone;
-        }
     },
 
     watch: {
         modelValue() {
             this.configVariablesFromModelValue();
+        },
+
+        txtValue() {
+            const match = this.txtValue.match(this.timeRegex);
+            if (!match) {
+                this.invalid = true;
+                return;
+            };
+
+            const hour = match[1];
+            const minute = match[2];
+
+            if (isNaN(new Date(`2000-01-01 ${hour}:${minute}`) as any)) {
+                this.invalid = true;
+                return;
+            };
+
+            this.dateValue.setHours(parseInt(hour));
+            this.dateValue.setMinutes(parseInt(minute));
+
+            this.$emit('update:modelValue', moment(this.dateValue).utc().format());
+
+            this.invalid = false;
+        },
+        
+        dateValue() {
+            // Kiểm tra ngày nhỏ nhất
+            if (this.minDate && this.dateValue < this.minDate) {
+                this.invalid = true;
+                return;
+            }
+
+            this.invalid = false;
         }
     }
 }

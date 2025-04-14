@@ -60,10 +60,11 @@
                     <VTabsWindowItem :value="1">
                         <VForm @keypress.enter="handleCustomerSignup" :disabled="customerLoading" ref="formCustomerRegister" class="mt-4 sm:mt-6">
                             <VTextField v-model:model-value="customerSignupData.CustomerName" class="mt-2" :rules="[$commonValue.textFieldRequireRule]" style="color: white;" label="Họ tên" variant="outlined" bg-color="rgba(52, 211, 153, 0.5)" />
-                            <VTextField bg-color="rgba(52, 211, 153, 0.5)" style="color: white;" :rules="[$commonValue.textFieldRequireRule]" label="Số điện thoại" variant="outlined"
+                            <VTextField bg-color="rgba(52, 211, 153, 0.5)" style="color: white;" :rules="[$commonValue.textFieldRequireRule]" label="Số điện thoại2" variant="outlined"
                                 v-mask="'0### ### ###'"
                                 v-on:update:model-value="(value: string) => {
                                     customerSignupData.PhoneNumber = $commonFunction.getRealPhoneNumberValue(value);
+                                    console.log(customerSignupData.PhoneNumber)
                                 }"
                             />
                             <VTextField v-model:model-value="customerSignupData.Email" bg-color="rgba(52, 211, 153, 0.5)" style="color: white;" label="Email" variant="outlined" />

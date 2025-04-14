@@ -1,5 +1,7 @@
 import { EnumReservationStatus } from "@/common/Enumeration";
 import MLEntity from "./MLEntity";
+import Customer from "./Customer";
+import ReservationTable from "./ReservationTable";
 
 interface Reservation extends MLEntity {
     ReservationID: string,
@@ -10,7 +12,10 @@ interface Reservation extends MLEntity {
     ReservationInfo: string,
     Status: EnumReservationStatus
     GuestCount: number,
-    Note: string
+    Note: string,
+
+    Customer?: Customer,
+    ReservationTables?: ReservationTable[]
 };
 
 export default Reservation;

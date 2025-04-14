@@ -8,6 +8,10 @@ import EmployeeService, { employeeService } from "./employeeService";
 import OrderService, { orderService } from "./orderService";
 import SettingService, { settingService } from "./settingService";
 import MenuItemCategoryService, { menuItemCategoryService } from "./menuItemCategoryService";
+import InventoryItemCategoryService, { inventoryItemCategoryService } from "./inventoryItemCategoryService";
+import TableService, { tableService } from "./tableService";
+import AreaService, { areaService } from "./areaService";
+import CustomMenuRequestService, { customMenuRequestService } from "./customMenuRequestService";
 
 class ServiceInterface {
     UserLoginService: UserLoginService = new UserLoginService;
@@ -16,10 +20,14 @@ class ServiceInterface {
     MenuItemService: MenuItemService = menuItemService;
     CustomerService: CustomerService = customerService;
     InventoryItemService: InventoryItemService = inventoryItemService;
+    InventoryItemCategoryService: InventoryItemCategoryService = inventoryItemCategoryService;
     EmployeeService: EmployeeService = employeeService;
     OrderService: OrderService = orderService;
     SettingService: SettingService = settingService;
     MenuItemCategoryService: MenuItemCategoryService = menuItemCategoryService;
+    TableService: TableService = tableService;
+    AreaService: AreaService = areaService;
+    CustomMenuRequestService: CustomMenuRequestService = customMenuRequestService;
 };
 
 export default ServiceInterface;

@@ -1,7 +1,7 @@
 <!-- Màn danh sách khách hàng -->
 
 <template>
-    <VSheet style="display: flex; flex-direction: column;" class="h-full pb-2">
+    <VSheet style="display: flex; flex-direction: column; overflow: hidden;" class="h-full pb-2">
         <VBtn width="fit-content" class="bg-green-500 hover:bg-green-600 hover:scale-105 text-white ml-auto mt-4" prepend-icon="mdi-plus" rounded @click="handleAddNewClick">Thêm nguyên liệu</VBtn>
 
         <VCard style="width: 100% ; height: 100%;" color="rgb(249, 250, 251)" class="rounded-lg d-flex flex-column shadow-md border mt-6">
@@ -16,13 +16,14 @@
             <!-- Bảng dữ liệu -->
             <VDataTableServer
                 sticky
+                fixed-header
                 :items-length="totalCount"
                 :loading="loading"
                 loading-text="Đang tải dữ liệu..." 
                 no-data-text="Không có dữ liệu" 
                 items-per-page-text="Số bản ghi"
                 :items="(dataList as InventoryItem[])"
-                style="height: 100%;"
+                style="flex-grow: 1; overflow: hidden;"
                 hide-default-footer
             >
                 <template #loader>
@@ -31,10 +32,11 @@
 
                 <template #headers>
                     <tr class="bg-gray-50">
-                        <th class="py-3 px-6 text-left font-medium text-gray-500" style="min-width: 150px;">Tên nguyên liệu</th>
-                        <th class="py-3 px-6 text-left font-medium text-gray-500" style="width: 250px;">Tồn kho</th>
-                        <th class="py-3 px-6 text-left font-medium text-gray-500" style="width: 100px;">Đơn vị tính</th>
-                        <th class="py-3 px-6 text-left font-medium text-gray-500" style="width: 128px;">Thao tác</th>
+                        <th class="py-3 px-6 text-left font-medium text-gray-500" style="min-width: 150px; width: 100%;">Tên nguyên liệu</th>
+                        <th class="py-3 px-6 text-left font-medium text-gray-500" style="min-width: 200px;">Nhóm nguyên liệu</th>
+                        <th class="py-3 px-6 text-left font-medium text-gray-500" style="min-width: 250px;">Tồn kho</th>
+                        <th class="py-3 px-6 text-left font-medium text-gray-500" style="min-width: 100px;">Đơn vị tính</th>
+                        <th class="py-3 px-6 text-left font-medium text-gray-500" style="min-width: 128px;">Thao tác</th>
                     </tr>
                 </template>
 
@@ -56,6 +58,7 @@
                         @click="setSelectedIndex(index)" @dblclick="openDetail(item)"
                     >
                         <td class="py-4 px-6">{{ item.Name }}</td>
+                        <td class="py-4 px-6">{{ item.InventoryItemCategory?.InventoryItemCategoryName ?? '' }}</td>
                         <td class="py-4 px-6">
                             <span class="px-2.5 py-1 rounded-full text-xs font-medium"
                                 :class="[

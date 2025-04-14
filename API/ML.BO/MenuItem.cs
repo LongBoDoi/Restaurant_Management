@@ -16,11 +16,13 @@ namespace API.ML.BO
         /// <summary>
         /// Tên món
         /// </summary>
+        [StringLength(128)]
         public string Name { get; set; } = string.Empty;
 
         /// <summary>
         /// Mô tả món
         /// </summary>
+        [StringLength(255)]
         public string? Description { get; set; }
 
         /// <summary>
@@ -36,7 +38,7 @@ namespace API.ML.BO
         /// <summary>
         /// Hết hàng
         /// </summary>
-        public bool OutOfStock { get; set; }
+        public bool Inactive { get; set; }
 
         /// <summary>
         /// Link ảnh món

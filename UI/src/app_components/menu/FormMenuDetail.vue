@@ -32,7 +32,7 @@
                         <div>
                             <!-- Giá món -->
                             <label className="block text-sm font-medium text-gray-700">Giá món</label>
-                            <VTextField class="w-full mt-2" v-money="$commonValue.moneyConfig" density="compact" variant="outlined" suffix="đ" v-model:model-value="menuItem.Price" hide-details />
+                            <VTextField class="w-full mt-2 text-right" v-money="$commonValue.moneyConfig" density="compact" variant="outlined" suffix="đ" v-model:model-value="menuItem.Price" hide-details />
                         </div>
 
                         <div>
@@ -92,8 +92,8 @@
                         </div>
 
                         <div className="col-span-2">
-                            <!-- Hết hàng -->
-                            <VCheckbox color="primary" class="text-gray-700" style="opacity: 1;" label="Hết hàng" v-model:model-value="menuItem.OutOfStock" hide-details />
+                            <!-- Ngừng hoạt động -->
+                            <VCheckbox color="primary" class="text-gray-700" style="opacity: 1;" label="Ngừng hoạt động" v-model:model-value="menuItem.Inactive" hide-details />
                         </div>
 
                         <div className="col-span-2" v-if="false">

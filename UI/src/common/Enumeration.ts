@@ -10,11 +10,11 @@ export enum EnumApplicationErrorCode {
  * Edit mode
  */
 export enum EnumEditMode {
-    Add = 0,
+    Add = 1,
 
-    Edit = 1,
+    Edit = 2,
 
-    Delete = 2
+    Delete = 3
 }
 
 /**
@@ -50,13 +50,16 @@ export enum EnumChatbotSender {
  */
 export enum EnumReservationStatus {
     /// Đang chờ xác nhận
-    Pending = 0,
+    Pending = 1,
 
-    /// Đang hoạt động
-    Active = 1,
+    /// Đã xác nhận
+    Confirmed = 2,
 
-    /// Đã đóng
-    Closed = 2
+    /// Đã huỷ
+    Canceled = 3,
+
+    /// Đã nhận bàn
+    Received = 4
 }
 
 /**
@@ -99,7 +102,9 @@ export enum EnumMenuItemCategory {
 export enum EnumOrderStatus {
     Active = 1,
 
-    Paid = 2
+    Paid = 2,
+
+    Canceled = 3
 }
 
 /**
@@ -123,6 +128,39 @@ export enum EnumDayOfWeek {
     Holiday = 7
 }
 
+export enum EnumPaymentMethod {
+    Cash = 0,
+    
+    Transaction = 1,
+
+    Card = 2
+}
+
+/**
+ * Trạng thái bàn
+ */
+export enum EnumTableStatus {
+    // Còn trống
+    Available = 0,
+
+    // Hết chỗ
+    Occupied = 1,
+
+    // Đã được đặt chỗ
+    Reserved = 2
+}
+
+/**
+ * Enum trạng thái yêu cầu tạo món custom
+ */
+export enum EnumCustomMenuRequestStatus {
+    Pending = 0,
+
+    Approved = 1,
+
+    Rejected = 2
+}
+
 class EnumerationInterface {
     EnumUserType: typeof EnumUserType = EnumUserType;
     EnumChatbotSender: typeof EnumChatbotSender = EnumChatbotSender;
@@ -133,6 +171,9 @@ class EnumerationInterface {
     EnumOrderStatus: typeof EnumOrderStatus = EnumOrderStatus;
     EnumDayOfWeek: typeof EnumDayOfWeek = EnumDayOfWeek;
     EnumEmployeeWorkStatus: typeof EnumEmployeeWorkStatus = EnumEmployeeWorkStatus;
+    EnumPaymentMethod: typeof EnumPaymentMethod = EnumPaymentMethod;
+    EnumTableStatus: typeof EnumTableStatus = EnumTableStatus;
+    EnumCustomMenuRequestStatus: typeof EnumCustomMenuRequestStatus = EnumCustomMenuRequestStatus;
 }
 
 export default EnumerationInterface;

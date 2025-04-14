@@ -113,8 +113,6 @@
                 </template>
             </VDataTableServer>
         </VCard>
-
-        <FormMenuCategoryDetail />
     </VSheet>
 </template>
 
@@ -191,7 +189,7 @@ export default {
          handleDeleteRecord(item:MenuItemCategory) {
             this.$commonFunction.showDialog({
                 Title: 'Xác nhận xoá món',
-                Message: `Bạn có chắc chắn muốn xoá Nhóm thực đơn <b>${item.MenuItemCategoryName}</b> không?`,
+                Message: `Bạn có chắc chắn muốn xoá Nhóm thực đơn <b>${item.MenuItemCategoryName}</b> không? Các món ăn thuộc nhóm này sẽ bị gỡ ra khỏi nhóm.`,
                 ConfirmAction: async () => {
                     item.EditMode = this.$enumeration.EnumEditMode.Delete;
                     if ((await this.$service.MenuItemCategoryService.saveChanges(item)).Success) {

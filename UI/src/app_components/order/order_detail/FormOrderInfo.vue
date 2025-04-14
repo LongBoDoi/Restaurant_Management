@@ -1,105 +1,198 @@
 <template>
     <MLVbox>
-    <MLHbox style="padding: 0.625rem 1rem;">
-        <VTextField
-            hide-details
-            variant="outlined"
-            density="compact"
-            width="300"
-            style="flex-grow: 0;"
-            v-model:model-value="record.OrderName"
-            :rules="[(v:string|undefined) => v !== undefined && v !== '']"
-            placeholder="Số bàn, số tầng,..."
-        >
-            <template v-slot:label>
-                Tên order
-                <span style="color: red;">*</span>
-            </template>
-        </VTextField>
+        <div class="grid grid-cols-2 gap-6 mb-6 w-full">
+            <div class="">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Bàn</label>
+                <VCombobox
+                    class="mt-1"
+                    variant="outlined"
+                    density="compact"
+                    color="primary"
 
-        <VCombobox
-            class="flex-grow-0 ml-4"
-            v-model:model-value="selectedCustomer"
-            :disabled="loadingCustomer"
-            ref="cbMenuCategory"
-            label="Khách hàng"
-            width="250"
-            variant="outlined"
-            density="compact"
-            item-title="CustomerName"
-            item-value="CustomerID"
-            :items="listCustomer"
-            hide-details
-        >
-            <template v-slot:loader>
-                <VProgressLinear v-if="loadingCustomer" indeterminate color="primary" />
-            </template>
-        </VCombobox>
+                    item-title="TableName"
+                    item-value="TableID"
+                    :items="lstTablesFiltered"
+                    :multiple="true"
+                    :model-value="selectedTables"
+                    :item-props="(item:Table) => {
+                        return {
+                            title: item.TableName,
+                            subtitle: `${item.Area ? `${item.Area.AreaName} - ` : ''}${item.SeatCount} ghế`
+                        }
+                    }"
+                    v-on:update:model-value="(v:Table[]) => {
+                        record.TableName = v.map((table: Table) => table.TableName).join(', ');
+                        record.OrderTables = v.map((table:Table) => {
+                            return {
+                                OrderID: record.OrderID,
+                                TableID: table.TableID,
+                                Table: table
+                            } as OrderTable;
+                        })
+                    }"
+                />
+            </div>
 
-        <VSpacer />
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Khách hàng</label>
+                <VCombobox
+                    color="primary"
+                    class="mt-1"
+                    ref="cbMenuCategory"
+                    variant="outlined"
+                    density="compact"
+                    item-title="CustomerName"
+                    item-value="CustomerID"
+                    :items="lstCustomers"
+                    hide-details
+                    placeholder="Nhập tên khách hàng..."
+                    v-model:model-value="selectedCustomer"
+                />
+            </div>
+        </div>
 
-        <VTextField density="compact" variant="outlined" prepend-inner-icon="mdi-magnify" max-width="300" hide-details placeholder="Nhập tên món..." v-model:model-value="txtSearch" @update:model-value="selectedMenuCategory = ''" />
-    </MLHbox>
+        <div class="grid grid-cols-2 gap-6 mb-6">
+            <!-- Các món đã chọn -->
+            <div class="mb-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-semibold text-gray-800">Món order</h3>
+                </div>
 
-    <MLHbox style="flex-grow: 1; padding: 0.625rem 1rem; overflow: hidden;">
-        <!-- Các món đã chọn -->
-        <VCard style="width: 300px; height: 100%; flex-shrink: 0; display: flex; flex-direction: column;">
-            <VCardTitle style="background-color: rgb(var(--v-theme-primary)); color: rgb(var(--v-theme-on-primary))">Món ăn</VCardTitle>
-            <VDivider />
+                <div class="bg-gray-50 rounded-lg p-4 mb-4 overflow-y-auto" style="min-height: 350px;">
+                    <div 
+                        v-for="orderDetail in record.OrderDetails"
+                        class="grid grid-cols-12 gap-4 border-b pb-4 mb-4"
+                    >
+                        <div class="col-span-7">
+                            <div class="flex items-center gap-3">
+                                <img
+                                    v-if="orderDetail.MenuItem?.ImageUrl"
+                                    :src="$commonFunction.getImageUrl(orderDetail.MenuItem?.ImageUrl)"
+                                    class="w-12 h-12 object-cover rounded-md shadow-sm"
+                                />
+                                <div v-else class="bg-gray-200 w-12 h-12 rounded-md flex items-center justify-center">
+                                    <VIcon icon="mdi-food" class="text-gray-400" />
+                                </div>
+                                <div>
+                                    <p class="font-medium">{{ orderDetail.MenuItemName }}</p>
+                                    <p class="text-sm text-gray-500">{{ $commonFunction.formatThousands(orderDetail.Price) }} đ</p>
+                                </div>
+                            </div>
+                        </div>
 
-            <VList style="flex-grow: 1;">
-                <VHover v-for="od in record.OrderDetails">
-                    <template v-slot:default="{ isHovering, props }">
-                        <VListItem v-bind="props">
-                            <template v-slot:prepend>
-                                <VLabel style="opacity: 1; font-weight: bold;">{{od.Quantity}}x</VLabel>
-                            </template>
-                            <span style="margin-left: 8px;">{{ od.MenuItem?.Name }}</span>
-                            <template v-slot:append>
-                                <b>{{ od.Price }} đ</b>
-                                
-                                <VBtn @click="od.Quantity--; updateOrderDetail(od);" class="ml-1" color="blue" v-if="isHovering" size="24" icon="mdi-minus" />
-                                <VBtn @click="od.Quantity = 0; updateOrderDetail(od);" class="ml-1" color="error" v-if="isHovering" size="24" icon="mdi-delete" />
-                            </template>
-                        </VListItem>
-                    </template>
-                </VHover>
-            </VList>
-            
-            <VDivider />
-            
-            <VListItem style="font-size: 1.2rem;">
-                <template v-slot:prepend>
-                    <b>Tạm tính</b>
-                </template>
-                <template v-slot:append>
-                    <b>{{ record.TotalAmount ?? 0 }} đ</b>
-                </template>
-            </VListItem>
+                        <div class="col-span-3">
+                            <label class="block text-sm font-medium text-gray-700">Số lượng</label>
+                            <MLNumberField
+                                :config="$commonValue.moneyConfig"
+                                density="compact"
+                                variant="outlined"
+                                hide-spin-buttons
+                                hide-details
+                                class="w-full mt-1 bg-white border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-400 transition duration-200"
+                                v-model:model-value="orderDetail.Quantity"
+                                v-on:update:model-value="(v:any) => {
+                                    orderDetail.Amount = v * orderDetail.Price;
+                                }"
+                            />
+                        </div>
 
-            <VCardActions>
-                <VSpacer />
-                <VBtn style="background-color: rgb(var(--v-theme-primary)); color: rgb(var(--v-theme-on-primary));" @click="handleCheckoutClick">Thanh toán</VBtn>
-            </VCardActions>
-        </VCard>
+                        <div class="col-span-2 flex items-end justify-center">
+                            <VBtn variant="text" icon="mdi-trash-can-outline" class="text-red-500 hover:text-red-700 p-2 rounded-lg hover:bg-red-50 transition duration-150"
+                                @click="record.OrderDetails?.splice(record.OrderDetails.indexOf(orderDetail), 1)"
+                            />
+                        </div>
+                    </div>
+                </div>
 
-        <VSpacer style="width: 16px; flex-grow: 0; flex-shrink: 0;" />
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700">
+                        Yêu cầu đặc biệt
+                    </label>
+                    <VTextarea
+                        no-resize
+                        hide-details
+                        variant="outlined"
+                        placeholder="Nhập yêu cầu đặc biệt hoặc ghi chú..."
+                        rows="3"
+                        class="mt-1 w-full bg-white border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-400 transition duration-200"
+                        v-model:model-value="record.SpecialRequest"
+                    />
+                </div>
 
-        <VCard :disabled="loadingMenu" style="flex-grow: 1; height: 100%; display: flex; flex-direction: column;">
-            <template v-slot:loader>
-                <VProgressLinear color="primary" indeterminate v-if="loadingMenu" />
-            </template>
+                <div class="bg-gray-50 rounded-lg p-4 mt-4">
+                    <h4 class="font-medium mb-3"><b>Tạm tính</b></h4>
+                    <div class="space-y-2 mb-4">
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Tiền hàng:</span>
+                            <span class="font-medium">{{ $commonFunction.formatThousands(orderNetAmount) }} đ</span>
+                        </div>
+                        <div class="flex justify-between" v-if="false">
+                            <span class="text-gray-600">Tax (8%):</span>
+                            <span class="font-medium">$3.76</span>
+                        </div>
+                        <div class="flex justify-between align-center">
+                            <span class="text-gray-600">Tip:</span>
+                            <div class="relative flex align-center" style="width: 128px;">
+                                <MLNumberField
+                                    :config="$commonValue.moneyConfig"
+                                    variant="outlined"
+                                    density="compact"
+                                    hide-details
+                                    style="color: black;"
+                                    suffix="đ"
+                                    class="text-right border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-400 transition duration-200"
+                                    v-model="record.TipAmount"
+                                />
+                            </div>
+                        </div>
+                        <div class="border-t pt-2 mt-2">
+                            <div class="flex justify-between font-bold">
+                                <span>Tổng tiền:</span>
+                                <span>{{ $commonFunction.formatThousands(orderTotalAmount) }} đ</span>
+                            </div>
+                        </div>
+                    </div>
 
-            <!-- Nhóm món -->
-            <VSheet color="secondary" style="padding: 0.625rem;">
-                <VSlideGroup v-model:model-value="selectedMenuCategory">
+                    <div class="flex justify-between gap-2 mt-">
+                        <div class="relative flex-1" v-if="false">
+                            <select class="w-full bg-white border border-gray-300 rounded-lg px-4 py-3 appearance-none focus:outline-none focus:ring-2 focus:ring-primary-400 transition duration-200">
+                                <option value="cash">Cash</option>
+                                <option value="credit">Credit Card</option>
+                                <option value="debit">Debit Card</option>
+                            </select>
+                            <span class="material-symbols-outlined absolute right-3 top-3 pointer-events-none text-gray-500">
+                                expand_more
+                            </span>
+                        </div>
+
+                        <VBtn rounded prepend-icon="mdi-cash-multiple" class="bg-secondary ml-auto hover:bg-yellow-600 text-white transition duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-1"
+                            :disabled="!record.OrderDetails?.length"
+                            style="color: white !important;"
+                            @click="handlePaymentClick"
+                        >
+                            Thanh toán
+                        </VBtn>
+                    </div>
+                </div>
+            </div>
+
+            <div style="flex-grow: 1; height: 100%; display: flex; flex-direction: column;">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-semibold text-gray-800">Thực đơn</h3>
+                    <VTextField density="compact" variant="outlined" prepend-inner-icon="mdi-magnify" max-width="225" hide-details placeholder="Tìm kiếm tên món..." v-model:model-value="txtSearch" />
+                </div>
+                <!-- Nhóm món -->
+                <VSlideGroup>
                     <VSlideGroupItem
-                        v-for="category, index in listMenuItemCategory"
+                        v-for="category, index in lstMenuItemCategoriesFiltered"
                         :key="index"
                     >
                         <v-btn
-                            :color="category.MenuItemCategoryID === selectedMenuCategory ? 'primary' : undefined"
-                            class="ma-2"
+                            variant="outlined"
+                            class="mx-2 border-gray-300"
+                            :class="[
+                                {'bg-primary text-white' : category.MenuItemCategoryID === selectedMenuCategory}
+                            ]"
                             rounded
                             @click="selectedMenuCategory = category.MenuItemCategoryID"
                         >
@@ -107,50 +200,61 @@
                         </v-btn>
                     </VSlideGroupItem>
                 </VSlideGroup>
-            </VSheet>
 
-            <VDivider />
+                <VDivider />
 
-            <!-- Danh sách món -->
-            <div style="display: ruby; padding: 0.625rem 1rem; overflow-y: auto;">
-                <VCard @click="handleMenuItemClick(menu)" color="primary" v-for="menu in listMenu" min-width="150" width="22%" link class="mr-4 mb-4">
-                    <VCardItem class="d-flex" style="flex-direction: column;">
-                        <VIcon size="108" icon="mdi-noodles" />
-                    </VCardItem>
-                    <VCardText>
-                        <div style="display: flex; flex-direction: column; align-items: center; text-align: center">
-                            <b style="font-size: 1.25rem;">{{ menu.Name }}</b>
-                            <span>{{menu.Price}} đ</span>
+                <!-- Danh sách món -->
+                <div class="grid grid-cols-2 qhd:grid-cols-3 gap-4 pb-4 mt-4">
+                    <div
+                        v-for="menuItem in lstMenuItemsFiltered"
+                        @click="handleMenuItemClick(menuItem)"
+                        class="bg-white rounded-lg shadow-sm border border-gray-200 pa-3 hover:shadow-md transition duration-200 cursor-pointer group"
+                    >
+                        <div class="relative">
+                            <img
+                                v-if="menuItem.ImageUrl"
+                                :src="$commonFunction.getImageUrl(menuItem.ImageUrl)"
+                                class="w-full object-cover rounded-md"
+                                style="aspect-ratio: 16/9;"
+                            />
+                            <div v-else class="w-full rounded-md bg-gray-200 flex items-center justify-center" style="aspect-ratio: 16/9;">
+                                <VIcon icon="mdi-food" class="text-gray-400" :size="48" />
+                            </div>
+                            <div
+                                class="absolute inset-0 bg-black bg-opacity-0 rounded-md group-hover:bg-opacity-20 transition-all duration-200 flex items-center justify-center"
+                            >
+                                <VBtn
+                                    icon="mdi-plus"
+                                    class="bg-emerald-600 text-white p-2 rounded-full transform scale-0 group-hover:scale-100 transition-all duration-200"
+                                />
+                            </div>
                         </div>
-                    </VCardText>
-                </VCard>
+                        <h4 data-id="PG2w" class="font-medium mt-2">
+                            {{ menuItem.Name }}
+                        </h4>
+                        <div data-id="bIEP" class="flex justify-between items-center">
+                            <p data-id="ftj9" class="text-sm text-gray-500">
+                                {{ menuItem.Description }}
+                            </p>
+                            <p data-id="48MY" class="font-bold">
+                                {{ $commonFunction.formatThousands(menuItem.Price) }} đ
+                            </p>
+                        </div>
+                    </div>
+                </div>
             </div>
-        </VCard>
-    </MLHbox>
+        </div>
     </MLVbox>
 </template>
 
 <script lang="ts">
 import EventBus from '@/common/EventBus';
-import { Customer, MenuItem, MenuItemCategory, Order } from '@/models';
+import { Customer, MenuItem, MenuItemCategory, Order, Table } from '@/models';
 import OrderDetail from '@/models/OrderDetail';
+import OrderTable from '@/models/OrderTable';
 import { PropType } from 'vue';
 
 export default {
-    created() {
-        this.getListCustomer();
-        this.getListMenuItem();
-        this.$service.MenuItemCategoryService.getAll().then((data:any) => {
-            this.listMenuItemCategory = data;
-        })
-
-        if (this.record.Customer) {
-            this.selectedCustomer = this.record.Customer;
-        } else {
-            this.selectedCustomer = this.record.CustomerName;
-        }
-    },
-
     props: {
         record: {
             type: Object as PropType<Order>,
@@ -160,41 +264,80 @@ export default {
         editMode: {
             type: Number,
             required: true
+        },
+
+        lstCustomers: {
+            type: Object as PropType<Customer[]>,
+            default: []
+        },
+
+        lstMenuItemCategories: {
+            type: Object as PropType<MenuItemCategory[]>,
+            default: []
+        },
+
+        lstMenuItems: {
+            type: Object as PropType<MenuItem[]>,
+            default: []
+        },
+        
+        lstTables: {
+            type: Object as PropType<Table[]>,
+            default: []
+        },
+
+        reservedTables: {
+            type: Object as PropType<Table[]>,
+            default: []
         }
+    },
+
+    created() {
+        this.selectedCustomer = this.record.Customer ?? this.record.CustomerName;
     },
 
     data() {
         return {
-            loadingCustomer: <boolean>false,
-            listCustomer: <Customer[]>[],
             selectedCustomer: <Customer|string|undefined>undefined,
-            
-            loadingMenu: <boolean>false,
-            allMenuItems: <MenuItem[]>[],
+            selectedMenuCategory: <string>this.$commonValue.GuidEmpty,
 
-            listMenuItemCategory: <MenuItemCategory[]>[],
-
-            selectedMenuCategory: <string>'',
             txtSearch: <string>'',
         }
     },
 
     computed: {
-        listMenu():MenuItem[] {
-            return this.allMenuItems.filter(mi => (this.selectedMenuCategory === '' || mi.MenuItemCategoryID === this.selectedMenuCategory) && mi.Name.toLowerCase().includes(this.txtSearch.toLowerCase()));
+        lstMenuItemsFiltered():MenuItem[] {
+            return this.lstMenuItems.filter(mi => 
+                (this.selectedMenuCategory === this.$commonValue.GuidEmpty || mi.MenuItemCategoryID === this.selectedMenuCategory) 
+                && mi.Name.toLowerCase().includes(this.txtSearch.toLowerCase())
+            );
         },
+
+        lstMenuItemCategoriesFiltered() {
+            return [{
+                MenuItemCategoryID: this.$commonValue.GuidEmpty,
+                MenuItemCategoryName: 'Tất cả'
+            } as MenuItemCategory].concat(this.lstMenuItemCategories);
+        },
+
+        lstTablesFiltered() {
+            return this.lstTables.filter(t => t.Status === this.$enumeration.EnumTableStatus.Available).concat(this.reservedTables);
+        },
+
+        selectedTables():Table[] {
+            return this.record.OrderTables?.map(ot => ot.Table).filter(t => t !== undefined) ?? [];
+        },
+
+        orderNetAmount() {
+            return this.record.OrderDetails?.reduce((sum, orderDetail) => sum + orderDetail.Amount, 0) ?? 0;
+        },
+
+        orderTotalAmount() {
+            return this.orderNetAmount + (this.record.TipAmount ?? 0);
+        }
     },
 
     methods: {
-        updateOrderDetail(orderDetail: OrderDetail) {
-            if (orderDetail.Quantity === 0) {
-                this.record.OrderDetails.splice(this.record.OrderDetails.indexOf(orderDetail), 1);
-            }
-
-            orderDetail.Price = orderDetail.Quantity * (orderDetail.MenuItem?.Price ?? 0);
-            this.record.TotalAmount = this.record.OrderDetails.reduce((a, v) => a + v.Price, 0);
-        },
-
         /**
          * Xử lý khi click vào món ăn
          */
@@ -203,8 +346,9 @@ export default {
             if (!existDetail) {
                 existDetail = {
                     MenuItemID: menuItem.MenuItemID,
+                    MenuItemName: menuItem.Name,
                     Quantity: 0,
-                    Price: 0,
+                    Price: menuItem.Price,
 
                     MenuItem: menuItem
                 } as OrderDetail;
@@ -212,34 +356,15 @@ export default {
             }
 
             existDetail.Quantity++;
-            this.updateOrderDetail(existDetail);
+            existDetail.Amount = existDetail.Quantity * existDetail.Price;
         },
 
         /**
-         * Lấy danh sách khách hàng
+         * Xử lý click vào nút Thanh toán
          */
-         async getListCustomer() {
-            this.loadingCustomer = true;
-
-            this.listCustomer = await this.$service.CustomerService.getAll();
-
-            this.loadingCustomer = false;
-        },
-
-        handleCheckoutClick() {
-            EventBus.emit(this.$eventName.SwitchTabFormOrderDetail, 1);
-        },
-
-        /**
-         * Lấy danh sách món ăn
-         */
-         async getListMenuItem() {
-            this.loadingMenu = true;
-
-            this.allMenuItems = await this.$service.MenuItemService.getAll();
-            
-            this.loadingMenu = false;
-        },
+        handlePaymentClick() {
+            EventBus.emit(this.$eventName.ShowFormPayment, this.record);
+        }
     },
 
     watch: {
@@ -258,6 +383,14 @@ export default {
                 this.record.Customer = undefined;
                 this.record.CustomerName = '';
             }
+        },
+
+        orderNetAmount() {
+            this.record.NetAmount = this.orderNetAmount;
+        },
+
+        orderTotalAmount() {
+            this.record.TotalAmount = this.orderTotalAmount;
         }
     },
 }

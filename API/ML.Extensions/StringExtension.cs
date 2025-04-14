@@ -1,7 +1,7 @@
 ﻿using System.Globalization;
 using System.Text;
 
-namespace API.ML.Common
+namespace API.ML.Extensions
 {
     public static class StringExtensions
     {

@@ -52,7 +52,8 @@
                         density="compact" 
                         variant="outlined"
                         hide-details
-                        placeholder="Nhập số điện thoại nhà hàng" 
+                        placeholder="Nhập số điện thoại nhà hàng"
+                        v-mask="'0### ### ###'"
                         v-model="getSettingByKey('RestaurantPhoneNumber').SettingValue" 
                     />
                 </MLVbox>

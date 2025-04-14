@@ -17,7 +17,7 @@ namespace API.ML.BO
         /// Tên nhóm thực đơn
         /// </summary>
         [StringLength(128)]
-        [NameField]
+        [SearchField]
 
         public string MenuItemCategoryName { get; set; } = string.Empty;
 

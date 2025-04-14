@@ -4,19 +4,7 @@
     <VContainer style="padding: unset;" class="flex flex-column">
         <h2 className="text-2xl font-bold text-gray-800">Thực đơn</h2>
 
-        <VTabs color="primary" v-model:model-value="tab" class="flex-shrink-0 mt-4">
-            <VTab :value="0">THỰC ĐƠN</VTab>
-            <VTab :value="1">NHÓM THỰC ĐƠN</VTab>
-        </VTabs>
-
-        <VTabsWindow :model-value="tab" class="mt-4 h-full">
-            <VTabsWindowItem :value="0" class="h-full">
-                <FormMenuList class="h-full" />
-            </VTabsWindowItem>
-            <VTabsWindowItem :value="1" class="h-full">
-                <FormMenuCategoryList class="h-full" />
-            </VTabsWindowItem>
-        </VTabsWindow>
+        <FormMenuList class="h-full" />
     </VContainer>
 
     <FormMenuDetail />
@@ -24,15 +12,6 @@
 
 <script lang="ts">
 export default {
-    data() {
-        return {
-            tab: <number>0
-        }
-    },
-
-    methods: {
-        
-    }
 }
 </script>
 

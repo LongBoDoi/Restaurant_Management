@@ -106,13 +106,24 @@ abstract class BaseService<IMLEntity> {
   /**
    * Lấy dữ liệu theo ID
    */
-  public async getByID(ID: string) : Promise<MLActionResult> {
-    const result = await this.api.get('/GetByID', {
-      params: {
-        ID: ID
+  public async getByID(ID: string) : Promise<IMLEntity|undefined> {
+    var result:IMLEntity|undefined = undefined;
+
+    try {
+      const response = await this.api.get('/GetByID', {
+        params: {
+          ID: ID
+        }
+      });
+      const actionResult:MLActionResult = response.data as MLActionResult;
+      if (actionResult.Success) {
+        result = actionResult.Data as IMLEntity;
       }
-    });
-    return result.data as MLActionResult;
+    } catch (e) {
+      CommonFunction.handleException(e);
+    }
+    
+    return result;
   }
 
   /**
@@ -120,8 +131,18 @@ abstract class BaseService<IMLEntity> {
    * @param entity Bản ghi
    */
   public async saveChanges(entity: IMLEntity) : Promise<MLActionResult> {
-    const result = await this.api.post('/SaveChanges', entity);
-    return result.data as MLActionResult;
+    var result:MLActionResult = {
+      Success: false
+    }
+
+    try {
+      const actionResult = await this.api.post('/SaveChanges', entity);
+      result = actionResult.data as MLActionResult;
+    } catch (e) {
+      CommonFunction.handleException(e);
+    }
+    
+    return result;
   }
 
   /**

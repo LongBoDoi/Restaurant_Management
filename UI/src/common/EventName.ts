@@ -17,8 +17,11 @@ class EventName {
     // Mở dialog thông báo
     static ShowDialog = 'ShowDialog';
 
-    // Mở form chi tiết nhân viên
+    // Mở form chi tiết nguyên liệu
     static ShowFormInventoryItemDetail = 'ShowFormInventoryItemDetail';
+
+    // Mở form chi tiết nhóm nguyên liệu
+    static ShowFormInventoryItemCategoryDetail = 'ShowFormInventoryItemCategoryDetail';
 
     // Mở form chi tiết nhân viên
     static ShowFormEmployeeDetail = 'ShowFormEmployeeDetail';
@@ -34,6 +37,18 @@ class EventName {
 
     // Mở form thêm màu cho nhóm thực đơn
     static ShowFormAddMenuCategoryColor = 'ShowFormAddMenuCategoryColor';
+
+    // Mở form payment
+    static ShowFormPayment = 'ShowFormPayment';
+
+    // Mở form chi tiết bàn
+    static ShowFormTableDetail = 'ShowFormTableDetail';
+
+    // Mở form chi tiết khu vực
+    static ShowFormAreaDetail = 'ShowFormAreaDetail';
+
+    // Mở form chi tiết xử lý yêu cầu tạo sushi custom
+    static ShowFormCustomMenuDetail = 'ShowFormCustomMenuDetail';
 };
 
 export default EventName;

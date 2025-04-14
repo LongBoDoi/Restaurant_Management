@@ -3,6 +3,7 @@ using API.ML.BO;
 using API.ML.BOBase;
 using API.ML.Common;
 using API.ML.CustomAtrributes;
+using API.ML.Extensions;
 using API.ML.Utility;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -15,7 +16,7 @@ namespace API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public abstract class MLBaseController<IMLEntity>(ApplicationDBContext context) : ControllerBase where IMLEntity : class
+    public abstract class MLBaseController<IMLEntity>(ApplicationDBContext context) : ControllerBase where IMLEntity : MLEntity
     {
         #region Properties
         protected readonly ApplicationDBContext _context = context;
@@ -33,7 +34,6 @@ namespace API.Controllers
         /// <param name="page">Số trang</param>
         /// <param name="itemsPerPage">Kích thước trang</param>
         /// <returns></returns>
-        [Authorize]
         [HttpGet("GetAll")]
         public virtual MLActionResult GetAll()
         {
@@ -44,7 +44,16 @@ namespace API.Controllers
 
             try
             {
-                result.Data = _entities.ToList();
+                IEnumerable<IMLEntity> dataList = _entities.WithAutoIncludes<IMLEntity, GetAll>().ToList();
+                if (dataList.Any())
+                {
+                    foreach (IMLEntity entity in dataList)
+                    {
+                        entity.RemoveCircularReferences();
+                    }
+                }
+
+                result.Data = dataList;
             }
             catch (Exception ex)
             {
@@ -71,13 +80,13 @@ namespace API.Controllers
 
             try
             {
-                IEnumerable<IMLEntity> data = _entities.ToList();
+                IEnumerable<IMLEntity> data = _entities.WithAutoIncludes<IMLEntity, GetDataPagingInclude>().ToList();
 
                 string? normalizedSearchTerm = search?.RemoveDiacritics().ToLower();
                 if (!string.IsNullOrEmpty(normalizedSearchTerm))
                 {
 
-                    IEnumerable<PropertyInfo> nameFields = typeof(IMLEntity).GetProperties().Where(p => p.GetCustomAttribute<NameField>() != null);
+                    IEnumerable<PropertyInfo> nameFields = typeof(IMLEntity).GetProperties().Where(p => p.GetCustomAttribute<SearchField>() != null);
                     if (nameFields.Any())
                     {
                         data = data.Where(e =>
@@ -95,9 +104,17 @@ namespace API.Controllers
                     }
                 }
 
-                result.Data = new
+                data = data.OrderByDescending(e => e.ModifiedDate).Skip((page - 1) * itemsPerPage).Take(itemsPerPage);
+
+                PrepareExtraData(data);
+                foreach (IMLEntity entity in data)
                 {
-                    Data = data.OrderByDescending(e => (e as MLEntity)?.CreatedDate).Skip((page - 1) * itemsPerPage).Take(itemsPerPage).ToList(),
+                    entity.RemoveCircularReferences();
+                }
+
+                result.Data = new MLPagingData<IMLEntity>
+                {
+                    Data = data,
                     TotalCount = data.Count()
                 };
             }
@@ -117,20 +134,33 @@ namespace API.Controllers
         /// <returns></returns>
         [Authorize]
         [HttpGet("GetByID")]
-        public virtual MLActionResult GetByID(Guid ID)
+        public virtual MLActionResult GetByID(string ID)
         {
             MLActionResult result = new()
             {
-                Success = true
+                Success = false
             };
 
             try
             {
-                var keyProperty = typeof(IMLEntity).GetProperties()
+                if (Guid.TryParse(ID, out Guid gID))
+                {
+                    var keyProperty = typeof(IMLEntity).GetProperties()
                                                     .FirstOrDefault(prop => prop.GetCustomAttribute<KeyAttribute>() != null);
 
-                result.Data = _entities.FirstOrDefault(x => keyProperty != null && keyProperty.GetValue(x) != null && (Guid?)keyProperty.GetValue(x) == ID);
-                result.Success = result.Data != null;
+                    IMLEntity? objectData = _entities.WithAutoIncludes<IMLEntity, GetDetail>().ToList().FirstOrDefault(x => keyProperty != null && keyProperty.GetValue(x) != null && (Guid?)keyProperty.GetValue(x) == gID);
+
+                    if (objectData != null)
+                    {
+                        objectData.RemoveCircularReferences();
+                        result.Data = objectData;
+                        result.Success = true;
+                    } else
+                    {
+                        result.Success = false;
+                        result.ErrorMsg = "Không tìm thấy dữ liệu bản ghi";
+                    }
+                }
             }
             catch (Exception ex)
             {
@@ -265,11 +295,17 @@ namespace API.Controllers
         /// </summary>
         protected virtual void AfterSaveSuccess(IMLEntity entity)
         {
+            entity.RemoveCircularReferences();
         }
 
         protected virtual bool BeforeSave(IMLEntity entity, MLActionResult result)
         {
             return true;
+        }
+
+        protected virtual void PrepareExtraData(IEnumerable<IMLEntity> entites)
+        {
+
         }
         #endregion
     }

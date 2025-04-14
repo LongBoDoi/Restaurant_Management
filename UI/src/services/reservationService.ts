@@ -1,6 +1,7 @@
 import { MLActionResult, Reservation } from "@/models";
 import BaseService from "./baseService";
 import { EnumReservationStatus } from "@/common/Enumeration";
+import CommonFunction from "@/common/CommonFunction";
 
 class ReservationService extends BaseService<Reservation> {
     protected entityName: string = 'Reservation';
@@ -14,8 +15,18 @@ class ReservationService extends BaseService<Reservation> {
      * Lấy dữ liệu đoạn chat
      */
     async createCustomerReservation(reservation:Reservation) : Promise<MLActionResult> {
-        const response = await this.api.post('/CreateCustomerReservation', reservation);
-        return response?.data as MLActionResult;
+        var result:MLActionResult = {
+            Success: false
+        } as MLActionResult;
+
+        try {
+            const response = await this.api.post('/CreateCustomerReservation', reservation);
+            result = response.data as MLActionResult;
+        } catch (e) {
+            CommonFunction.handleException(e);
+        }
+
+        return result;
     }
 
     /**

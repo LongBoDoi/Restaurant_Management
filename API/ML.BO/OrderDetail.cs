@@ -17,7 +17,12 @@ namespace API.ML.BO
         /// <summary>
         /// ID món
         /// </summary>
-        public Guid MenuItemID { get; set; }
+        public Guid? MenuItemID { get; set; }
+
+        /// <summary>
+        /// Tên món
+        /// </summary>
+        public string MenuItemName { get; set; } = string.Empty;
 
         /// <summary>
         /// Số lượng món
@@ -28,6 +33,11 @@ namespace API.ML.BO
         /// Giá món
         /// </summary>
         public decimal Price { get; set; }
+
+        /// <summary>
+        /// Thành tiền
+        /// </summary>
+        public decimal Amount { get; set; }
 
         /// <summary>
         /// Note món

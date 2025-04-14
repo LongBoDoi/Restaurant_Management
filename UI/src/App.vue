@@ -25,7 +25,6 @@ export default {
 
       result = await this.$service.UserLoginService.getUserData();
     } catch (e) {
-      this.redirectToLogin();
     } finally {
       this.isLoading = false;
     }
@@ -35,11 +34,10 @@ export default {
     }
 
     if (result?.Success) {
-      if (result.Data.UserType === EnumUserType.Employee && window.location.pathname === '/') {
+      if (result.Data.UserType === EnumUserType.Employee && !window.location.pathname.startsWith('/management')) {
         this.$router.replace({name: '/management'});
       }
     } else {
-      this.redirectToLogin();
     }
 
     EventBus.on(this.$eventName.RedirectToLogin, this.redirectToLogin);
@@ -59,9 +57,7 @@ export default {
     ...mapActions(userStore, ['setUserID']),
 
     redirectToLogin() {
-      if (window.location.pathname !== '/') {
-        window.location.pathname = '/';
-      }
+      window.location.pathname = '/login';
     }
   }
 }

@@ -73,13 +73,5 @@ namespace API.Controllers
             }
             return true;
         }
-
-        protected override void AfterSaveSuccess(Employee employee)
-        {
-            if (employee.UserLogin != null)
-            {
-                employee.UserLogin = null;
-            }
-        }
     }
 }

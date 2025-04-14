@@ -1,3 +1,4 @@
+import InventoryItemCategory from "./InventoryItemCategory";
 import MLEntity from "./MLEntity";
 
 interface InventoryItem extends MLEntity {
@@ -5,7 +6,10 @@ interface InventoryItem extends MLEntity {
     Name: string,
     Quantity: number,
     WarningStockQuantity: number,
-    Unit: string
+    Unit: string,
+    InventoryItemCategoryID: string,
+
+    InventoryItemCategory?: InventoryItemCategory
 };
 
 export default InventoryItem;

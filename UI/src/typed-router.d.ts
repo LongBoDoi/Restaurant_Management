@@ -19,13 +19,23 @@ declare module 'vue-router/auto-routes' {
    */
   export interface RouteNamedMap {
     '/': RouteRecordInfo<'/', '/', Record<never, never>, Record<never, never>>,
+    '//home': RouteRecordInfo<'//home', '/home', Record<never, never>, Record<never, never>>,
+    '//login': RouteRecordInfo<'//login', '/login', Record<never, never>, Record<never, never>>,
+    '//menu': RouteRecordInfo<'//menu', '/menu', Record<never, never>, Record<never, never>>,
+    '//reservation': RouteRecordInfo<'//reservation', '/reservation', Record<never, never>, Record<never, never>>,
     '/management': RouteRecordInfo<'/management', '/management', Record<never, never>, Record<never, never>>,
+    '/management/area': RouteRecordInfo<'/management/area', '/management/area', Record<never, never>, Record<never, never>>,
+    '/management/custom-menu-request': RouteRecordInfo<'/management/custom-menu-request', '/management/custom-menu-request', Record<never, never>, Record<never, never>>,
     '/management/customer': RouteRecordInfo<'/management/customer', '/management/customer', Record<never, never>, Record<never, never>>,
+    '/management/dashboard': RouteRecordInfo<'/management/dashboard', '/management/dashboard', Record<never, never>, Record<never, never>>,
     '/management/employee': RouteRecordInfo<'/management/employee', '/management/employee', Record<never, never>, Record<never, never>>,
     '/management/inventory': RouteRecordInfo<'/management/inventory', '/management/inventory', Record<never, never>, Record<never, never>>,
+    '/management/inventory-category': RouteRecordInfo<'/management/inventory-category', '/management/inventory-category', Record<never, never>, Record<never, never>>,
     '/management/menu': RouteRecordInfo<'/management/menu', '/management/menu', Record<never, never>, Record<never, never>>,
+    '/management/menu-category': RouteRecordInfo<'/management/menu-category', '/management/menu-category', Record<never, never>, Record<never, never>>,
     '/management/order': RouteRecordInfo<'/management/order', '/management/order', Record<never, never>, Record<never, never>>,
     '/management/reservation': RouteRecordInfo<'/management/reservation', '/management/reservation', Record<never, never>, Record<never, never>>,
     '/management/setting': RouteRecordInfo<'/management/setting', '/management/setting', Record<never, never>, Record<never, never>>,
+    '/management/table': RouteRecordInfo<'/management/table', '/management/table', Record<never, never>, Record<never, never>>,
   }
 }

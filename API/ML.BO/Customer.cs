@@ -15,14 +15,14 @@ namespace API.ML.BO
         /// <summary>
         /// Tên khách hàng
         /// </summary>
-        [NameField]
+        [SearchField]
         [StringLength(128)]
         public string CustomerName { get; set; } = string.Empty;
 
         /// <summary>
         /// Số điện thoại khách hàng
         /// </summary>
-        [NameField]
+        [SearchField]
         [StringLength(50)]
         public string PhoneNumber { get; set; } = string.Empty;
 
@@ -67,5 +67,7 @@ namespace API.ML.BO
         /// Danh sách bản ghi order
         /// </summary>
         public IEnumerable<Order>? Orders { get; set; }
+
+        public IEnumerable<CustomMenuRequest>? CustomMenuRequests { get; set; }
     }
 }

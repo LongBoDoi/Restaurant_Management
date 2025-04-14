@@ -41,7 +41,7 @@ export function createStoreOnBase<IMLEntity extends MLEntity>(storeID: string, s
 
             removeSelectedRecord() {
                 this._dataList.splice(this._selectedIndex, 1);
-                this._selectedIndex = this._dataList.length - 1;
+                this._selectedIndex = Math.min(this.selectedIndex, this._dataList.length - 1);
             },
 
             addNewRecord():IMLEntity {
@@ -49,7 +49,7 @@ export function createStoreOnBase<IMLEntity extends MLEntity>(storeID: string, s
                     EditMode: EnumEditMode.Add
                 } as any;
 
-                this._dataList.push(newRecord);
+                this._dataList.unshift(newRecord);
                 this._selectedIndex = this._dataList.indexOf(newRecord);
 
                 return newRecord;

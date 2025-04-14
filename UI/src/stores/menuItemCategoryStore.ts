@@ -21,7 +21,7 @@ export const menuItemCategoryStore = createStoreOnBase<MenuItemCategory>('menuIt
                 EditMode: EnumEditMode.Add
             } as MenuItemCategory;
 
-            me._dataList.push(newRecord);
+            me._dataList.unshift(newRecord);
             me._selectedIndex = CommonValue.GuidEmpty;
 
             return newRecord;

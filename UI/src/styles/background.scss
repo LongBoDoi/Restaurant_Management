@@ -1,0 +1,73 @@
+.bg-yellow-500 {
+    --tw-bg-opacity: 1;
+    background-color: rgb(234 179 8 / var(--tw-bg-opacity)) !important;
+}
+
+.hover\:bg-yellow-600:hover {
+    --tw-bg-opacity: 1;
+    background-color: rgb(202 138 4 / var(--tw-bg-opacity)) !important;
+}
+
+.bg-black {
+    --tw-bg-opacity: 1;
+    background-color: rgb(0 0 0 / var(--tw-bg-opacity)) !important;
+}
+
+.bg-opacity-0 {
+    --tw-bg-opacity: 0;
+}
+
+:is(.group:hover .group-hover\:bg-opacity-20) {
+    --tw-bg-opacity: 0.2;
+}
+
+// Blue
+.bg-blue-50 {
+    --tw-bg-opacity: 1;
+    background-color: rgb(239 246 255 / var(--tw-bg-opacity));
+}
+.bg-blue-100 {
+    --tw-bg-opacity: 1;
+    background-color: rgb(219 234 254 / var(--tw-bg-opacity)) !important;
+}
+
+// Gray
+.bg-gray-50,
+.hover\:bg-gray-50:hover {
+    --tw-bg-opacity: 1;
+    background-color: rgb(249 250 251 / var(--tw-bg-opacity)) !important;
+}
+
+// Red
+.bg-red-50 {
+    --tw-bg-opacity: 1;
+    background-color: rgb(254 242 242 / var(--tw-bg-opacity));
+}
+
+.bg-red-500 {
+    --tw-bg-opacity: 1;
+    background-color: rgb(239 68 68 / var(--tw-bg-opacity)) !important;
+}
+.hover\:bg-red-600:hover,
+.bg-red-600 {
+    --tw-bg-opacity: 1;
+    background-color: rgb(220 38 38 / var(--tw-bg-opacity)) !important;
+}
+
+//Green
+.bg-green-50 {
+    --tw-bg-opacity: 1;
+    background-color: rgb(240 253 244 / var(--tw-bg-opacity));
+}
+
+// Emerald
+.bg-emerald-100 {
+    --tw-bg-opacity: 1;
+    background-color: rgb(209 250 229 / var(--tw-bg-opacity)) !important;
+}
+
+// Purple
+.bg-purple-100 {
+    --tw-bg-opacity: 1;
+    background-color: rgb(233 229 255 / var(--tw-bg-opacity));
+}
