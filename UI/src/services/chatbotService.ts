@@ -1,8 +1,8 @@
 import { ChatbotConversation, ChatbotConversationDetail } from "@/models";
-import BaseService from "./baseService";
+import MLBaseService from "./baseService";
 import { EnumChatbotSender } from "@/common/Enumeration";
 
-class ChatbotService extends BaseService<ChatbotConversation> {
+class ChatbotService extends MLBaseService<ChatbotConversation> {
     protected entityName: string = 'Chatbot';
 
     constructor() {

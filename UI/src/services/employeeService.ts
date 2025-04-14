@@ -1,7 +1,7 @@
 import { Employee, MLActionResult } from "@/models";
-import BaseService from "./baseService";
+import MLBaseService from "./baseService";
 
-class EmployeeService extends BaseService<Employee> {
+class EmployeeService extends MLBaseService<Employee> {
     protected entityName: string = 'Employee';
     
     constructor() {

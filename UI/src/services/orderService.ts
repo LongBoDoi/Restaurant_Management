@@ -1,8 +1,8 @@
 import { MLActionResult, Order } from "@/models";
-import BaseService from "./baseService";
+import MLBaseService from "./baseService";
 import CommonFunction from "@/common/CommonFunction";
 
-class OrderService extends BaseService<Order> {
+class OrderService extends MLBaseService<Order> {
     protected entityName: string = 'Order';
     
     constructor() {

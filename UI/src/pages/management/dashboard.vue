@@ -5,24 +5,10 @@
         <MLVbox style="overflow-y: auto;" class="mt-6 px-1">
         <!-- Dòng 1 -->
         <div className="grid grid-cols-4 gap-6 mb-6">
-            <div className="bg-gray-50 rounded-xl p-6 shadow-md hover:shadow-lg transition duration-300 border-l-4 border-purple-500">
-                <div className="flex justify-between h-full">
-                    <div>
-                        <p className="text-gray-500 text-sm">Doanh thu hôm nay</p>
-                        <h3 className="text-2xl font-bold mt-1">$3,542.70</h3>
-                        <p className="text-green-600 text-sm mt-1 flex items-center">
-                            <span className="material-symbols-outlined text-sm mr-1">trending_up</span>
-                            +12.5% from yesterday
-                        </p>
-                    </div>
-                    <div className="bg-purple-100 rounded-full pa-3 text-purple-600">
-                        <span className="material-symbols-outlined text-3xl">payments</span>
-                    </div>
-                </div>
-            </div>
+            <FormTodayRevenue />
 
             <div className="bg-gray-50 rounded-xl p-6 shadow-md hover:shadow-lg transition duration-300 border-l-4 border-blue-500">
-                <div className="flex justify-between h-full">
+                <div className="flex justify-between h-full space-x-3">
                     <div>
                         <p className="text-gray-500 text-sm">Số order đã hoàn thành</p>
                         <h3 className="text-2xl font-bold mt-1">87</h3>
@@ -38,7 +24,7 @@
             </div>
 
             <div className="bg-gray-50 rounded-xl p-6 shadow-md hover:shadow-lg transition duration-300 border-l-4 border-yellow-500">
-                <div className="flex justify-between h-full">
+                <div className="flex justify-between h-full space-x-3">
                     <div>
                         <p className="text-gray-500 text-sm">Giá trị order trung bình</p>
                         <h3 className="text-2xl font-bold mt-1">$40.72</h3>
@@ -54,7 +40,7 @@
             </div>
 
             <div className="bg-gray-50 rounded-xl p-6 shadow-md hover:shadow-lg transition duration-300 border-l-4 border-green-500">
-                <div className="flex justify-between h-full">
+                <div className="flex justify-between h-full space-x-3">
                     <div>
                         <p className="text-gray-500 text-sm">Số lượng bàn hoạt động</p>
                         <h3 className="text-2xl font-bold mt-1">12/15</h3>
@@ -71,21 +57,21 @@
         <div className="grid grid-cols-3 gap-6 mb-6">
             <div className="bg-gray-50 rounded-xl p-6 shadow-md hover:shadow-lg transition duration-300 col-span-2">
                 <div className="flex justify-between items-center mb-4">
-                    <h3 className="text-lg font-bold">Revenue Trend</h3>
+                    <h3 className="text-lg font-bold">Xu hướng doanh thu</h3>
                     <div className="flex gap-2">
-                        <button className="px-3 py-1 text-sm bg-emerald-100 text-emerald-700 rounded-md hover:bg-primary-200 transition duration-150">
+                        <button className="px-3 py-1 text-sm bg-emerald-100 text-emerald-700 rounded-md hover:bg-emerald-200 transition duration-150">
                             Day
                         </button>
                         <button className="px-3 py-1 text-sm bg-emerald-600 text-white rounded-md hover:bg-emerald-700 transition duration-150">
                             Week
                         </button>
-                        <button className="px-3 py-1 text-sm bg-emerald-100 text-emerald-700 rounded-md hover:bg-primary-200 transition duration-150">
+                        <button className="px-3 py-1 text-sm bg-emerald-100 text-emerald-700 rounded-md hover:bg-emerald-200 transition duration-150">
                             Month
                         </button>
                     </div>
                 </div>
                 <div className="w-full" style="height: 300px;">
-
+                    <FormRevenueTrend />
                 </div>
             </div>
 
@@ -382,3 +368,8 @@
         </MLVbox>
     </VContainer>
 </template>
+
+<script lang="ts">
+export default {
+}
+</script>

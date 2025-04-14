@@ -1,7 +1,7 @@
 import { Area } from "@/models";
-import BaseService from "./baseService";
+import MLBaseService from "./baseService";
 
-class AreaService extends BaseService<Area> {
+class AreaService extends MLBaseService<Area> {
     protected entityName: string = 'Area';
     
     constructor() {

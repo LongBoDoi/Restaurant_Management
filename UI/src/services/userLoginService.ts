@@ -1,8 +1,8 @@
-import BaseService from "./baseService";
+import MLBaseService from "./baseService";
 import { Customer, UserLogin } from "../models";
 import MLActionResult from "../models/MLActionResult";
 
-class UserLoginService extends BaseService<UserLogin> {
+class UserLoginService extends MLBaseService<UserLogin> {
     protected override entityName: string = 'UserLogin';
 
     constructor() {

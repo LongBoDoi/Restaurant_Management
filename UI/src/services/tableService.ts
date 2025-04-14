@@ -1,7 +1,7 @@
 import { Table } from "@/models";
-import BaseService from "./baseService";
+import MLBaseService from "./baseService";
 
-class TableService extends BaseService<Table> {
+class TableService extends MLBaseService<Table> {
     protected entityName: string = 'Table';
     
     constructor() {

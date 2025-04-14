@@ -1,9 +1,9 @@
 import { MenuItem, MLActionResult } from "@/models";
-import BaseService from "./baseService";
+import MLBaseService from "./baseService";
 import PagingData from "@/models/PagingData";
 import CommonFunction from "@/common/CommonFunction";
 
-class MenuItemService extends BaseService<MenuItem> {
+class MenuItemService extends MLBaseService<MenuItem> {
   protected entityName: string = 'MenuItem';
   
   constructor() {

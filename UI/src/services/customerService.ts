@@ -1,7 +1,7 @@
 import { Customer } from "@/models";
-import BaseService from "./baseService";
+import MLBaseService from "./baseService";
 
-class CustomerService extends BaseService<Customer> {
+class CustomerService extends MLBaseService<Customer> {
     protected entityName: string = 'Customer';
     
     constructor() {

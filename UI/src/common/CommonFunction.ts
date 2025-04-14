@@ -118,7 +118,7 @@ class CommonFunction {
     /**
      * Trả về dữ liệu số thực từ số bị format theo dạng ###.###,###
      */
-    static getRealFloatValue = (number: number|undefined) => {
+    static getRealFloatValue = (number: string|undefined) => {
         return parseFloat(number?.toString().replaceAll('.', '').replaceAll(',', '.') ?? '0');
     };
 

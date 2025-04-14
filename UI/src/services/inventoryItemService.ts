@@ -1,7 +1,7 @@
-import BaseService from "./baseService";
+import MLBaseService from "./baseService";
 import InventoryItem from "@/models/InventoryItem";
 
-class InventoryItemService extends BaseService<InventoryItem> {
+class InventoryItemService extends MLBaseService<InventoryItem> {
     protected entityName: string = 'InventoryItem';
     
     constructor() {

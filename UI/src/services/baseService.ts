@@ -7,7 +7,7 @@ import { MLActionResult } from "@/models";
 import PagingData from "@/models/PagingData";
 import axios, { AxiosInstance } from "axios";
 
-abstract class BaseService<IMLEntity> {
+export abstract class BaseService {
   protected baseURL: string = '';
   protected api: AxiosInstance = axios.create();
   protected entityName: string = '';
@@ -47,7 +47,9 @@ abstract class BaseService<IMLEntity> {
 
     this.api = api;
   }
+}
 
+abstract class MLBaseService<IMLEntity> extends BaseService {
   /**
    * Lấy dữ liệu phân trang
    * @param page Số trang
@@ -155,4 +157,4 @@ abstract class BaseService<IMLEntity> {
   }
 }
 
-export default BaseService;
+export default MLBaseService;

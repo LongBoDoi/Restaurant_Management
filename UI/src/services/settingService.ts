@@ -1,8 +1,8 @@
 import { MenuItemCategory, MLActionResult, Setting } from "@/models";
-import BaseService from "./baseService";
+import MLBaseService from "./baseService";
 import CommonFunction from "@/common/CommonFunction";
 
-class SettingService extends BaseService<Setting> {
+class SettingService extends MLBaseService<Setting> {
     protected entityName: string = 'Setting';
     
     constructor() {

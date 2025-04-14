@@ -12,6 +12,7 @@ import InventoryItemCategoryService, { inventoryItemCategoryService } from "./in
 import TableService, { tableService } from "./tableService";
 import AreaService, { areaService } from "./areaService";
 import CustomMenuRequestService, { customMenuRequestService } from "./customMenuRequestService";
+import DashboardService, { dashboardService } from "./dashboardService";
 
 class ServiceInterface {
     UserLoginService: UserLoginService = new UserLoginService;
@@ -28,6 +29,7 @@ class ServiceInterface {
     TableService: TableService = tableService;
     AreaService: AreaService = areaService;
     CustomMenuRequestService: CustomMenuRequestService = customMenuRequestService;
+    DashboardService: DashboardService = dashboardService;
 };
 
 export default ServiceInterface;

@@ -1,9 +1,9 @@
 import { MLActionResult, Reservation } from "@/models";
-import BaseService from "./baseService";
+import MLBaseService from "./baseService";
 import { EnumReservationStatus } from "@/common/Enumeration";
 import CommonFunction from "@/common/CommonFunction";
 
-class ReservationService extends BaseService<Reservation> {
+class ReservationService extends MLBaseService<Reservation> {
     protected entityName: string = 'Reservation';
 
     constructor() {

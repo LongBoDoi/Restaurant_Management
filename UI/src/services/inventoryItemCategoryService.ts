@@ -1,9 +1,9 @@
 import InventoryItemCategory from "@/models/InventoryItemCategory";
-import BaseService from "./baseService";
+import MLBaseService from "./baseService";
 import { MLActionResult } from "@/models";
 import CommonFunction from "@/common/CommonFunction";
 
-class InventoryItemCategoryService extends BaseService<InventoryItemCategory> {
+class InventoryItemCategoryService extends MLBaseService<InventoryItemCategory> {
     protected entityName: string = 'InventoryItemCategory';
     
     constructor() {

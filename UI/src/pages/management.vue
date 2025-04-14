@@ -236,7 +236,7 @@ export default {
 
             if (result?.Success) {
                 localStorage.removeItem(LocalStorageKey.AuthToken);
-                window.location.reload();
+                window.location.pathname = '/';
             }
         },
 

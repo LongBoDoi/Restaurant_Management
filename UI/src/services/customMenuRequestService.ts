@@ -1,7 +1,7 @@
-import BaseService from "./baseService";
+import MLBaseService from "./baseService";
 import CustomMenuRequest from "@/models/CustomMenuRequest";
 
-class CustomMenuRequestService extends BaseService<CustomMenuRequest> {
+class CustomMenuRequestService extends MLBaseService<CustomMenuRequest> {
   protected entityName: string = 'CustomMenuRequest';
   
   constructor() {
