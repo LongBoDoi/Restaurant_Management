@@ -2,7 +2,7 @@
     <VCard class="pa-6 ml-1 mr-1 bg-gray-50" style="border-radius: 24px;">
         <b style="font-size: 18px;">Liên kết mạng xã hội</b>
 
-        <MLHbox align="center">
+        <MLHbox align="center" class="mb-2 mt-4">
             <VCheckbox color="primary" hide-details style="width: 150px;" v-model:model-value="lstSocialLinks" :value="facebookData">
                 <template #label>
                     <i class="fa-brands fa-facebook mr-2" style="font-size: 16px; color: #1877F2;" />
@@ -13,7 +13,7 @@
             <VTextField v-if="lstSocialLinks.includes(facebookData)" placeholder="Nhập URL Facebook" density="compact" variant="outlined" class="ml-4" hide-details v-model:model-value="facebookData.Link" />
         </MLHbox>
 
-        <MLHbox align="center">
+        <MLHbox align="center" class="mb-2">
             <VCheckbox color="primary" hide-details style="width: 150px;" v-model:model-value="lstSocialLinks" :value="instagramData">
                 <template #label>
                     <i class="fa-brands fa-instagram mr-2" style="font-size: 16px; color: #C13584;" />
@@ -24,7 +24,7 @@
             <VTextField v-if="lstSocialLinks.includes(instagramData)" placeholder="Nhập URL Instagram" density="compact" variant="outlined" class="ml-4" hide-details v-model:model-value="instagramData.Link" />
         </MLHbox>
 
-        <MLHbox align="center">
+        <MLHbox align="center" class="mb-2">
             <VCheckbox color="primary" hide-details style="width: 150px; flex-shrink: 0;" v-model:model-value="lstSocialLinks" :value="youtubeData">
                 <template #label>
                     <i class="fa-brands fa-youtube mr-2" style="font-size: 16px; color: red;" />

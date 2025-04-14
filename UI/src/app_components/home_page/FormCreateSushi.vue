@@ -124,8 +124,8 @@ export default {
 
             loading: <boolean>false,
             customMenuRequest: <CustomMenuRequest>{
-                CustomerID: (this.$session.UserData as Customer).CustomerID,
-                CustomerName: (this.$session.UserData as Customer).CustomerName,
+                CustomerID: (this.$session.UserData as Customer)?.CustomerID,
+                CustomerName: (this.$session.UserData as Customer)?.CustomerName,
                 InventoryItems: [] as InventoryItem[]
             } as CustomMenuRequest,
             saveSuccess: <boolean>false

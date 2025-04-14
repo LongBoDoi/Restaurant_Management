@@ -95,10 +95,10 @@
         <VCard class="mt-6 mb-1 pa-6 ml-1 mr-1 bg-gray-50" style="border-radius: 24px;" :disabled="loading">
             <b style="font-size: 18px;">Tuỳ chỉnh hiển thị</b>
 
-            <VCheckbox color="primary" class="mt-2" hide-details v-model="(getSettingByKey('DisplayMenuScreenForCustomer').Value)" label="Hiển thị màn Thực đơn" />
+            <VCheckbox color="primary" class="mt-4" hide-details v-model="(getSettingByKey('DisplayMenuScreenForCustomer').Value)" label="Hiển thị màn Thực đơn" />
 
             <VExpandTransition>
-                <MLVbox class="ml-8" v-if="(getSettingByKey('DisplayMenuScreenForCustomer').Value as boolean)">
+                <MLVbox class="ml-8 mb-4" v-if="(getSettingByKey('DisplayMenuScreenForCustomer').Value as boolean)">
                     <VRadioGroup inline color="primary" v-model:model-value="(getSettingByKey('DisplayMenuScreenForCustomerType').Value as number)" hide-details>
                         <VRadio label="Hiển thị theo ảnh" :value="0" />
                         <VRadio class="ml-4" label="Hiển thị theo danh sách món" :value="1" />
@@ -207,7 +207,7 @@
                 </MLVbox>
             </VExpandTransition>
 
-            <VCheckbox color="primary" hide-details label="Hiển thị màn Đặt chỗ" v-model="(getSettingByKey('DisplayBookingScreenForCustomer').Value)" />
+            <VCheckbox class="mt-2" color="primary" hide-details label="Hiển thị màn Đặt chỗ" v-model="(getSettingByKey('DisplayBookingScreenForCustomer').Value)" />
         </VCard>
     </VForm>
 </template>
