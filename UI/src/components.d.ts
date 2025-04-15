@@ -8,7 +8,6 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     ChatbotWindow: typeof import('./app_components/home_page/ChatbotWindow.vue')['default']
-    copy: typeof import('./app_components/table/FormTableDetail copy.vue')['default']
     FormAreaDetail: typeof import('./app_components/table/FormAreaDetail.vue')['default']
     FormAreaList: typeof import('./app_components/table/FormAreaList.vue')['default']
     FormBookReservation: typeof import('./app_components/home_page/FormBookReservation.vue')['default']

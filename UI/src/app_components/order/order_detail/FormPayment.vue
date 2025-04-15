@@ -96,7 +96,6 @@
                         hide-details
                         v-model="paymentAmount"
 
-                        :config="$commonValue.moneyConfig"
                         :rules="[
                             (v:any) => {
                                 return v >= order.TotalAmount || $commonFunction.getRealFloatValue(v) >= order.TotalAmount;

@@ -65,7 +65,7 @@
                             <div class="text-sm text-gray-500">Giá bán</div>
                             <div class="font-medium ml-auto" v-if="record.Status !== $enumeration.EnumCustomMenuRequestStatus.Pending">{{ $commonFunction.formatThousands(record.Price) }} đ</div>
                         </MLHbox>
-                        <MLNumberField v-if="record.Status === $enumeration.EnumCustomMenuRequestStatus.Pending" density="compact" variant="outlined" suffix="đ" class="text-right" color="primary" :config="$commonValue.moneyConfig" hide-details v-model="record.Price" />
+                        <MLNumberField v-if="record.Status === $enumeration.EnumCustomMenuRequestStatus.Pending" density="compact" variant="outlined" suffix="đ" class="text-right" color="primary" hide-details v-model="record.Price" />
                     </div>
 
                     <div class="mb-4" v-if="record.Status === $enumeration.EnumCustomMenuRequestStatus.Pending">

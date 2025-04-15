@@ -1,37 +1,49 @@
 <template>
     <VTextField
-        :model-value="realModelValue"
-        v-on:update:model-value="onInput"
-        v-money="config"
+        :model-value="value"
+        ref="txtFieldRef"
     />
 </template>
 
 <script lang="ts">
-import CommonValue from '@/common/CommonValue';
+import Cleave from 'cleave.js';
 
 export default {
     props: {
         modelValue: {
-            type: Number,
-            default: 0
-        },
-
-        config: {
-            type: Object as any,
-            default: CommonValue.quantityConfig
+            type: Number
         },
     },
 
-    methods: {
-        onInput(v: string) {
-            const value = this.$commonFunction.getRealFloatValue(v);
-            this.$emit('update:modelValue', value);
+    mounted() {
+        const inputEl = (this.$refs.txtFieldRef as any)?.$el.querySelector('input');
+        if (inputEl) {
+            this.cleave = new Cleave(inputEl, {
+                numeral: true,
+                numeralThousandsGroupStyle: 'thousand',
+                numeralDecimalMark: ',',
+                delimiter: '.',
+                onValueChanged: (e) => {
+                    if (e.target.rawValue === '') {
+                        e.target.value = '0';
+                        this.cleave?.setRawValue('0');
+                    }
+                    this.value = e.target.value;
+                    
+                    this.$emit('update:modelValue', parseInt(this.cleave?.getRawValue() ?? '0'));
+                }
+            })
         }
+
+        this.cleave?.setRawValue(this.modelValue?.toString() ?? '');
+        this.value = this.cleave?.getFormattedValue();
     },
 
-    computed: {
-        realModelValue() {
-            return (this.modelValue ?? 0) * Math.pow(10, this.config.precision ?? 0);
+    data() {
+        return {
+            value: <any>'',
+
+            cleave: <Cleave|undefined>undefined
         }
     },
 }

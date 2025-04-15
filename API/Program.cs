@@ -11,11 +11,11 @@ var builder = WebApplication.CreateBuilder(args);
 //Use HTTPS
 builder.WebHost.ConfigureKestrel(options =>
 {
-    options.ListenLocalhost(7198);
-    options.ListenLocalhost(7197, listenOptions =>
-    {
-        listenOptions.UseHttps();
-    });
+    options.ListenAnyIP(7198);
+    //options.ListenLocalhost(7197, listenOptions =>
+    //{
+    //    listenOptions.UseHttps();
+    //});
 });
 
 // Add services to the container.
@@ -50,6 +50,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddHostedService<CleanupService>();
+builder.Services.AddHostedService<FakeDataService>();
 
 Config.ReadConfig(builder);
 //Add Authentication
@@ -78,6 +79,13 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 builder.Services.AddAuthorization();
 
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    var dbContext = services.GetRequiredService<ApplicationDBContext>();
+    dbContext.Database.Migrate();
+}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

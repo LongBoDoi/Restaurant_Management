@@ -88,7 +88,6 @@
                     <VBtn icon="mdi-minus" variant="text" class="mt-1" @click="record.GuestCount--" />
                     <MLNumberField
                         style="max-width: 80px;"
-                        :config="$commonValue.moneyConfig"
                         class="mt-1 text-center"
                         variant="outlined"
                         density="compact"

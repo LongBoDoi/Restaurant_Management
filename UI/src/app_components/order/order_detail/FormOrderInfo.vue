@@ -83,7 +83,6 @@
                         <div class="col-span-3">
                             <label class="block text-sm font-medium text-gray-700">Số lượng</label>
                             <MLNumberField
-                                :config="$commonValue.moneyConfig"
                                 density="compact"
                                 variant="outlined"
                                 hide-spin-buttons
@@ -134,7 +133,6 @@
                             <span class="text-gray-600">Tip:</span>
                             <div class="relative flex align-center" style="width: 128px;">
                                 <MLNumberField
-                                    :config="$commonValue.moneyConfig"
                                     variant="outlined"
                                     density="compact"
                                     hide-details

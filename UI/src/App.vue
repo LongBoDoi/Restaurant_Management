@@ -29,15 +29,13 @@ export default {
       this.isLoading = false;
     }
 
-    if (result?.Data) {
+    if (result?.Success && result?.Data) {
       Object.assign(this.$session, result.Data);
-    }
-
-    if (result?.Success) {
       if (result.Data.UserType === EnumUserType.Employee && !window.location.pathname.startsWith('/management')) {
         this.$router.replace({name: '/management'});
       }
     } else {
+      this.redirectToLogin();
     }
 
     EventBus.on(this.$eventName.RedirectToLogin, this.redirectToLogin);
@@ -57,7 +55,9 @@ export default {
     ...mapActions(userStore, ['setUserID']),
 
     redirectToLogin() {
-      window.location.pathname = '/login';
+      if (window.location.pathname !== '/login') {
+        window.location.pathname = '/login';
+      }
     }
   }
 }

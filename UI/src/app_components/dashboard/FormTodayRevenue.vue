@@ -59,7 +59,7 @@ export default {
                 if (this.data.Trend >= 0) {
                     return `+${this.data.Trend}% so với hôm qua`;
                 } else {
-                    return `-${this.data.Trend}% so với hôm qua`
+                    return `${this.data.Trend}% so với hôm qua`
                 }
             }
 
@@ -69,9 +69,9 @@ export default {
         trendIcon() {
             if (this.data && this.data.Trend !== null) {
                 if (this.data.Trend >= 0) {
-                    return 'trend_up';
+                    return 'trending_up';
                 } else {
-                    return 'trend_down';
+                    return 'trending_down';
                 }
             }
 

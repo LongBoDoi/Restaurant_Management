@@ -32,7 +32,7 @@ namespace API.Controllers
                 DateTime yesterday = minDate.AddDays(-1);
                 decimal yesterdayRevenue = _context.Order.Where(o => o.OrderDate >= yesterday && o.OrderDate < minDate && o.Status == ML.Common.EnumOrderStatus.Paid).Sum(o => o.TotalAmount);
 
-                decimal? revenueTrend = yesterdayRevenue > 0 ? Math.Abs(todayRevenue - yesterdayRevenue) / yesterdayRevenue * 100 : null;
+                decimal? revenueTrend = yesterdayRevenue > 0 ? (todayRevenue - yesterdayRevenue) / yesterdayRevenue * 100 : null;
 
                 object dataResult = new
                 {

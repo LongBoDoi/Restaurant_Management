@@ -26,3 +26,5 @@ UI/*.sw?
 /API/bin/Debug
 /API/obj
 /API/wwwroot/uploads
+/API/bin/Release
+/API/Publish

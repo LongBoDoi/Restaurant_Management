@@ -32,7 +32,7 @@
                         <div>
                             <!-- Giá món -->
                             <label className="block text-sm font-medium text-gray-700">Giá món</label>
-                            <VTextField class="w-full mt-2 text-right" v-money="$commonValue.moneyConfig" density="compact" variant="outlined" suffix="đ" v-model:model-value="menuItem.Price" hide-details />
+                            <MLNumberField class="w-full mt-2 text-right" density="compact" variant="outlined" suffix="đ" v-model:model-value="menuItem.Price" hide-details />
                         </div>
 
                         <div>
@@ -195,8 +195,6 @@ export default {
             if (!formValid) return;
 
             this.loading = true;
-
-            this.menuItem.Price = this.$commonFunction.getRealFloatValue(this.menuItem.Price);
 
             if ((await this.saveChanges('Lưu thành công')).Success) {
                 this.isShow = false;
