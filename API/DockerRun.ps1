@@ -1,1 +1,1 @@
-docker run --name Gudfud-API -p 7198:7198 -e "ConnectionStrings__DefaultConnection=server=host.docker.internal;port=3306;database=restaurant_management;user=root;password=123456;" manhlong2712/gudfud-api
+docker run --name Gudfud-API -p 7198:7198 -v "C:/Projects/Gudfud API/uploads":/app/wwwroot/uploads -e "ConnectionStrings__DefaultConnection=server=host.docker.internal;port=3306;database=restaurant_management;user=root;password=123456;" manhlong2712/gudfud-api

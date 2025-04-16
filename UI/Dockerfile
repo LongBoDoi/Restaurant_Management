@@ -22,6 +22,9 @@ RUN rm -rf /usr/share/nginx/html/*
 # Copy built files from build stage to nginx's public folder
 COPY --from=build-stage /app/dist /usr/share/nginx/html
 
+RUN rm /etc/nginx/conf.d/default.conf
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
 # Expose nginx default port
 EXPOSE 80
 

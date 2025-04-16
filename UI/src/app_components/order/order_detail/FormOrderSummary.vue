@@ -15,7 +15,7 @@
             <!-- Thông tin order -->
             <div class="border rounded-lg p-4 hover:shadow-md transition duration-200">
                 <h4 class="text-sm text-gray-500 mb-1">Thông tin order</h4>
-                <p class="font-bold">{{ order.OrderName }}</p>
+                <p class="font-bold">{{ order.TableName }}</p>
                 <p class="text-sm text-gray-600">{{ order.OrderDetails?.length ?? 0 }} món</p>
                 <p class="text-xs text-gray-500 mt-2">{{ $commonFunction.formatDateTime(order.OrderDate) }}</p>
             </div>
@@ -29,7 +29,7 @@
                     </span>
                 </div>
                 <div v-if="order.Status === $enumeration.EnumOrderStatus.Paid">
-                    <p class="font-medium">{{ $commonFunction.formatThousands(order.TotalAmount) }} đ</p>
+                    <p class="font-bold">{{ $commonFunction.formatThousands(order.PaidAmount) }} đ</p>
                     <p class="text-sm text-gray-600">{{ orderPaymentMethodName }}</p>
                 </div>
             </div>
@@ -66,7 +66,7 @@
                                     </div>
                                 </div>
                             </td>
-                            <td class="px-4 py-3 text-right">1</td>
+                            <td class="px-4 py-3 text-right">{{ $commonFunction.formatThousands(orderDetail.Quantity) }}</td>
                             <td class="px-4 py-3 text-right">{{ $commonFunction.formatThousands(orderDetail.Price) }} đ</td>
                             <td class="px-4 py-3 font-bold text-right">{{ $commonFunction.formatThousands(orderDetail.Amount) }} đ</td>
                         </tr>

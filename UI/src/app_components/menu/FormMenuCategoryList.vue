@@ -1,7 +1,7 @@
 <!-- Màn danh sách thực đơn -->
 
 <template>
-    <VSheet style="display: flex; flex-direction: column;" class="h-full pb-2">
+    <VSheet style="display: flex; flex-direction: column;" class="h-full pb-2 overflow-hidden">
         <VBtn width="fit-content" class="bg-green-500 hover:bg-green-600 hover:scale-105 text-white ml-auto mr-2 mt-1" prepend-icon="mdi-plus" @click="handleAddNewRecord" rounded>Thêm nhóm thực đơn</VBtn>
         <VCard style="width: 100% ; height: 100%;" color="rgb(249, 250, 251)" class="rounded-lg d-flex flex-column shadow-md border mt-6" :disabled="saveSorting">
             <div class="flex items-center space-x-4 px-6 py-4 border-b">

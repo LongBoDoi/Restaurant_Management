@@ -71,7 +71,7 @@ namespace API.Controllers
         /// <returns></returns>
         [Authorize]
         [HttpGet("GetDataPaging")]
-        public virtual MLActionResult GetDataPaging(int page, int itemsPerPage, string? search)
+        public virtual MLActionResult GetDataPaging(int page, int itemsPerPage, string? search, string? filter)
         {
             MLActionResult result = new()
             {
@@ -80,12 +80,11 @@ namespace API.Controllers
 
             try
             {
-                IEnumerable<IMLEntity> data = _entities.WithAutoIncludes<IMLEntity, GetDataPagingInclude>().ToList();
+                IEnumerable<IMLEntity> data = _entities.WithAutoIncludes<IMLEntity, GetDataPagingInclude>().ApplyFilters(filter).ToList();
 
                 string? normalizedSearchTerm = search?.RemoveDiacritics().ToLower();
                 if (!string.IsNullOrEmpty(normalizedSearchTerm))
                 {
-
                     IEnumerable<PropertyInfo> nameFields = typeof(IMLEntity).GetProperties().Where(p => p.GetCustomAttribute<SearchField>() != null);
                     if (nameFields.Any())
                     {
@@ -104,6 +103,8 @@ namespace API.Controllers
                     }
                 }
 
+                int totalCount = data.Count();
+
                 data = data.OrderByDescending(e => e.ModifiedDate).Skip((page - 1) * itemsPerPage).Take(itemsPerPage);
 
                 PrepareExtraData(data);
@@ -115,7 +116,7 @@ namespace API.Controllers
                 result.Data = new MLPagingData<IMLEntity>
                 {
                     Data = data,
-                    TotalCount = data.Count()
+                    TotalCount = totalCount
                 };
             }
             catch (Exception ex)

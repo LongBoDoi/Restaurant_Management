@@ -94,11 +94,11 @@
                         density="compact"
                         variant="outlined"
                         hide-details
-                        v-model="paymentAmount"
+                        v-model="order.PaidAmount"
 
                         :rules="[
-                            (v:any) => {
-                                return v >= order.TotalAmount || $commonFunction.getRealFloatValue(v) >= order.TotalAmount;
+                            (v: number) => {
+                                return v >= order.TotalAmount;
                             }
                         ]"
                         suffix="đ"
@@ -154,13 +154,12 @@ export default {
             loading: <boolean>false,
 
             order: <Order>{},
-            paymentAmount: <number>0,
         }
     },
 
     computed: {
         returnAmount() {
-            return Math.max(this.paymentAmount - this.order.TotalAmount, 0);
+            return Math.max(this.order.PaidAmount - this.order.TotalAmount, 0);
         }
     },
 
@@ -175,7 +174,7 @@ export default {
                 }
 
                 this.order = order;
-                this.paymentAmount = order.TotalAmount;
+                this.order.PaidAmount = order.TotalAmount;
 
                 this.isShow = true;
             }

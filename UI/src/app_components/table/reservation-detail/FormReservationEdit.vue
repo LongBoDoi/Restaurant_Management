@@ -96,11 +96,7 @@
 
                         v-model:model-value="record.GuestCount"
                         required
-                        :rules="[
-                            (v:any) => {
-                                return $commonFunction.getRealFloatValue(v) > 0;
-                            }
-                        ]"
+                        :rules="[(v: number) => v > 0]"
                     />
                     <VBtn icon="mdi-plus" variant="text" class="mt-1" @click="record.GuestCount++" />
                 </MLHbox>

@@ -32,7 +32,7 @@
                         <div>
                             <!-- Giá món -->
                             <label className="block text-sm font-medium text-gray-700">Giá món</label>
-                            <MLNumberField class="w-full mt-2 text-right" density="compact" variant="outlined" suffix="đ" v-model:model-value="menuItem.Price" hide-details />
+                            <MLNumberField class="w-full mt-2 text-right" density="compact" variant="outlined" suffix="đ" v-model:model-value="menuItem.Price" hide-details :rules="[(v: number) => v >= 0]" />
                         </div>
 
                         <div>

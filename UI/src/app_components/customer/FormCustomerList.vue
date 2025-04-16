@@ -1,7 +1,7 @@
 <!-- Màn danh sách khách hàng -->
 
 <template>
-    <VSheet style="display: flex; flex-direction: column;" class="h-full pb-2">
+    <VSheet style="display: flex; flex-direction: column;" class="h-full pb-2 overflow-hidden">
         <VBtn width="fit-content" class="bg-green-500 hover:bg-green-600 hover:scale-105 text-white ml-auto mt-4" prepend-icon="mdi-plus" rounded @click="handleAddNewClick">Thêm khách hàng</VBtn>
 
         <VCard style="width: 100% ; height: 100%;" color="rgb(249, 250, 251)" class="rounded-lg d-flex flex-column shadow-md border mt-6">

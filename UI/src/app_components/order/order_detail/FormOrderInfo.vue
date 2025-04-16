@@ -75,7 +75,7 @@
                                 </div>
                                 <div>
                                     <p class="font-medium">{{ orderDetail.MenuItemName }}</p>
-                                    <p class="text-sm text-gray-500">{{ $commonFunction.formatThousands(orderDetail.Price) }} đ</p>
+                                    <p class="text-sm text-gray-500">{{ $commonFunction.formatThousands(orderDetail.Amount) }} đ</p>
                                 </div>
                             </div>
                         </div>
@@ -89,6 +89,7 @@
                                 hide-details
                                 class="w-full mt-1 bg-white border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-400 transition duration-200"
                                 v-model:model-value="orderDetail.Quantity"
+                                :rules="[(v: number) => v > 0]"
                                 v-on:update:model-value="(v:any) => {
                                     orderDetail.Amount = v * orderDetail.Price;
                                 }"
@@ -140,6 +141,7 @@
                                     suffix="đ"
                                     class="text-right border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-400 transition duration-200"
                                     v-model="record.TipAmount"
+                                    :rules="[(v: number) => v >= 0]"
                                 />
                             </div>
                         </div>

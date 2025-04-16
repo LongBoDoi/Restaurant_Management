@@ -11,7 +11,7 @@
                     :model-value="options.search"
                     @keypress.enter="options.search = $event.target.value;"
                 />
-                <MLDateField variant="outlined" compact hide-details class="ml-4" style="width: 180px;" :model-value="(new Date())" />
+                <MLDateField variant="outlined" compact hide-details class="ml-4" style="width: 180px;" v-model="options.filterDate" />
             </div>
 
             <!-- Bảng dữ liệu -->
@@ -35,6 +35,7 @@
                     <tr class="bg-gray-50">
                         <th class="py-3 px-6 text-left font-medium text-gray-500" style="min-width: 200px;">Tên khách hàng</th>
                         <th class="py-3 px-6 text-left font-medium text-gray-500" style="min-width: 150px;">Số điện thoại</th>
+                        <th class="py-3 px-6 text-left font-medium text-gray-500" style="min-width: 150px;">Thời gian</th>
                         <th class="py-3 px-6 text-right font-medium text-gray-500" style="min-width: 120px;">Số người</th>
                         <th class="py-3 px-6 text-left font-medium text-gray-500" style="min-width: 150px;">Trạng thái</th>
                         <th class="py-3 px-6 text-left font-medium text-gray-500" style="min-width: 128px; width: 128px;">Thao tác</th>
@@ -60,6 +61,7 @@
                     >
                         <td class="py-4 px-6">{{ item.CustomerName }}</td>
                         <td class="py-4 px-6">{{ $commonFunction.formatPhoneNumber(item.CustomerPhoneNumber) }}</td>
+                        <td class="py-4 px-6">{{ $commonFunction.formatDateTime(item.ReservationDate) }}</td>
                         <td class="py-4 px-6 text-right">{{ item.GuestCount }}</td>
                         <td class="py-4 px-6 text-left">
                             <span class="px-2.5 py-1 rounded-full text-xs font-medium"
@@ -91,7 +93,9 @@
 import { EnumReservationStatus } from '@/common/Enumeration';
 import EventBus from '@/common/EventBus';
 import { Reservation } from '@/models';
+import MLFilterCondition from '@/models/MLFilterCondition';
 import { reservationStore } from '@/stores/reservationStore';
+import moment from 'moment';
 import { mapActions, mapState } from 'pinia';
 
 export default {
@@ -106,7 +110,8 @@ export default {
             options: <any>{
                 page: 1,
                 itemsPerPage: 10,
-                search: ''
+                search: '',
+                filterDate: <string>moment().startOf('day').utc().format()
             }
         }
     },
@@ -128,7 +133,25 @@ export default {
          */
         async getData() {
             this.loading = true;
-            await this.getDataPaging(this.options.page, this.options.itemsPerPage, this.options.search);
+
+            var filters:MLFilterCondition[] = [];
+            if (this.options.filterDate) {
+                const endFilterTime = moment(this.options.filterDate).add(1, 'days').utc().format();
+                filters = [
+                    {
+                        Name: 'ReservationDate',
+                        Operator: '>=',
+                        Value: this.options.filterDate
+                    } as MLFilterCondition,
+                    {
+                        Name: 'ReservationDate',
+                        Operator: '<',
+                        Value: endFilterTime
+                    }
+                ];
+            }
+            
+            await this.getDataPaging(this.options.page, this.options.itemsPerPage, this.options.search, JSON.stringify(filters));
             this.loading = false;
         },
 

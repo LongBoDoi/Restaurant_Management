@@ -49,7 +49,7 @@ namespace API.Controllers
         /// <param name="search"></param>
         /// <returns></returns>
         [Authorize]
-        public override MLActionResult GetDataPaging(int page, int itemsPerPage, string? search)
+        public override MLActionResult GetDataPaging(int page, int itemsPerPage, string? search, string? filter)
         {
             MLActionResult result = new()
             {
@@ -58,7 +58,7 @@ namespace API.Controllers
 
             try
             {
-                IEnumerable<MenuItemCategory> allData = _entities.ToList();
+                IEnumerable<MenuItemCategory> allData = _entities.ApplyFilters(filter).ToList();
 
                 string? normalizedSearchTerm = search?.RemoveDiacritics().ToLower();
 

@@ -1,18 +1,26 @@
 <template>
     <VTextField
-        :model-value="value"
+        :model-value="formattedValue"
         ref="txtFieldRef"
+        :error="error"
+        @blur="onInputBlur"
     />
 </template>
 
 <script lang="ts">
 import Cleave from 'cleave.js';
+import { PropType } from 'vue';
 
 export default {
     props: {
         modelValue: {
             type: Number
         },
+
+        rules: {
+            type: Object as PropType<((v:number) => boolean)[]>,
+            default: []
+        }
     },
 
     mounted() {
@@ -25,26 +33,52 @@ export default {
                 delimiter: '.',
                 onValueChanged: (e) => {
                     if (e.target.rawValue === '') {
-                        e.target.value = '0';
                         this.cleave?.setRawValue('0');
+                        return;
                     }
-                    this.value = e.target.value;
+                    this.formattedValue = e.target.value;
                     
-                    this.$emit('update:modelValue', parseInt(this.cleave?.getRawValue() ?? '0'));
+                    const rawValue = parseFloat(this.cleave?.getRawValue() ?? '0');
+                    this.rawValue = rawValue;
+
+                    const errorRule = this.rules.find((method) => method(rawValue) === false);
+                    this.error = errorRule !== undefined;
                 }
             })
         }
 
-        this.cleave?.setRawValue(this.modelValue?.toString() ?? '');
-        this.value = this.cleave?.getFormattedValue();
+        this.cleave?.setRawValue(this.modelValue?.toString() ?? '0');
+        this.rawValue = this.modelValue ?? 0;
+
+        this.$nextTick().then(() => {
+            this.init = true;
+        });
     },
 
     data() {
         return {
-            value: <any>'',
+            rawValue: <number>0,
+            formattedValue: <string>'0',
 
-            cleave: <Cleave|undefined>undefined
+            cleave: <Cleave|undefined>undefined,
+            error: <boolean>false,
+            init: <boolean>false
         }
     },
+
+    watch: {
+        modelValue() {
+            if (!this.init) {
+                return;
+            }
+            this.cleave?.setRawValue(this.modelValue?.toString() ?? '0');
+        }
+    },
+
+    methods: {
+        onInputBlur() {
+            this.$emit('update:modelValue', this.rawValue);
+        }
+    }
 }
 </script>

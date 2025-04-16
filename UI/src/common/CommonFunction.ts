@@ -44,8 +44,8 @@ class CommonFunction {
     /**
      * Định dạng ngày
      */
-    static formatDate = (date:Date) => {
-        return moment(date).format('DD/MM/YYYY');
+    static formatDate = (date:Date|string) => {
+        return moment.utc(date).local().format('DD/MM/YYYY');
     };
 
     static getDateValueFormat = (date:Date) => {
@@ -55,9 +55,11 @@ class CommonFunction {
     /**
      * Lấy giờ UTC
      */
-    static getUTCDate = (date: Date) => {
-        const utcDate = moment(date).utc().format();
-        return utcDate;
+    static getUTCDate = (date: Date|undefined) => {
+        if (date) {
+            return moment(date).utc().format();
+        }
+        return undefined;
     };
 
     static showDialog = (dialogData:any) => {

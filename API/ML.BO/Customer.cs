@@ -66,7 +66,7 @@ namespace API.ML.BO
         /// <summary>
         /// Danh sách bản ghi order
         /// </summary>
-        public IEnumerable<Order>? Orders { get; set; }
+        public IEnumerable<Order> Orders { get; set; } = new List<Order>();
 
         public IEnumerable<CustomMenuRequest>? CustomMenuRequests { get; set; }
     }

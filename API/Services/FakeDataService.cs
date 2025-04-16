@@ -22,7 +22,6 @@ namespace API.Services
             {
                 try
                 {
-                    // Tính thời gian còn lại tới nửa đêm
                     Console.WriteLine("===========================================================================");
                     Console.WriteLine("ĐANG FAKE DỮ LIỆU ORDER...");
 
@@ -43,10 +42,10 @@ namespace API.Services
                             return;
                         }
 
-                        var itemToTake = randomizer.Next(1, menuCount);
+                        var itemToTake = randomizer.Next(1, menuCount + 1);
                         List<MenuItem> randomMenuItems = dbContext.MenuItem.OrderBy(x => EF.Functions.Random()).Take(itemToTake).ToList();
-                        IEnumerable<OrderDetail> orderDetails = randomMenuItems.Select(mi => {
-                            int quantity = randomizer.Next(1, 5);
+                        List<OrderDetail> orderDetails = randomMenuItems.Select(mi => {
+                            int quantity = randomizer.Next(1, 6);
 
                             return new OrderDetail
                             {
@@ -56,12 +55,12 @@ namespace API.Services
                                 Price = mi.Price,
                                 Amount = quantity * mi.Price
                             };
-                        });
+                        }).ToList();
 
                         // Fake dữ liệu khách hàng
                         Customer? randomCustomer = null;
                         List<Customer> lstCustomers = dbContext.Customer.OrderBy(x => EF.Functions.Random()).ToList();
-                        var randomCustomerIndex = randomizer.Next(0, lstCustomers.Count());
+                        var randomCustomerIndex = randomizer.Next(0, lstCustomers.Count() + 1);
                         if (randomCustomerIndex < lstCustomers.Count())
                         {
                             randomCustomer = lstCustomers.ElementAt(randomCustomerIndex);
@@ -71,41 +70,44 @@ namespace API.Services
                         DateTime orderDate = GetRandomDateTime(new DateTime(2024, 1, 1, 0, 0, 0), DateTime.UtcNow);
 
                         // Fake dữ liệu bàn
-                        IEnumerable<OrderTable> orderTables = [];
+                        List<OrderTable> orderTables = [];
                         string tableName = "";
                         int tableCount = dbContext.Table.Count();
                         if (tableCount > 0)
                         {
-                            var tablesToTake = randomizer.Next(1, tableCount);
+                            var tablesToTake = randomizer.Next(0, 4);
                             List<Table> randomTables = dbContext.Table.OrderBy(x => EF.Functions.Random()).Take(tablesToTake).ToList();
                             orderTables = randomTables.Select(t => new OrderTable
                             {
                                 TableID = t.TableID
-                            });
+                            }).ToList();
                             tableName = String.Join(", ", randomTables.Select(t => t.TableName));
                         }
 
                         // Fake dữ liệu order
-                        decimal tipAmount = randomizer.Next(0, 4) * 5000;
+                        decimal tipAmount = randomizer.Next(0, 5) * 5000;
                         decimal netAmount = orderDetails.Sum(od => od.Amount);
                         Order fakeOrder = new Order
                         {
                             CustomerID = randomCustomer?.CustomerID,
-                            CustomerName = randomCustomer != null ? randomCustomer.CustomerName : $"Khách hàng {randomizer.Next(1, 100)}",
+                            CustomerName = randomCustomer != null ? randomCustomer.CustomerName : $"Khách hàng {randomizer.Next(1, 101)}",
                             OrderDate = orderDate,
                             NetAmount = netAmount,
                             TipAmount = tipAmount,
                             TotalAmount = netAmount + tipAmount,
+                            PaidAmount = netAmount + tipAmount,
                             Status = EnumOrderStatus.Paid,
                             PaymentMethod = (EnumPaymentMethod)randomizer.Next(Enum.GetValues(typeof(EnumPaymentMethod)).Length),
                             OrderTables = orderTables,
-                            TableName = tableName
+                            TableName = tableName,
+                            OrderDetails = orderDetails
                         };
 
                         dbContext.Order.Add(fakeOrder);
                         if (dbContext.SaveChanges() > 0)
                         {
                             Console.WriteLine("FAKE THÀNH CÔNG!");
+                            Console.WriteLine("===========================================================================");
                         }
                     }
 

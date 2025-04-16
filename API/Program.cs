@@ -51,6 +51,7 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddHostedService<CleanupService>();
 builder.Services.AddHostedService<FakeDataService>();
+builder.Services.AddHostedService<SimulateOrderService>();
 
 Config.ReadConfig(builder);
 //Add Authentication

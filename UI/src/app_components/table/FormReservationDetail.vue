@@ -97,6 +97,7 @@ export default {
 
                     const reservationDate = (moment().add(1, 'hours') as any)._d as Date;
                     reservationDate.setMinutes(0);
+                    reservationDate.setSeconds(0);
                     record.ReservationDate = reservationDate;
 
                     this.reservedTables = record.ReservationTables?.map(rt => rt.Table).filter(x => x !== undefined) ?? [];

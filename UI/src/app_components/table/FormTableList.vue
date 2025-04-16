@@ -49,7 +49,6 @@
                 </template>
 
                 <template v-slot:item="{ item, index }">
-                    <span v-if="loading">Đang tải dữ liệu</span>
                     <tr v-if="item !== null" style="cursor: pointer;" class="hover:bg-green-50 transition-colors duration-150" 
                         :class="[
                             {'bg-gray-50' : index % 2 !== 0},
@@ -58,7 +57,7 @@
                         @click="setSelectedIndex(index)" @dblclick="openDetail(item)"
                     >
                         <td class="py-4 px-6">{{ item.TableName }}</td>
-                        <td class="py-4 px-6">{{ item.SeatCount }}</td>
+                        <td class="py-4 px-6">{{ $commonFunction.formatThousands(item.SeatCount) }}</td>
                         <td class="py-4 px-6">{{ item.Area?.AreaName ?? '' }}</td>
                         <td class="py-4 px-6">
                             <span class="px-2.5 py-1 rounded-full text-xs font-medium"

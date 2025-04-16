@@ -45,7 +45,9 @@
                             Số lượng tồn kho cảnh báo
                         </label>
                         <div className="flex items-center mt-2">
-                            <MLNumberField color="primary" class="text-right w-full" hide-spin-buttons density="compact" variant="outlined" v-model:model-value="record.WarningStockQuantity" hide-details />
+                            <MLNumberField color="primary" class="text-right w-full" hide-spin-buttons density="compact" variant="outlined" v-model:model-value="record.WarningStockQuantity" hide-details
+                                :rules="[(v: number) => v >= 0]"
+                            />
                             <div className="ml-2 text-gray-500 text-sm">
                                 <i>Nguyên liệu sẽ được đánh dấu là "Sắp hết hàng" khi tồn kho ít hơn số lượng này.</i>
                             </div>

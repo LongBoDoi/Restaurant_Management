@@ -2,19 +2,20 @@
     <div>
         <VTextField
             :variant="(variant as any)"
-            v-mask="'##/##/####'"
             placeholder="DD/MM/YYYY"
             :label="label"
             append-inner-icon="mdi-calendar-month-outline"
             :bg-color="bgColor"
             :base-color="baseColor"
             :color="color"
-            v-model:model-value="txtValue"
+            :model-value="formattedValue"
             @click:append-inner="showDatePicker = true"
             :density="compact ? 'compact' : 'default'"
             ref="txtFieldRef"
             :hide-details="hideDetails"
-            :error="invalid"
+            :error="error"
+            @blur="onInputBlur"
+            @keypress.enter="onInputBlur"
         />
         
         <VMenu
@@ -28,7 +29,7 @@
                 <span v-bind="props"></span>
             </template>
             <VDatePicker
-                v-model="dateValue"
+                :model-value="dateValue"
                 @update:model-value="handleUpdateValueFromDatePicker"
                 scrollable
                 color="primary"
@@ -42,6 +43,7 @@
 </template>
 
 <script lang="ts">
+import Cleave from 'cleave.js';
 import moment from 'moment';
 import { PropType } from 'vue';
 
@@ -70,7 +72,7 @@ export default {
             type: String
         },
         rules: {
-            type: Object as PropType<((v:string) => boolean|string)[]>,
+            type: Object as PropType<((v: Date) => boolean|string)[]>,
             default: []
         },
         hideDetails: {
@@ -85,32 +87,106 @@ export default {
         },
     },
 
-    created() {
-        this.configVariablesFromModelValue();
+    mounted() {
+        const inputEl = (this.$refs.txtFieldRef as any)?.$el.querySelector('input');
+        if (inputEl) {
+            this.cleave = new Cleave(inputEl, {
+                date: true,
+                datePattern: ['d', 'm', 'Y'],
+                onValueChanged: (e) => {
+                    this.formattedValue = e.target.value;
+                    this.rawValue = e.target.rawValue;
+
+                    if (!e.target.value) {
+                        this.dateValue = undefined;
+                        this.error = this.required;
+                        return;
+                    }
+
+                    // Kiểm tra định dạng DD/MM/YYYY
+                    const match = e.target.value.match(this.dateRegex);
+                    if (!match) {
+                        this.dateValue = undefined;
+                        this.error = true;
+                        return;
+                    };
+
+                    // Kiểm tra ngày hợp lệ
+                    const day = match[1];
+                    const month = match[2];
+                    const year = match[3];
+
+                    const dateValue = new Date(`${year}-${month}-${day} ${this.dateValue?.getHours() ?? '00'}:${this.dateValue?.getMinutes() ?? '00'}:${this.dateValue?.getSeconds() ?? '00'}`);
+
+                    if (isNaN(dateValue as any)) {
+                        this.dateValue = undefined;
+                        this.error = true;
+                        return;
+                    }
+
+                    this.dateValue = dateValue;
+
+                    if (this.minDate && dateValue < this.minDate) {
+                        this.error = true;
+                        return
+                    }
+
+                    const errorRule = this.rules.find((method) => method(dateValue) === false);
+                    this.error = errorRule !== undefined;
+                    // if (e.target.rawValue === '') {
+                    //     e.target.value = '0';
+                    //     this.cleave?.setRawValue('0');
+                    // }
+                    // this.value = e.target.value;
+                    
+                    // const rawValue = parseFloat(this.cleave?.getRawValue() ?? '0');
+                    // this.$emit('update:modelValue', rawValue);
+
+                    // const errorRule = this.rules.find((method) => method(rawValue) === false);
+                    // this.error = errorRule !== undefined;
+                }
+            })
+        }
+
+        if (this.modelValue) {
+            this.formattedValue = this.$commonFunction.formatDate(this.modelValue);
+            this.dateValue = new Date(this.modelValue);
+            this.originalDateValue = new Date(this.modelValue);
+        }
+        // this.cleave?.setRawValue(this.modelValue);
+        // this.value = this.cleave?.getFormattedValue();
     },
 
     data() {
         return {
-            txtValue: <string>'',
+            formattedValue: <string>'',
+            rawValue: <any>'',
+            dateValue: <Date|undefined>undefined,
+            originalDateValue: <Date>(moment().startOf('day') as any)._d as Date,
+
+            cleave: <Cleave|undefined>undefined,
 
             showDatePicker: <boolean>false,
-            dateValue: <Date>new Date(),
-
-            invalid: <boolean>false
+            error: <boolean>false
         }
     },
 
     methods: {
-        handleUpdateValueFromDatePicker(value:Date) {
-            this.txtValue = this.$commonFunction.formatDate(value);
+        handleUpdateValueFromDatePicker(value: Date) {
+            value.setHours(this.originalDateValue.getHours());
+            value.setMinutes(this.originalDateValue.getMinutes());
+            value.setSeconds(this.originalDateValue.getSeconds());
+
+            this.$emit('update:modelValue', this.$commonFunction.getUTCDate(value));
+
+            this.cleave?.setRawValue(moment(value).format('DDMMYYYY'));
         },
 
-        configVariablesFromModelValue() {
-            //Check value type
-            if (this.modelValue) {
-                this.dateValue = (moment.utc(this.modelValue).local() as any)._d as Date;
-                this.txtValue = moment(this.dateValue).format('DD/MM/YYYY');
+        onInputBlur() {
+            if (this.error) {
+                return;
             }
+            this.$emit('update:modelValue', this.$commonFunction.getUTCDate(this.dateValue));
         }
     },
 
@@ -122,99 +198,16 @@ export default {
         dateRegex():RegExp {
             return /^(\d{2})\/(\d{2})\/(\d{4})$/;
         },
-
-        validationRules() {
-            return [
-                (str:string):boolean|string => {
-                    // Bắt buộc
-                    console.log('Changed')
-                    if (this.required && !str) {
-                        this.$emit('update:modelValue', null);
-                        return false;
-                    }
-
-                    // Kiểm tra định dạng DD/MM/YYYY
-                    const match = str.match(this.dateRegex);
-                    if (!match) {
-                        this.$emit('update:modelValue', null);
-                        return false;
-                    };
-
-                    // Kiểm tra ngày hợp lệ
-                    const day = match[1];
-                    const month = match[2];
-                    const year = match[3];
-
-                    const dateValue = new Date(`${year}-${month}-${day} 00:00:00`);
-                    this.dateValue = dateValue;
-
-                    if (isNaN(dateValue as any)) {
-                        this.$emit('update:modelValue', null);
-                        return false;
-                    }
-                    
-                    this.$emit('update:modelValue', moment(dateValue).utc().format());
-
-                    // Kiểm tra ngày nhỏ nhất
-                    if (this.minDate && dateValue < this.minDate) {
-                        return false;
-                    }
-                    
-                    return true;
-                }
-            ].concat(this.rules);
-        }
     },
 
     watch: {
         modelValue() {
-            this.configVariablesFromModelValue();
+            if (this.modelValue) {
+                this.formattedValue = this.$commonFunction.formatDate(this.modelValue);
+                this.dateValue = new Date(this.modelValue);
+            }
+            this.cleave?.setRawValue(this.cleave?.getRawValue());
         },
-
-        txtValue() {
-            // Bắt buộc
-            if (this.required && !this.txtValue) {
-                this.$emit('update:modelValue', null);
-                this.invalid = true;
-                return;
-            }
-
-            // Kiểm tra định dạng DD/MM/YYYY
-            const match = this.txtValue.match(this.dateRegex);
-            if (!match) {
-                this.$emit('update:modelValue', null);
-                this.invalid = true;
-                return;
-            };
-
-            // Kiểm tra ngày hợp lệ
-            const day = match[1];
-            const month = match[2];
-            const year = match[3];
-
-            const dateValue = new Date(`${year}-${month}-${day} ${this.dateValue.getHours()}:${this.dateValue.getMinutes()}:00`);
-            this.dateValue = dateValue;
-
-            if (isNaN(dateValue as any)) {
-                this.$emit('update:modelValue', null);
-                this.invalid = true;
-                return;
-            }
-
-            this.$emit('update:modelValue', moment(dateValue).utc().format());
-
-            this.invalid = false;
-        },
-
-        dateValue() {
-            // Kiểm tra ngày nhỏ nhất
-            if (this.minDate && this.dateValue < this.minDate) {
-                this.invalid = true;
-                return;
-            }
-
-            this.invalid = false;
-        }
-    }
+    },
 }
 </script>

@@ -27,7 +27,7 @@
                         <!-- Số ghế -->
                         <div>
                             <label className="block text-gray-700 text-sm font-medium">Số ghế</label>
-                            <MLNumberField class="mt-2 text-right" hide-spin-buttons density="compact" variant="outlined" v-model:model-value="record.SeatCount" hide-details />
+                            <MLNumberField class="mt-2 text-right" hide-spin-buttons density="compact" variant="outlined" v-model:model-value="record.SeatCount" hide-details :rules="[(v: number) => v > 0]" />
                         </div>
                     </div>
 

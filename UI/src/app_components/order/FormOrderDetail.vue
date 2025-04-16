@@ -82,7 +82,6 @@ export default {
          */
         handleShowDialog(order: Order) {
             if (order) {
-                console.log(order)
                 if (order.EditMode !== undefined) {
                     this.editMode = order.EditMode;
                 }

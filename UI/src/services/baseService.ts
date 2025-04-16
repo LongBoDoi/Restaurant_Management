@@ -77,7 +77,7 @@ abstract class MLBaseService<IMLEntity> extends BaseService {
    * @param page Số trang
    * @param itemsPerPage Kích thước trang
    */
-  public async getDataPaging(page: number, itemsPerPage: number, search?: string) : Promise<PagingData<IMLEntity>> {
+  public async getDataPaging(page: number, itemsPerPage: number, search?: string, filter?: string) : Promise<PagingData<IMLEntity>> {
     var result:PagingData<IMLEntity> = {
       Data: [],
       TotalCount: 0
@@ -88,7 +88,8 @@ abstract class MLBaseService<IMLEntity> extends BaseService {
         params: {
           page: page,
           itemsPerPage: itemsPerPage,
-          search: search
+          search: search,
+          filter: filter
         }
       });
       const actionResult = response.data as MLActionResult;

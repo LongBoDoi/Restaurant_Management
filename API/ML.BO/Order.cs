@@ -50,6 +50,11 @@ namespace API.ML.BO
         public EnumOrderStatus Status { get; set; }
 
         /// <summary>
+        /// Số tiền đã trả
+        /// </summary>
+        public decimal PaidAmount { get; set; }
+
+        /// <summary>
         /// Hình thức thanh toán
         /// </summary>
         public EnumPaymentMethod PaymentMethod { get; set; }

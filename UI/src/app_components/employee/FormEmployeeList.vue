@@ -1,7 +1,7 @@
 <!-- Màn danh sách khách hàng -->
 
 <template>
-    <VSheet style="display: flex; flex-direction: column;" class="h-full pb-2">
+    <VSheet style="display: flex; flex-direction: column;" class="h-full pb-2 overflow-hidden">
         <VBtn width="fit-content" class="bg-green-500 hover:bg-green-600 hover:scale-105 text-white ml-auto mt-4" prepend-icon="mdi-plus" rounded @click="handleAddNewClick">Thêm nhân viên</VBtn>
 
         <VSpacer style="height: 16px; flex-shrink: 0; flex-grow: 0;" />
