@@ -15,7 +15,8 @@
                         <div className="col-span-2">
                             <label className="block text-sm font-medium text-gray-700">Tên món <span style="color: red;">*</span></label>
                             <!-- Tên món -->
-                            <VTextField 
+                            <VTextField
+                                color="primary"
                                 density="compact"
                                 class="mt-2 flex-grow-1 flex-shrink-0" 
                                 variant="outlined" 
@@ -32,7 +33,7 @@
                         <div>
                             <!-- Giá món -->
                             <label className="block text-sm font-medium text-gray-700">Giá món</label>
-                            <MLNumberField class="w-full mt-2 text-right" density="compact" variant="outlined" suffix="đ" v-model:model-value="menuItem.Price" hide-details :rules="[(v: number) => v >= 0]" />
+                            <MLNumberField class="w-full mt-2 text-right" density="compact" variant="outlined" suffix="đ" v-model:model-value="menuItem.Price" hide-details :rules="[(v: number) => v >= 0]" color="primary" />
                         </div>
 
                         <div>
@@ -40,6 +41,7 @@
 
                             <!-- Nhóm thực đơn -->
                             <VCombobox
+                                color="primary"
                                 class="mt-2"
                                 :return-object="false"
                                 v-model:model-value="menuItem.MenuItemCategoryID"
@@ -57,7 +59,7 @@
                         <div className="col-span-2">
                             <!-- Mô tả -->
                             <label className="block text-sm font-medium text-gray-700">Mô tả</label>
-                            <VTextarea no-resize class="mt-2" variant="outlined" v-model:model-value="menuItem.Description" hide-details />
+                            <VTextarea color="primary" no-resize class="mt-2" variant="outlined" v-model:model-value="menuItem.Description" hide-details />
                         </div>
 
                         <div className="col-span-2">
@@ -254,7 +256,9 @@ export default {
 
         onSelectCategory(menuItemCategoryID: string) {
             const menuItemCategory:MenuItemCategory|undefined = this.lstMenuItemCategory.find(mic => mic.MenuItemCategoryID === menuItemCategoryID);
-            this.menuItem.MenuItemCategory = menuItemCategory;
+            if (menuItemCategory) {
+                this.menuItem.MenuItemCategory = menuItemCategory;
+            }
         }
     },
 

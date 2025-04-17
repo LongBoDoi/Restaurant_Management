@@ -642,9 +642,10 @@ video {
   color: inherit !important;
 }
 
-.bg-gray-100 {
+.bg-gray-100,
+.hover\:bg-gray-100:hover {
   --tw-bg-opacity: 1;
-  background-color: rgb(243 244 246 / var(--tw-bg-opacity));
+  background-color: rgb(243 244 246 / var(--tw-bg-opacity)) !important;
 }
 .hover\:bg-green-50:hover {
   --tw-bg-opacity: 1;
@@ -776,9 +777,10 @@ video {
   --tw-text-opacity: 1;
   color: rgb(5 150 105 / var(--tw-text-opacity)) !important;
 }
-.text-emerald-700 {
+.text-emerald-700,
+.hover\:text-emerald-700:hover {
   --tw-text-opacity: 1;
-  color: rgb(4 120 87 / var(--tw-text-opacity));
+  color: rgb(4 120 87 / var(--tw-text-opacity)) !important;
 }
 .text-emerald-800 {
   --tw-text-opacity: 1;

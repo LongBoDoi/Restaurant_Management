@@ -2,6 +2,7 @@
 using API.ML.Common;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace API.ML.BO
 {
@@ -49,7 +50,8 @@ namespace API.ML.BO
         /// <summary>
         /// Dữ liệu order detail
         /// </summary>
-        public List<OrderDetail>? OrderDetails { get; set; }
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public List<OrderDetail> OrderDetails { get; set; } = new List<OrderDetail>();
 
         /// <summary>
         /// Dữ liệu nhóm thực đơn

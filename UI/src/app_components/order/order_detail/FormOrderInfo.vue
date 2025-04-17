@@ -74,7 +74,7 @@
                                     <VIcon icon="mdi-food" class="text-gray-400" />
                                 </div>
                                 <div>
-                                    <p class="font-medium">{{ orderDetail.MenuItemName }}</p>
+                                    <p class="font-medium">{{ orderDetail.MenuItem?.Name ?? orderDetail.MenuItemName }}</p>
                                     <p class="text-sm text-gray-500">{{ $commonFunction.formatThousands(orderDetail.Amount) }} đ</p>
                                 </div>
                             </div>

@@ -203,7 +203,6 @@ export default {
             const saveObject:Order = Object.assign({}, this.order);
 
             saveObject.Status = this.$enumeration.EnumOrderStatus.Paid;
-            saveObject.EditMode = this.$enumeration.EnumEditMode.Edit;
 
             const actionResult:MLActionResult = await this.$service.OrderService.saveChanges(saveObject);
             if (actionResult.Success) {

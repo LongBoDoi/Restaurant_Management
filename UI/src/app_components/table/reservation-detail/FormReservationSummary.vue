@@ -44,7 +44,7 @@
                 <span class="material-symbols-outlined mr-2"
                     :class="[`text-${mainColor}-600`]"
                 >chair</span>
-                <p class="font-medium">{{ record.ReservationTables?.map(rt => rt.Table?.TableName).join(', ') ?? '' }}</p>
+                <p class="font-medium">{{ record.TableName }}</p>
             </div>
         </div>
 

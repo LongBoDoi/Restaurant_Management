@@ -75,12 +75,11 @@
                         </td>
                         <td class="py-4 px-6">
                             <MLHbox>
-                                <VBtn icon="mdi-eye-outline" class="text-gray-700" :width="40" variant="text" @click="openDetail(item)" />
-
                                 <MLHbox v-if="item.Status !== $enumeration.EnumOrderStatus.Paid && item.Status !== $enumeration.EnumOrderStatus.Canceled">
                                     <VBtn icon="mdi-pencil-outline" :width="40" variant="text" color="rgb(37, 99, 235)" @click="openDetail(item)" />
                                     <VBtn icon="mdi-trash-can-outline" :width="40" variant="text" color="rgb(220, 38, 38)" @click="handleDeleteRecord(item)" />
                                 </MLHbox>
+                                <VBtn v-else icon="mdi-eye-outline" class="text-gray-700" :width="40" variant="text" @click="openDetail(item)" />
                             </MLHbox>
                         </td>
                     </tr>

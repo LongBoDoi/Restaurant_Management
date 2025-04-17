@@ -36,6 +36,7 @@
                         <th class="py-3 px-6 text-left font-medium text-gray-500" style="min-width: 200px;">Tên khách hàng</th>
                         <th class="py-3 px-6 text-left font-medium text-gray-500" style="min-width: 150px;">Số điện thoại</th>
                         <th class="py-3 px-6 text-left font-medium text-gray-500" style="min-width: 150px;">Thời gian</th>
+                        <th class="py-3 px-6 text-left font-medium text-gray-500" style="min-width: 200px;">Bàn</th>
                         <th class="py-3 px-6 text-right font-medium text-gray-500" style="min-width: 120px;">Số người</th>
                         <th class="py-3 px-6 text-left font-medium text-gray-500" style="min-width: 150px;">Trạng thái</th>
                         <th class="py-3 px-6 text-left font-medium text-gray-500" style="min-width: 128px; width: 128px;">Thao tác</th>
@@ -62,6 +63,7 @@
                         <td class="py-4 px-6">{{ item.CustomerName }}</td>
                         <td class="py-4 px-6">{{ $commonFunction.formatPhoneNumber(item.CustomerPhoneNumber) }}</td>
                         <td class="py-4 px-6">{{ $commonFunction.formatDateTime(item.ReservationDate) }}</td>
+                        <td class="py-4 px-6 text-sm text-gray-600">{{ item.TableName }}</td>
                         <td class="py-4 px-6 text-right">{{ item.GuestCount }}</td>
                         <td class="py-4 px-6 text-left">
                             <span class="px-2.5 py-1 rounded-full text-xs font-medium"
@@ -72,10 +74,12 @@
                         </td>
                         <td class="py-4 px-6">
                             <MLHbox>
-                                <VBtn icon="mdi-pencil-outline" :width="40" variant="text" color="rgb(37, 99, 235)" @click="openDetail(item)" />
-                                <VBtn icon="mdi-trash-can-outline" :width="40" variant="text" color="rgb(220, 38, 38)" @click="handleDeleteRecord(item)"
-                                    v-if="item.Status === $enumeration.EnumReservationStatus.Pending || item.Status === $enumeration.EnumReservationStatus.Confirmed"
-                                />
+                                <MLHbox v-if="item.Status === $enumeration.EnumReservationStatus.Pending || item.Status === $enumeration.EnumReservationStatus.Confirmed">
+                                    <VBtn icon="mdi-pencil-outline" :width="40" variant="text" color="rgb(37, 99, 235)" @click="openDetail(item)" />
+                                    <VBtn icon="mdi-trash-can-outline" :width="40" variant="text" color="rgb(220, 38, 38)" @click="handleDeleteRecord(item)"/>
+                                </MLHbox>
+                                
+                                <VBtn v-else icon="mdi-eye-outline" class="text-gray-700" :width="40" variant="text" @click="openDetail(item)" />
                             </MLHbox>
                         </td>
                     </tr>

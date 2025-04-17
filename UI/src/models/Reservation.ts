@@ -13,9 +13,10 @@ interface Reservation extends MLEntity {
     Status: EnumReservationStatus
     GuestCount: number,
     Note: string,
+    TableName: string,
 
     Customer?: Customer,
-    ReservationTables?: ReservationTable[]
+    ReservationTables?: ReservationTable[],
 };
 
 export default Reservation;

@@ -11,11 +11,13 @@
 
             <VCardItem class="pa-6">
                 <VForm ref="form">
+                    <!-- Tên nhóm thực đơn -->
                     <div class="grid grid-cols-2 gap-4 mb-4">
                         <div class="col-span-2">
                             <label class="block text-sm font-medium text-gray-700">Tên nhóm thực đơn <span style="color: red;">*</span></label>
                             <!-- Tên nhóm thực đơn -->
-                            <VTextField 
+                            <VTextField
+                                color="primary"
                                 density="compact"
                                 class="mt-2 flex-grow-1 flex-shrink-0" 
                                 variant="outlined" 
@@ -27,11 +29,12 @@
                         </div>
                     </div>
 
+                    <!-- Mô tả -->
                     <div class="grid grid-cols-2 gap-4 mb-4">
                         <div class="col-span-2">
                             <label class="block text-sm font-medium text-gray-700">Mô tả</label>
-                            <!--  -->
                             <VTextarea
+                                color="primary"
                                 no-resize
                                 density="compact"
                                 class="mt-2 flex-grow-1 flex-shrink-0" 

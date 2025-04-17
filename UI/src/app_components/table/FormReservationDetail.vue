@@ -160,7 +160,7 @@ export default {
                 CustomerID: this.record.CustomerID,
                 Customer: this.record.Customer,
                 SpecialRequest: this.record.Note,
-                TableName: this.record.ReservationTables?.map(rt => this.lstTables.find(t => t.TableID === rt.TableID)?.TableName).join(', '),
+                TableName: this.record.TableName,
                 OrderTables: this.record.ReservationTables?.map(rt => {
                     return {
                         TableID: rt.TableID,

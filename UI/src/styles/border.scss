@@ -2,6 +2,12 @@
     border-left-width: 4px !important;
 }
 
+// Red
+.border-red-200 {
+    --tw-border-opacity: 1;
+    border-color: rgb(254 202 202 / var(--tw-border-opacity)) !important;
+}
+
 // Purple
 .border-purple-500 {
     --tw-border-opacity: 1;
@@ -9,15 +15,23 @@
 }
 
 // Blue
+.border-blue-200 {
+    --tw-border-opacity: 1;
+    border-color: rgb(191 219 254 / var(--tw-border-opacity)) !important;
+}
 .border-blue-500 {
     --tw-border-opacity: 1;
-    border-color: rgb(59 130 246 / var(--tw-border-opacity));
+    border-color: rgb(59 130 246 / var(--tw-border-opacity)) !important;
 }
 
 // Yellow
+.border-yellow-200 {
+    --tw-border-opacity: 1;
+    border-color: rgb(254 240 138 / var(--tw-border-opacity)) !important;
+}
 .border-yellow-500 {
     --tw-border-opacity: 1;
-    border-color: rgb(234 179 8 / var(--tw-border-opacity));
+    border-color: rgb(234 179 8 / var(--tw-border-opacity)) !important;
 }
 
 // Green
@@ -27,5 +41,5 @@
 }
 .border-green-500 {
     --tw-border-opacity: 1;
-    border-color: rgb(34 197 94 / var(--tw-border-opacity));
+    border-color: rgb(34 197 94 / var(--tw-border-opacity)) !important;
 }

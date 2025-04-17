@@ -2,6 +2,7 @@
 using API.ML.Common;
 using API.ML.CustomAtrributes;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace API.ML.BO
 {

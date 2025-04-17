@@ -56,6 +56,11 @@ namespace API.ML.BO
         public string Note { get; set; } = string.Empty;
 
         /// <summary>
+        /// Tên bàn
+        /// </summary>
+        public string TableName { get; set; } = string.Empty;
+
+        /// <summary>
         /// Dữ liệu bản ghi khách hàng
         /// </summary>
         public Customer? Customer { get; set; }

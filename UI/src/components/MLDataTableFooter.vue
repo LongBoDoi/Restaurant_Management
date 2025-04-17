@@ -22,6 +22,7 @@
                     return parseInt(v) > 0 && parseInt(v) <= lastPage;
                 }]"
                 @blur="onPageNumberBlur"
+                @keypress.enter="onPageNumberBlur"
             />
 
             <VBtn icon="mdi-chevron-right" variant="outlined" class="text-gray-600 ml-2" :width="40" :height="40" :disabled="options.page >= lastPage" @click="options.page++;" />
@@ -65,7 +66,7 @@ export default {
             }
 
             const startIndex:number = (this.options.page - 1) * (this.options.itemsPerPage) + 1;
-            const endIndex:number = startIndex + Math.min(this.options.itemsPerPage, this.totalCount) - 1;
+            const endIndex:number = Math.min(startIndex + this.options.itemsPerPage - 1, this.totalCount);
             return `Hiển thị ${startIndex}-${endIndex} trên ${this.totalCount} bản ghi`;
         },
 

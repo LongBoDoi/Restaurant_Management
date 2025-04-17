@@ -61,7 +61,7 @@
                                         <VIcon icon="mdi-food" class="text-gray-400" :size="16" />
                                     </div>
                                     <div>
-                                        <p class="font-medium">{{ orderDetail.MenuItemName }}</p>
+                                        <p class="font-medium">{{ orderDetail.MenuItem?.Name ?? orderDetail.MenuItemName }}</p>
                                         <p class="text-xs text-gray-500">{{ orderDetail.MenuItem?.Description }}</p>
                                     </div>
                                 </div>

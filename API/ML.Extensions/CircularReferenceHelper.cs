@@ -62,6 +62,17 @@ namespace API.ML.Extensions
             }
         }
 
+        public static void RemoveCircularReferences(this IEnumerable<MLEntity>? entities)
+        {
+            if (entities == null || !entities.Any())
+                return;
+
+            foreach (MLEntity entity in entities)
+            {
+                entity.RemoveCircularReferences();
+            }
+        }
+
         public static void RemoveAllReferences(this MLEntity? entity)
         {
             if (entity == null) return;

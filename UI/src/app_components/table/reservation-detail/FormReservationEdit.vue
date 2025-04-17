@@ -131,6 +131,7 @@
                         }
                     }"
                     v-on:update:model-value="(v:any) => {
+                        record.TableName = v.map((table:Table) => table.TableName).join(', ');
                         record.ReservationTables = v.map((table:Table) => {
                             return {
                                 ReservationID: record.ReservationID,

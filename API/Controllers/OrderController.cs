@@ -95,8 +95,8 @@ namespace API.Controllers
                 case EnumEditMode.Add:
                     order.OrderDate = DateTime.UtcNow;
 
-                    // Nếu là tạo order mới thì gán tất cả bàn sang trạng thái "Hết chỗ"
-                    if (order.OrderTables != null && order.OrderTables.Any())
+                    // Nếu là tạo order mới mà chưa thanh toán thì gán tất cả bàn sang trạng thái "Hết chỗ"
+                    if (order.Status != EnumOrderStatus.Paid && order.OrderTables != null && order.OrderTables.Any())
                     {
                         foreach (OrderTable orderTable in order.OrderTables)
                         {
