@@ -3,7 +3,6 @@ import spacy
 from spacy.training import Example
 from tqdm import tqdm
 import random
-from database_util import execute_query
 
 def load_training_data(data_path):
     """
@@ -64,6 +63,7 @@ def train_ner_model(data_path, model_output_dir, iterations=5):
     nlp.to_disk(model_output_dir)
     print(f"Mô hình NER đã được lưu tại: {model_output_dir}")
 
+
 def predict_topic(entities_detected):
     """
     Kiểm tra sự xuất hiện của các thực thể để xác định topic.
@@ -71,8 +71,8 @@ def predict_topic(entities_detected):
     """
     detected_labels = {ent["label"] for ent in entities_detected}
 
-    # Đối với "Đặt bàn", cần ít nhất 2 nhãn trong nhóm {SỐ_BÀN, GIỜ, NGÀY, THÁNG, KHOẢNG_THỜI_GIAN}
-    đặt_bàn_labels = {"SỐ_BÀN", "GIỜ", "NGÀY", "THÁNG"}
+    
+    đặt_bàn_labels = {"SỐ_NGƯỜI", "GIỜ", "NGÀY", "THÁNG"}
     #nếu có ít nhất 2 nhãn trùng khớp
     if len(detected_labels & đặt_bàn_labels) >= 1:
         return "đặt bàn"
@@ -81,27 +81,11 @@ def predict_topic(entities_detected):
     if "SỐ_LƯỢNG" in detected_labels and "MÓN_ĂN" in detected_labels:
         return "gọi món"
     
-    # Đối với "Trạng thái order", cần có MÓN_ĂN
-    if "MÓN_ĂN" in detected_labels:
-        # Kiểm tra xem món ăn có tồn tại trong cơ sở dữ liệu không
-        if not check_menu_exists(entities_detected):
-            return "Unknown"  # Trả về unknown nếu món ăn không tồn tại
-        return "trạng thái order"
-    
+    # Đối với "Gợi ý món ăn", cần có THỂ_LOẠI
+    if "THỂ_LOẠI" in detected_labels or "GIÁ" in detected_labels:
+        return "gợi ý món ăn"    
     return "Unknown"
 
-def check_menu_exists(entities_detected):
-    """
-    Kiểm tra xem món ăn có tồn tại trong cơ sở dữ liệu không.
-    """
-    for ent in entities_detected:
-        if ent["label"] == "MÓN_ĂN":
-            # Thực hiện truy vấn để kiểm tra món ăn
-            query = "SELECT COUNT(*) FROM MenuItem WHERE Name = %s"
-            result = execute_query(query, (ent["text"],))
-            if result and result[0]['COUNT(*)'] > 0:
-                return True
-    return False
 
 def test_ner_model(model_path, test_sentence):
     """
@@ -120,9 +104,9 @@ def test_ner_model(model_path, test_sentence):
 
     # Cập nhật all_entity_labels với thông tin về các thực thể theo từng topic
     all_entity_labels = {
-    "đặt bàn": {"SỐ_BÀN", "GIỜ", "NGÀY", "THÁNG"},
+    "đặt bàn": {"SỐ_NGƯỜI", "GIỜ", "NGÀY", "THÁNG"},
     "gọi món": {"SỐ_LƯỢNG", "MÓN_ĂN"},
-    "trạng thái order": {"MÓN_ĂN"}
+    "gợi ý món ăn": {"THỂ_LOẠI","GIÁ"}
 }
 
     # Lấy nhãn của các thực thể đã phát hiện
@@ -141,9 +125,12 @@ def test_ner_model(model_path, test_sentence):
 
     # In kết quả theo định dạng yêu cầu
     return predicted_topic, entities_detected, missing_info
+
+
+
 # Hàm in ra kết quả test:
-def print_model_results(user_input):
-    predicted_topic, entities_detected, missing_info = test_ner_model('./ner_model_sample',user_input)#load_training_data("ner_training_data.json")[1])
+def print_model_results(user_input,model_path):
+    predicted_topic, entities_detected, missing_info = test_ner_model(model_path, user_input)
     print(f"Test Sentence: {user_input}")
     print(f"Predicted Topic: {predicted_topic}")
     print("Entities Detected:")
@@ -153,23 +140,17 @@ def print_model_results(user_input):
 
 if __name__ == "__main__":
     # Đường dẫn tới file dữ liệu và thư mục lưu mô hình
-    data_file = "training_data.json"  # File JSON chứa dữ liệu huấn luyện
-    output_dir = "./ner_model_sample"
-
+    data_file = "ner_training_data.json"  # File JSON chứa dữ liệu huấn luyện
+    #output_dir = "./ner_model"
+    output_dir = "./ner_model"
+    #train_ner_model(data_file,output_dir)
     # Huấn luyện mô hình
-    training_data, topic_mapping = load_training_data(data_file)  # Lưu topic_mapping để kiểm tra
-    #train_ner_model(data_file, output_dir)
-    print("model created")
+    #training_data, topic_mapping = load_training_data(data_file)
+    # train_ner_model(data_file, output_dir)
 
     # Kiểm tra mô hình đã huấn luyện
-    model_path = "./ner_model_sample"  # Đường dẫn tới mô hình đã huấn luyện
-    #test_sentence = "Món gỏi cuốn của tôi đã xong chưa"
-    test_sentence = "hello"
-    print(test_ner_model(model_path,test_sentence))
-    #while(test_sentence != "quit"):
-        #print(test_ner_model(model_path, test_sentence))
-        #print_model_results(test_sentence)
-        #print(test_ner_model(model_path,test_sentence))
-        #load_training_data(test_sentence)
-        #test_sentence = input("Nhập câu hỏi muốn test: ")
-    #test_ner_model(model_path, test_sentence, topic_mapping)'''
+    model_path = "./ner_model"
+    #model_path = "./ner_model"
+    #test_sentence = "Làm ơn đặt bàn giúp tôi 3 người lúc 4 giờ ngày 11 tháng 10."
+    test_sentence = "Gợi ý món thể loại đồ uống giá dưới 20000 đồng"
+    print_model_results(test_sentence, model_path)
