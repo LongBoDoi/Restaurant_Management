@@ -1,0 +1,6 @@
+[
+  {
+    "name": "so_nguoi",
+    "pattern": "\\d+ người"
+  }
+]

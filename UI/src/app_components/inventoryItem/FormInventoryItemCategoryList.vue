@@ -2,15 +2,51 @@
 
 <template>
     <VSheet style="display: flex; flex-direction: column;" class="h-full pb-2 overflow-hidden">
-        <VBtn width="fit-content" class="bg-green-500 hover:bg-green-600 hover:scale-105 text-white ml-auto mt-4" prepend-icon="mdi-plus" rounded @click="handleAddNewClick">Thêm nhóm nguyên liệu</VBtn>
+        <VBtn width="fit-content" class="bg-green-500 hover:bg-green-600 hover:scale-105 text-white ml-auto mt-4 mr-3" prepend-icon="mdi-plus" rounded @click="handleAddNewClick">Thêm nhóm nguyên liệu</VBtn>
 
         <VCard style="width: 100% ; height: 100%;" color="rgb(249, 250, 251)" class="rounded-lg d-flex flex-column shadow-md border mt-6">
             <!-- Toolbar -->
-            <div className="flex items-center space-x-4 px-6 py-4 border-b">
+            <div class="flex items-center space-x-4 px-6 py-4 border-b">
                 <VTextField density="compact" variant="outlined" prepend-inner-icon="mdi-magnify" class="focus:outline-green-500" style="max-width: 320px;" hide-details placeholder="Tìm kiếm nhóm nguyên liệu..."
                     :model-value="options.search"
                     @keypress.enter="options.search = $event.target.value;"
                 />
+
+                <MLFilterPopup :filter-count="lstFilters.length" v-on:reset-filter="handleResetFilters" v-on:apply-filter="handleApplyFilters">
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block font-medium text-gray-700">Trạng thái</label>
+                            <VSelect
+                                :items="[
+                                    {
+                                        Text: 'Tất cả',
+                                        Value: -1
+                                    },
+                                    {
+                                        Text: 'Đang hoạt động',
+                                        Value: false
+                                    },
+                                    {
+                                        Text: 'Ngừng hoạt động',
+                                        Value: true
+                                    },
+                                ]"
+                                item-title="Text"
+                                item-value="Value"
+                                :return-object="false"
+                                v-model:model-value="inactiveFilter"
+
+                                density="compact"
+                                variant="outlined"
+                                hide-details
+                                color="primary"
+                                class="mt-1"
+                            />
+                        </div>
+                    </div>
+                </MLFilterPopup>
+
+                <MLSortPopup :items="sortOptionList" v-model="options.sort" />
             </div>
 
             <!-- Bảng dữ liệu -->
@@ -31,7 +67,7 @@
 
                 <template #headers>
                     <tr class="bg-gray-50">
-                        <th class="py-3 px-6 text-left font-medium text-gray-500" style="min-width: 250px; width: 100%;">Tên nguyên liệu</th>
+                        <th class="py-3 px-6 text-left font-medium text-gray-500" style="min-width: 250px; width: 100%;">Tên nhóm nguyên liệu</th>
                         <th class="py-3 px-6 text-right font-medium text-gray-500" style="min-width: 250px;">Số lượng nguyên liệu</th>
                         <th class="py-3 px-6 text-left font-medium text-gray-500" style="min-width: 200px;">Trạng thái</th>
                         <th class="py-3 px-6 text-left font-medium text-gray-500" style="min-width: 128px;">Thao tác</th>
@@ -87,14 +123,12 @@
 <script lang="ts">
 import EventBus from '@/common/EventBus';
 import InventoryItemCategory from '@/models/InventoryItemCategory';
+import MLFilterCondition from '@/models/MLFilterCondition';
+import MLSortCondition from '@/models/MLSortCondition';
 import { inventoryItemCategoryStore } from '@/stores/inventoryItemCategoryStore';
 import { mapActions, mapState } from 'pinia';
 
 export default {
-    created() {
-        this.getData();
-    },
-
     data() {
         return {
             loading: <boolean>false,
@@ -102,8 +136,12 @@ export default {
             options: <any>{
                 page: 1,
                 itemsPerPage: 10,
-                search: ''
-            }
+                search: '',
+                sort: ''
+            },
+
+            inactiveFilter: <any>-1,
+            lstFilters: <MLFilterCondition[]>[]
         }
     },
 
@@ -124,7 +162,7 @@ export default {
          */
         async getData() {
             this.loading = true;
-            await this.getDataPaging(this.options.page, this.options.itemsPerPage, this.options.search);
+            await this.getDataPaging(this.options.page, this.options.itemsPerPage, this.options.search, this.filterJson, this.options.sort);
             this.loading = false;
         },
 
@@ -142,7 +180,7 @@ export default {
         */
         handleDeleteRecord(item: InventoryItemCategory) {
             this.$commonFunction.showDialog({
-                Title: 'Xác nhận xoá món',
+                Title: 'Xác nhận xoá nhóm nguyên liệu',
                 Message: `Bạn có chắc chắn muốn xoá Nhóm nguyên liệu <b>${item.InventoryItemCategoryName}</b> không?`,
                 ConfirmAction: async () => {
                     item.EditMode = this.$enumeration.EnumEditMode.Delete;
@@ -157,10 +195,52 @@ export default {
                 }
             });
         },
+
+        handleResetFilters() {
+            this.inactiveFilter = -1;
+
+            this.lstFilters = [];
+        },
+
+        handleApplyFilters() {
+            this.lstFilters = [];
+            if (this.inactiveFilter !== -1) {
+                this.lstFilters.push({
+                    Name: 'Inactive',
+                    Operator: '==',
+                    Value: this.inactiveFilter
+                } as MLFilterCondition);
+            }
+
+            this.getData();
+        }
     },
 
     computed: {
         ...mapState(inventoryItemCategoryStore as any, ['dataList', 'selectedIndex', 'totalCount']),
+
+        filterJson() {
+            if (this.lstFilters.length) {
+                return JSON.stringify(this.lstFilters);
+            }
+
+            return '';
+        },
+
+        sortOptionList():MLSortCondition[] {
+            return [
+                {
+                    Text: 'Tên nhóm nguyên liệu (A-Z)',
+                    Name: 'InventoryItemCategoryName',
+                    Direction: 'ASC'
+                },
+                {
+                    Text: 'Tên nhóm nguyên liệu (Z-A)',
+                    Name: 'InventoryItemCategoryName',
+                    Direction: 'DESC'
+                }
+            ]
+        },
     },
 
     watch: {

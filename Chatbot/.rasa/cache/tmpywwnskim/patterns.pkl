@@ -1,0 +1,10 @@
+[
+  {
+    "name": "ngay",
+    "pattern": "Thứ \\d+ tuần này"
+  },
+  {
+    "name": "ngay",
+    "pattern": "Thứ \\d+ tuần sau"
+  }
+]

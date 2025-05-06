@@ -6,11 +6,13 @@
 
         <VCard style="width: 100% ; height: 100%;" color="rgb(249, 250, 251)" class="rounded-lg d-flex flex-column shadow-md border mt-6">
             <!-- Toolbar -->
-            <div className="flex items-center space-x-4 px-6 py-4 border-b">
+            <div class="flex items-center space-x-4 px-6 py-4 border-b">
                 <VTextField density="compact" variant="outlined" prepend-inner-icon="mdi-magnify" class="focus:outline-green-500" style="max-width: 320px;" hide-details placeholder="Tìm kiếm khu vực..."
                     :model-value="options.search"
                     @keypress.enter="options.search = $event.target.value;"
                 />
+
+                <MLSortPopup :items="sortConditionList" v-model:model-value="options.sort" />
             </div>
 
             <!-- Bảng dữ liệu -->
@@ -77,14 +79,11 @@
 <script lang="ts">
 import EventBus from '@/common/EventBus';
 import { Area } from '@/models';
+import MLSortCondition from '@/models/MLSortCondition';
 import { areaStore } from '@/stores/areaStore';
 import { mapActions, mapState } from 'pinia';
 
 export default {
-    created() {
-        this.getData();
-    },
-
     data() {
         return {
             loading: <boolean>false,
@@ -92,7 +91,8 @@ export default {
             options: <any>{
                 page: 1,
                 itemsPerPage: 10,
-                search: ''
+                search: '',
+                sort: ''
             }
         }
     },
@@ -114,7 +114,7 @@ export default {
          */
         async getData() {
             this.loading = true;
-            await this.getDataPaging(this.options.page, this.options.itemsPerPage, this.options.search);
+            await this.getDataPaging(this.options.page, this.options.itemsPerPage, this.options.search, '', this.options.sort);
             this.loading = false;
         },
 
@@ -124,7 +124,7 @@ export default {
         openDetail(record: Area) {
             record.EditMode = this.$enumeration.EnumEditMode.Edit;
             
-            EventBus.emit(this.$eventName.ShowFormTableDetail, record);
+            EventBus.emit(this.$eventName.ShowFormAreaDetail, record);
         },
 
         /**
@@ -132,7 +132,7 @@ export default {
         */
         handleDeleteRecord(item: Area) {
             this.$commonFunction.showDialog({
-                Title: 'Xác nhận xoá món',
+                Title: 'Xác nhận xoá khu vực',
                 Message: `Bạn có chắc chắn muốn xoá Khu vực <b>${item.AreaName}</b> không?`,
                 ConfirmAction: async () => {
                     item.EditMode = this.$enumeration.EnumEditMode.Delete;
@@ -151,6 +151,21 @@ export default {
 
     computed: {
         ...mapState(areaStore as any, ['dataList', 'selectedIndex', 'totalCount']),
+
+        sortConditionList() {
+            return [
+                {
+                    Text: 'Tên khu vực (A-Z)',
+                    Name: 'AreaName',
+                    Direction: 'ASC'
+                } as MLSortCondition,
+                {
+                    Text: 'Tên khu vực (Z-A)',
+                    Name: 'AreaName',
+                    Direction: 'DESC'
+                } as MLSortCondition
+            ]
+        }
     },
 
     watch: {

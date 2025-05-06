@@ -1,7 +1,7 @@
 <template>
     <div :class="[
         'ml-vbox',
-        alignClassName,
+        alignclass,
         {'stretch-all': stretch}
     ]"
         ref="div"
@@ -31,7 +31,7 @@ export default {
     },
 
     computed: {
-        alignClassName() {
+        alignclass() {
             return this.align ? `align-items-${this.align}` : '';
         }
     }

@@ -1,6 +1,7 @@
 import { EnumEmployeeWorkStatus } from "@/common/Enumeration";
 import UserLogin from "./UserLogin";
 import MLEntity from "./MLEntity";
+import Role from "./Role";
 
 interface Employee extends MLEntity {
     EmployeeID: string,
@@ -12,7 +13,8 @@ interface Employee extends MLEntity {
     ImageUrl: string,
     Schedule?: string,
 
-    UserLogin?: UserLogin
+    UserLogin?: UserLogin,
+    Roles: Role[]
 };
 
 export default Employee;

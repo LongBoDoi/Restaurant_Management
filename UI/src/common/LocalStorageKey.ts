@@ -1,5 +1,5 @@
 class LocalStorageKey {
-    static AuthToken:string = 'AuthToken'
+    static UserID:string = 'UserID'
 };
 
 export default LocalStorageKey;

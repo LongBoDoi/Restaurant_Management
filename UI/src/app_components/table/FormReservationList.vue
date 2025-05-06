@@ -6,12 +6,100 @@
 
         <VCard style="width: 100% ; height: 100%;" color="rgb(249, 250, 251)" class="rounded-lg d-flex flex-column shadow-md border mt-6">
             <!-- Toolbar -->
-            <div className="flex items-center space-x-4 px-6 py-4 border-b">
+            <div class="flex items-center space-x-4 px-6 py-4 border-b">
                 <VTextField density="compact" variant="outlined" prepend-inner-icon="mdi-magnify" class="focus:outline-green-500" style="max-width: 320px;" hide-details placeholder="Tìm kiếm tên khách hàng/SĐT..."
+                    color="primary"
                     :model-value="options.search"
                     @keypress.enter="options.search = $event.target.value;"
                 />
-                <MLDateField variant="outlined" compact hide-details class="ml-4" style="width: 180px;" v-model="options.filterDate" />
+                <MLDateField variant="outlined" compact hide-details class="ml-4" style="width: 180px;" v-model="options.filterDate" color="primary" />
+
+                <MLFilterPopup :filter-count="lstFilters.length" v-on:reset-filter="handleResetFilters" v-on:apply-filter="handleApplyFilters">
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block font-medium text-gray-700">Trạng thái</label>
+                            <VSelect
+                                :items="[
+                                    {
+                                        Text: 'Tất cả',
+                                        Value: -1
+                                    },
+                                    {
+                                        Text: 'Chờ xác nhận',
+                                        Value: $enumeration.EnumReservationStatus.Pending
+                                    },
+                                    {
+                                        Text: 'Đã xác nhận',
+                                        Value: $enumeration.EnumReservationStatus.Confirmed
+                                    },
+                                    {
+                                        Text: 'Đã nhận bàn',
+                                        Value: $enumeration.EnumReservationStatus.Received
+                                    },
+                                    {
+                                        Text: 'Đã huỷ',
+                                        Value: $enumeration.EnumReservationStatus.Canceled
+                                    }
+                                ]"
+                                item-title="Text"
+                                item-value="Value"
+                                v-model:model-value="statusFilter"
+
+                                hide-details
+                                density="compact"
+                                variant="outlined"
+                                color="primary"
+                                class="mt-1"
+                            />
+                        </div>
+
+                        <div>
+                            <label class="block font-medium text-gray-700">Số người</label>
+                            <MLHbox class="mt-1 space-x-2">
+                                <MLNumberField
+                                    placeholder="Tối thiểu"
+                                    variant="outlined"
+                                    density="compact"
+                                    hide-details
+                                    color="primary"
+                                    nullable
+                                    style="flex-grow: 0.5;"
+                                    
+                                    v-model="minGuestFilter"
+                                    :rules="[
+                                        (value: number) => {
+                                            return value > 0;
+                                        },
+                                        (value: number) => {
+                                            return (maxGuestFilter === undefined || value <= maxGuestFilter) || 'Số người tối thiểu không được lớn hơn số người tối đa';
+                                        }
+                                    ]"
+                                />
+                                <MLNumberField
+                                    placeholder="Tối đa"
+                                    variant="outlined"
+                                    density="compact"
+                                    hide-details
+                                    color="primary"
+                                    nullable
+                                    style="flex-grow: 0.5;"
+                                    
+                                    v-model="maxGuestFilter"
+                                    :rules="[
+                                        (value: number) => {
+                                            return value > 0;
+                                        },
+                                        (value: number) => {
+                                            return minGuestFilter === undefined || value >= minGuestFilter;
+                                        }
+                                    ]"
+                                />
+                            </MLHbox>
+                        </div>
+                    </div>
+                </MLFilterPopup>
+
+                <MLSortPopup :items="sortOptionList" v-model:model-value="options.sort" />
             </div>
 
             <!-- Bảng dữ liệu -->
@@ -98,6 +186,7 @@ import { EnumReservationStatus } from '@/common/Enumeration';
 import EventBus from '@/common/EventBus';
 import { Reservation } from '@/models';
 import MLFilterCondition from '@/models/MLFilterCondition';
+import MLSortCondition from '@/models/MLSortCondition';
 import { reservationStore } from '@/stores/reservationStore';
 import moment from 'moment';
 import { mapActions, mapState } from 'pinia';
@@ -115,8 +204,14 @@ export default {
                 page: 1,
                 itemsPerPage: 10,
                 search: '',
-                filterDate: <string>moment().startOf('day').utc().format()
-            }
+                filterDate: <string>moment().startOf('day').utc().format(),
+                sort: ''
+            },
+
+            statusFilter: <EnumReservationStatus|number>-1,
+            minGuestFilter: <number|undefined>undefined,
+            maxGuestFilter: <number|undefined>undefined,
+            lstFilters: <MLFilterCondition[]>[]
         }
     },
 
@@ -137,25 +232,7 @@ export default {
          */
         async getData() {
             this.loading = true;
-
-            var filters:MLFilterCondition[] = [];
-            if (this.options.filterDate) {
-                const endFilterTime = moment(this.options.filterDate).add(1, 'days').utc().format();
-                filters = [
-                    {
-                        Name: 'ReservationDate',
-                        Operator: '>=',
-                        Value: this.options.filterDate
-                    } as MLFilterCondition,
-                    {
-                        Name: 'ReservationDate',
-                        Operator: '<',
-                        Value: endFilterTime
-                    }
-                ];
-            }
-            
-            await this.getDataPaging(this.options.page, this.options.itemsPerPage, this.options.search, JSON.stringify(filters));
+            await this.getDataPaging(this.options.page, this.options.itemsPerPage, this.options.search, this.filterJson, this.options.sort);
             this.loading = false;
         },
 
@@ -217,6 +294,41 @@ export default {
             }
         },
 
+        handleResetFilters() {
+            this.statusFilter = -1;
+            this.minGuestFilter = undefined;
+            this.maxGuestFilter = undefined;
+
+            this.lstFilters = [];
+        },
+
+        handleApplyFilters() {
+            this.lstFilters = [];
+            if (this.statusFilter !== -1) {
+                this.lstFilters.push({
+                    Name: 'Status',
+                    Operator: '==',
+                    Value: this.statusFilter
+                } as MLFilterCondition);
+            }
+            if (this.minGuestFilter) {
+                this.lstFilters.push({
+                    Name: 'GuestCount',
+                    Operator: '>=',
+                    Value: this.minGuestFilter
+                } as MLFilterCondition);
+            }
+            if (this.maxGuestFilter) {
+                this.lstFilters.push({
+                    Name: 'GuestCount',
+                    Operator: '<=',
+                    Value: this.maxGuestFilter
+                } as MLFilterCondition);
+            }
+
+            this.getData();
+        },
+
         /**
          * Tên trạng thái đặt bàn
          */
@@ -249,6 +361,60 @@ export default {
 
     computed: {
         ...mapState(reservationStore, ['dataList', 'selectedIndex', 'totalCount']),
+
+        sortOptionList() {
+            return [
+                {
+                    Text: 'Thời gian (Gần nhất)',
+                    Name: 'ReservationDate',
+                    Direction: 'ASC'
+                } as MLSortCondition,
+                {
+                    Text: 'Thời gian (Xa nhất)',
+                    Name: 'ReservationDate',
+                    Direction: 'DESC'
+                } as MLSortCondition,
+                {
+                    Text: 'Tên khách hàng (A-Z)',
+                    Name: 'CustomerName',
+                    Direction: 'ASC'
+                } as MLSortCondition,
+                {
+                    Text: 'Tên khách hàng (Z-A)',
+                    Name: 'CustomerName',
+                    Direction: 'DESC'
+                } as MLSortCondition
+            ]
+        },
+
+        filterJson() {
+            var result = '';
+
+            var filterArray:MLFilterCondition[] = [];
+            if (this.options.filterDate) {
+                const endFilterTime = moment(this.options.filterDate).add(1, 'days').utc().format();
+                filterArray = filterArray.concat([
+                    {
+                        Name: 'ReservationDate',
+                        Operator: '>=',
+                        Value: this.options.filterDate
+                    } as MLFilterCondition,
+                    {
+                        Name: 'ReservationDate',
+                        Operator: '<',
+                        Value: endFilterTime
+                    } as MLFilterCondition
+                ]);
+            }
+
+            filterArray = filterArray.concat(this.lstFilters);
+
+            if (filterArray.length) {
+                result = JSON.stringify(filterArray);
+            }
+
+            return result;
+        }
     },
 
     watch: {

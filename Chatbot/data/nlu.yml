@@ -1,0 +1,171 @@
+version: "3.1"
+
+nlu:
+- intent: greet
+  examples: |
+    - Hello. Timezone = [7](timezone)
+
+- intent: ask_menu
+  examples: |
+    - Tôi muốn xem thực đơn
+    - Cho tôi xem thực đơn
+    - Tôi muốn biết thực đơn
+    - Tôi muốn xem menu
+    - Cho tôi xem menu
+    - Tôi muốn biết menu
+    - Tôi muốn xem món ăn
+    - Có những món gì?
+    - Có những món nào?
+    - Có món gì?
+    - Có món nào?
+    - Thực đơn hôm nay có món gì đặc biệt?
+    - Hôm nay có món gì ngon?
+    - Cho tôi biết món đặc biệt hôm nay
+    - Hôm nay có món gì hot không?
+    - Món ăn nổi bật hôm nay là gì?
+    - Hôm nay có món gì đặc sắc?
+    - Có món gì đặc biệt hôm nay không?
+    - Hôm nay nhà hàng có món gì ngon?
+    - Món hot hôm nay là gì?
+    - Hôm nay có món gì mới không?
+    - Thực đơn hôm nay có món gì nổi bật?
+    - Món ăn đặc biệt hôm nay là gì?
+    - Hôm nay có món gì hấp dẫn?
+    - Nhà hàng có món gì đặc biệt hôm nay?
+    - Hôm nay có món gì đáng thử không?
+
+- intent: ask_available_seats
+  examples: |
+    - Nhà hàng có còn chỗ không?
+    - Nhà hàng còn bàn không?
+    - Nhà hàng còn chỗ không?
+    - Nhà hàng có còn bàn trống không?
+    - Nhà hàng có còn chỗ trống không?
+    - Còn bàn không?
+    - Còn chỗ không?
+    - Có còn bàn không?
+    - Có còn chỗ không?
+    - Nhà hàng có bàn trống không?
+    - Nhà hàng có chỗ trống không?
+    - Tôi muốn biết nhà hàng còn bàn không?
+    - Tôi muốn biết nhà hàng còn chỗ không?
+    - Nhà hàng còn bàn trống không?
+    - Nhà hàng còn chỗ trống không?
+    - Còn bàn trống không?
+    - Còn chỗ trống không?
+    - Nhà hàng có bàn nào trống không?
+    - Nhà hàng có chỗ nào trống không?
+    - Có bàn nào trống không?
+    - Có chỗ nào trống không?
+
+- intent: dat_ban
+  examples: |
+    - Tôi muốn đặt bàn
+    - Đặt bàn giúp tôi với
+    - Cho mình đặt bàn
+    - Tôi cần đặt chỗ
+    - Làm ơn đặt bàn giúp tôi
+    - Đặt bàn cho tôi
+    
+    - Tôi muốn đặt bàn cho [5](so_nguoi) người
+    - Tôi muốn đặt bàn cho [5](so_nguoi) người vào [ngày mai](ngay)
+    - Tôi muốn đặt bàn cho [5](so_nguoi) người vào [hôm nay](ngay)
+    - Tôi muốn đặt bàn cho [5](so_nguoi) người vào [ngày kia](ngay)
+    - Tôi muốn đặt bàn cho [5](so_nguoi) người vào [7h tối](thoi_gian) [mai](ngay)
+    - Đặt bàn cho [5](so_nguoi) người vào [Thứ 7 tuần này](ngay) lúc [7 giờ tối](thoi_gian)
+    - Cần đặt bàn cho [5](so_nguoi) người vào [Thứ 2 tuần sau](ngay)
+    - Tôi muốn đặt bàn cho [3](so_nguoi) người vào [8 giờ sáng](thoi_gian) [hôm nay](ngay)
+    - Đặt bàn cho [10](so_nguoi) người vào [7 giờ 30 tối](thoi_gian) [ngày mai](ngay)
+    - Làm ơn đặt bàn cho [4](so_nguoi) người vào [8h30 sáng](thoi_gian) [Thứ 3 tuần sau](ngay)
+    - Tôi muốn đặt bàn cho [2](so_nguoi) người vào [12 giờ trưa](thoi_gian) [ngày kia](ngay)
+    - Đặt bàn cho [6](so_nguoi) người vào [7 giờ tối](thoi_gian) [Thứ 6 tuần này](ngay)
+    - Tôi muốn đặt bàn cho [8](so_nguoi) người vào [8 giờ sáng](thoi_gian) [ngày 1 tháng 5 năm 2025](ngay)
+
+
+- intent: cung_cap_thong_tin
+  examples: |
+    - [5](so_nguoi) người
+    - Cho [5](so_nguoi) người
+    - [2](so_nguoi)
+    - [3](so_nguoi)
+    - [4](so_nguoi)
+    - [10](so_nguoi)
+    - [hai](so_nguoi)
+    - [ba](so_nguoi)
+    - [bốn](so_nguoi)
+    - [mười](so_nguoi)
+    - [ba](so_nguoi) người
+
+    - [Thứ 7 tuần này](ngay)
+    - [Thứ 2 tuần sau](ngay)
+    - [Hôm nay](ngay)
+    - [Ngày mai](ngay)
+    - [mai](ngay)
+    - [Ngày kia](ngay)
+    - [01/05/2025](ngay)
+    - [Ngày 1 tháng 5 năm 2025](ngay)
+    - [1 tháng 5](ngay)
+    - [1/5](ngay)
+    - [24/12](ngay)
+
+    - [7 giờ tối](thoi_gian)
+    - [8 giờ sáng](thoi_gian)
+    - lúc [12 giờ trưa](thoi_gian)
+    - [7h tối](thoi_gian)
+    - [8h sáng](thoi_gian)
+    - vào lúc [3h chiều](thoi_gian)
+    - [7 giờ 30 tối](thoi_gian)
+    - [8 giờ 30 sáng](thoi_gian)
+    - [7h30 tối](thoi_gian)
+    - [8h30 sáng](thoi_gian)
+    - [7:30 tối](thoi_gian)
+    - [8:30 sáng](thoi_gian)
+    
+    - [Nguyễn Văn A](ten)
+    - [Nguyễn Thị B](ten)
+    - [Trần Văn C](ten)
+    - [Lê Thị D](ten)
+    - [Mạnh Long](ten)
+    - [Phạm Minh](ten)
+    - [Hoàng](ten)
+    - Tên tôi là [Nguyễn Văn A](ten)
+    - Tôi là [Nguyễn Thị B](ten)
+    - Tên là [Trần Văn C](ten)
+    - Tên [Lê Thị D](ten)
+
+    - Số điện thoại của tôi là [0909123456](so_dien_thoai)
+    - Số điện thoại là [+84987654321](so_dien_thoai)
+    - [84399893842](so_dien_thoai)
+    - [+84912345678](so_dien_thoai)
+    - Số của tôi là [0912345678](so_dien_thoai)
+    - [+84123456789](so_dien_thoai)
+    - [0987654321](so_dien_thoai)
+
+    - [Không](yeu_cau) có yêu cầu gì đặc biệt
+    - [Không](yeu_cau) có gì đặc biệt
+    - [Không](yeu_cau) có yêu cầu gì
+    - [Không](yeu_cau) có yêu cầu nào
+    - [Không](yeu_cau) có yêu cầu gì cả
+    - [Không](yeu_cau)
+    - [Không](yeu_cau) có
+    - [Ko](yeu_cau)
+
+- intent: cam_on
+  examples: |
+    - Cảm ơn
+    - Cảm ơn nhiều
+    - Thanks
+    - Ok cảm ơn nha
+
+- regex: so_nguoi
+  examples: |
+    - [0-9]+
+
+- regex: ngay
+  examples: |
+    - Thứ \d+ tuần này
+    - Thứ \d+ tuần sau
+  
+- regex: so_dien_thoai
+  examples: |
+    - \+?[0-9]{9,15}

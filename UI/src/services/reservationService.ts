@@ -20,7 +20,11 @@ class ReservationService extends MLBaseService<Reservation> {
         } as MLActionResult;
 
         try {
-            const response = await this.api.post('/CreateCustomerReservation', reservation);
+            const response = await this.api.post('/CreateCustomerReservation', reservation, {
+                headers: {
+                    Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySUQiOiJkMDkyOWFlZi0xYTViLTQ0ZjYtOTYyZC0wMWY3ZjliYjJiMmIiLCJVc2VybmFtZSI6ImFkbWluIiwiVXNlclR5cGUiOiIwIiwiZXhwIjo0OTAyMjA1ODExLCJpc3MiOiJtbF9pc3N1ZXIiLCJhdWQiOiJtbF9hdWRpZW5jZSJ9.4PyLxWfy0_yU9HCtoNkgFnDTrV3JgQnDoNJjL_42zN8}`
+                }
+            });
             result = response.data as MLActionResult;
         } catch (e) {
             CommonFunction.handleException(e);

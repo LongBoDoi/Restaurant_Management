@@ -46,7 +46,7 @@
 // Red
 .bg-red-50 {
     --tw-bg-opacity: 1;
-    background-color: rgb(254 242 242 / var(--tw-bg-opacity));
+    background-color: rgb(254 242 242 / var(--tw-bg-opacity)) !important;
 }
 
 .bg-red-500 {
@@ -62,7 +62,7 @@
 //Green
 .bg-green-50 {
     --tw-bg-opacity: 1;
-    background-color: rgb(240 253 244 / var(--tw-bg-opacity));
+    background-color: rgb(240 253 244 / var(--tw-bg-opacity)) !important;
 }
 
 // Emerald
@@ -80,4 +80,14 @@
 .bg-purple-100 {
     --tw-bg-opacity: 1;
     background-color: rgb(233 229 255 / var(--tw-bg-opacity));
+}
+
+// Amber
+.bg-amber-500 {
+    --tw-bg-opacity: 1;
+    background-color: rgb(245 158 11 / var(--tw-bg-opacity));
+}
+.hover\:bg-amber-600:hover {
+    --tw-bg-opacity: 1;
+    background-color: rgb(217 119 6 / var(--tw-bg-opacity));
 }

@@ -1,0 +1,31 @@
+{
+  "lookup": {
+    "rules": {
+      "[{\"active_loop\": {\"name\": \"should_not_be_set\"}, \"prev_action\": {\"action_name\": \"dat_ban_form\"}}]": "action_submit_booking",
+      "[{\"active_loop\": {\"name\": \"should_not_be_set\"}, \"prev_action\": {\"action_name\": \"dat_ban_form\"}}, {\"active_loop\": {\"name\": \"should_not_be_set\"}, \"prev_action\": {\"action_name\": \"action_submit_booking\"}}]": "action_listen",
+      "[{\"prev_action\": {\"action_name\": \"action_listen\"}, \"user\": {\"intent\": \"dat_ban\"}}]": "dat_ban_form",
+      "[{\"prev_action\": {\"action_name\": \"action_listen\"}, \"user\": {\"intent\": \"dat_ban\"}}, {\"active_loop\": {\"name\": \"dat_ban_form\"}, \"prev_action\": {\"action_name\": \"dat_ban_form\"}, \"user\": {\"intent\": \"dat_ban\"}}]": "action_listen",
+      "[{\"prev_action\": {\"action_name\": \"action_listen\"}, \"user\": {\"intent\": \"cam_on\"}}]": "utter_cam_on",
+      "[{\"prev_action\": {\"action_name\": \"action_listen\"}, \"user\": {\"intent\": \"cam_on\"}}, {\"prev_action\": {\"action_name\": \"utter_cam_on\"}, \"user\": {\"intent\": \"cam_on\"}}]": "action_listen"
+    },
+    "rule_only_slots": [],
+    "rule_only_loops": [
+      "dat_ban_form"
+    ],
+    "rules_for_loop_unhappy_path": {
+      "[{\"prev_action\": {\"action_name\": \"action_listen\"}}, {\"active_loop\": {\"name\": \"dat_ban_form\"}, \"prev_action\": {\"action_name\": \"dat_ban_form\"}, \"user\": {\"intent\": \"dat_ban\"}}]": "do_not_predict_loop_action"
+    },
+    "rules_not_in_stories": [
+      "handling active loops and forms - dat_ban_form",
+      "[{\"active_loop\": {\"name\": \"should_not_be_set\"}, \"prev_action\": {\"action_name\": \"dat_ban_form\"}}, {\"active_loop\": {\"name\": \"should_not_be_set\"}, \"prev_action\": {\"action_name\": \"action_submit_booking\"}}]",
+      "predicting default action with intent back",
+      "[{\"prev_action\": {\"action_name\": \"action_listen\"}, \"user\": {\"intent\": \"cam_on\"}}]",
+      "[{\"prev_action\": {\"action_name\": \"action_listen\"}, \"user\": {\"intent\": \"dat_ban\"}}]",
+      "[{\"active_loop\": {\"name\": \"should_not_be_set\"}, \"prev_action\": {\"action_name\": \"dat_ban_form\"}}]",
+      "predicting default action with intent session_start",
+      "[{\"prev_action\": {\"action_name\": \"action_listen\"}, \"user\": {\"intent\": \"cam_on\"}}, {\"prev_action\": {\"action_name\": \"utter_cam_on\"}, \"user\": {\"intent\": \"cam_on\"}}]",
+      "handling active loops and forms - dat_ban_form - action_listen",
+      "predicting default action with intent restart"
+    ]
+  }
+}

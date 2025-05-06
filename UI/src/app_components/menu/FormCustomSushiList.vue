@@ -2,11 +2,93 @@
     <VSheet style="display: flex; flex-direction: column; overflow: hidden;" class="h-full pb-2">
         <VCard style="width: 100% ; height: 100%;" color="rgb(249, 250, 251)" class="rounded-lg d-flex flex-column shadow-md border mt-6">
             <!-- Toolbar -->
-            <div className="flex items-center space-x-4 px-6 py-4 border-b">
+            <div class="flex items-center space-x-4 px-6 py-4 border-b">
                 <VTextField density="compact" variant="outlined" prepend-inner-icon="mdi-magnify" class="focus:outline-green-500" style="max-width: 320px;" hide-details placeholder="Tìm kiếm tên sushi/khách hàng..."
                     :model-value="options.search"
                     @keypress.enter="options.search = $event.target.value;"
                 />
+
+                <MLFilterPopup :filter-count="lstFilters.length" v-on:reset-filter="handleResetFilters" v-on:apply-filter="handleApplyFilters" width="365">
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block font-medium text-gray-700">Khoảng thời gian</label>
+                            <MLHbox class="space-x-2 mt-1">
+                                <div class="flex-1">
+                                    <div class="text-sm font-medium text-gray-500">Từ</div>
+                                    <MLDateField
+                                        variant="outlined"
+                                        compact
+                                        hide-details
+                                        color="primary"
+                                        nullable
+                                        style="flex-grow: 0.5;"
+                                        class="mt-1"
+
+                                        v-model="minDateFilter"
+                                        ref="customInput"
+                                        :rules="[(value: Date) => {
+                                            return (maxDateFilter === undefined || $moment(value).isSameOrBefore(maxDateFilter)) || 'Thời gian bắt đầu không được lớn hơn thời gian kết thúc';
+                                        }]"
+                                    />
+                                </div>
+                                
+                                <div class="flex-1">
+                                    <div class="text-sm font-medium text-gray-500">Đến</div>
+                                    <MLDateField
+                                        variant="outlined"
+                                        compact
+                                        hide-details
+                                        color="primary"
+                                        nullable
+                                        style="flex-grow: 0.5;"
+                                        class="mt-1"
+                                        
+                                        v-model="maxDateFilter"
+                                        :rules="[(value: Date) => {
+                                            return (minDateFilter === undefined || $moment(value).isSameOrAfter(minDateFilter)) || 'Thời gian bắt đầu không được lớn hơn thời gian kết thúc';
+                                        }]"
+                                    />
+                                </div>
+                            </MLHbox>
+                        </div>
+
+                        <div>
+                            <label class="block font-medium text-gray-700">Trạng thái</label>
+                            <VSelect
+                                :items="[
+                                    {
+                                        Text: 'Tất cả',
+                                        Value: -1
+                                    },
+                                    {
+                                        Text: 'Chờ xác nhận',
+                                        Value: $enumeration.EnumCustomMenuRequestStatus.Pending
+                                    },
+                                    {
+                                        Text: 'Đã xác nhận',
+                                        Value: $enumeration.EnumCustomMenuRequestStatus.Approved
+                                    },
+                                    {
+                                        Text: 'Đã huỷ',
+                                        Value: $enumeration.EnumCustomMenuRequestStatus.Rejected
+                                    },
+                                ]"
+                                item-title="Text"
+                                item-value="Value"
+                                :return-object="false"
+                                v-model:model-value="statusFilter"
+
+                                density="compact"
+                                variant="outlined"
+                                hide-details
+                                color="primary"
+                                class="mt-1"
+                            />
+                        </div>
+                    </div>
+                </MLFilterPopup>
+
+                <MLSortPopup :items="sortOptionList" v-model="options.sort" />
             </div>
 
             <!-- Bảng dữ liệu -->
@@ -85,14 +167,13 @@
 import { EnumCustomMenuRequestStatus } from '@/common/Enumeration';
 import EventBus from '@/common/EventBus';
 import { CustomMenuRequest } from '@/models';
+import MLFilterCondition from '@/models/MLFilterCondition';
+import MLSortCondition from '@/models/MLSortCondition';
 import { customMenuRequestStore } from '@/stores/customMenuRequestStore';
+import moment from 'moment';
 import { mapActions, mapState } from 'pinia';
 
 export default {
-    created() {
-        this.getData();
-    },
-
     data() {
         return {
             loading: <boolean>false,
@@ -100,8 +181,15 @@ export default {
             options: <any>{
                 page: 1,
                 itemsPerPage: 10,
-                search: ''
-            }
+                search: '',
+                sort: ''
+            },
+
+            minDateFilter: <string|undefined>undefined,
+            maxDateFilter: <string|undefined>undefined,
+            statusFilter: <any>-1,
+
+            lstFilters: <MLFilterCondition[]>[]
         }
     },
 
@@ -122,7 +210,7 @@ export default {
          */
         async getData() {
             this.loading = true;
-            await this.getDataPaging(this.options.page, this.options.itemsPerPage, this.options.search);
+            await this.getDataPaging(this.options.page, this.options.itemsPerPage, this.options.search, this.filterJson, this.options.sort);
             this.loading = false;
         },
 
@@ -140,7 +228,7 @@ export default {
         */
         handleDeleteRecord(item: CustomMenuRequest) {
             this.$commonFunction.showDialog({
-                Title: 'Xác nhận xoá món',
+                Title: 'Xác nhận xoá yêu cầu',
                 Message: `Bạn có chắc chắn muốn từ chối yêu cầu tạo món <b>${item.MenuItemName}</b> không?`,
                 ConfirmAction: async () => {
                     item.EditMode = this.$enumeration.EnumEditMode.Delete;
@@ -154,6 +242,41 @@ export default {
                     }
                 }
             });
+        },
+
+        handleResetFilters() {
+            this.minDateFilter = undefined;
+            this.maxDateFilter = undefined;
+            this.statusFilter = -1;
+
+            this.lstFilters = [];
+        },
+
+        handleApplyFilters() {
+            this.lstFilters = [];
+            if (this.minDateFilter !== undefined) {
+                this.lstFilters.push({
+                    Name: 'CreatedDate',
+                    Operator: '>=',
+                    Value: this.minDateFilter
+                } as MLFilterCondition);
+            }
+            if (this.maxDateFilter !== undefined) {
+                this.lstFilters.push({
+                    Name: 'CreatedDate',
+                    Operator: '<',
+                    Value: moment(this.maxDateFilter).add(1, 'days')
+                } as MLFilterCondition);
+            }
+            if (this.statusFilter !== -1) {
+                this.lstFilters.push({
+                    Name: 'Status',
+                    Operator: '==',
+                    Value: this.statusFilter
+                } as MLFilterCondition);
+            }
+            
+            this.getData();
         },
 
         /**
@@ -187,6 +310,48 @@ export default {
 
     computed: {
         ...mapState(customMenuRequestStore as any, ['dataList', 'selectedIndex', 'totalCount']),
+
+        filterJson() {
+            if (this.lstFilters) {
+                return JSON.stringify(this.lstFilters);
+            }
+            return '';
+        },
+
+        sortOptionList():MLSortCondition[] {
+            return [
+                {
+                    Text: 'Khách hàng (A-Z)',
+                    Name: 'CustomerName',
+                    Direction: 'ASC'
+                },
+                {
+                    Text: 'Khách hàng (Z-A)',
+                    Name: 'CustomerName',
+                    Direction: 'DESC'
+                },
+                {
+                    Text: 'Tên món (A-Z)',
+                    Name: 'MenuItemName',
+                    Direction: 'ASC'
+                },
+                {
+                    Text: 'Tên món (Z-A)',
+                    Name: 'MenuItemName',
+                    Direction: 'DESC'
+                },
+                {
+                    Text: 'Ngày tạo (Mới nhất)',
+                    Name: 'CreatedDate',
+                    Direction: 'DESC'
+                },
+                {
+                    Text: 'Ngày tạo (Cũ nhất)',
+                    Name: 'CreatedDate',
+                    Direction: 'ASC'
+                }
+            ];
+        }
     },
 
     watch: {

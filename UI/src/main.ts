@@ -24,6 +24,7 @@ import money from 'v-money';
 import LocalStorageKey from './common/LocalStorageKey';
 import Config from './common/Config';
 import CommonValue from './common/CommonValue';
+import moment from 'moment';
 
 const app = createApp(App);
 
@@ -41,5 +42,6 @@ app.config.globalProperties.$localStorageKey = LocalStorageKey;
 app.config.globalProperties.$eventName = EventName;
 app.config.globalProperties.$config = Config;
 app.config.globalProperties.$commonValue = CommonValue;
+app.config.globalProperties.$moment = moment;
 
 app.mount('#app')

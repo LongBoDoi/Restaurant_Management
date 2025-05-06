@@ -50,7 +50,7 @@ export default {
         occupiedTables() {
             if (this.data) {
                 const allTables = this.data.AllTablesCount ? this.$commonFunction.formatThousands(this.data.AllTablesCount) : 0;
-                const occupiedTables = this.data.OccupiedTablesCount ? this.$commonFunction.formatThousands(this.data.AllTablesCount) : 0;
+                const occupiedTables = this.data.OccupiedTablesCount ? this.$commonFunction.formatThousands(this.data.OccupiedTablesCount) : 0;
                 return `${occupiedTables}/${allTables}`;
             }
             return '0/0';

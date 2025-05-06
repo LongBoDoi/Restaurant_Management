@@ -161,6 +161,18 @@ export enum EnumCustomMenuRequestStatus {
     Rejected = 2
 }
 
+export enum EnumTimeFilter {
+    ByDay = 0,
+
+    ByWeek = 1,
+
+    ByMonth = 2,
+
+    ByYear = 3,
+
+    Custom = 4
+}
+
 class EnumerationInterface {
     EnumUserType: typeof EnumUserType = EnumUserType;
     EnumChatbotSender: typeof EnumChatbotSender = EnumChatbotSender;
@@ -174,6 +186,7 @@ class EnumerationInterface {
     EnumPaymentMethod: typeof EnumPaymentMethod = EnumPaymentMethod;
     EnumTableStatus: typeof EnumTableStatus = EnumTableStatus;
     EnumCustomMenuRequestStatus: typeof EnumCustomMenuRequestStatus = EnumCustomMenuRequestStatus;
+    EnumTimeFilter: typeof EnumTimeFilter = EnumTimeFilter;
 }
 
 export default EnumerationInterface;

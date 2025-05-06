@@ -7,7 +7,7 @@
 
             <!-- Header -->
             <VCardTitle class="bg-gradient-to-r from-teal-600 to-green-500 px-6 py-4 d-flex justify-between items-center">
-                <h2 className="text-white text-xl font-bold">Bàn</h2>
+                <h2 class="text-white text-xl font-bold">Bàn</h2>
                 <VBtn variant="plain" style="color: white; opacity: 1; width: 40px; height: 40px;" class="ml-auto" icon="mdi-close" @click="handleCloseDialog" />
             </VCardTitle>
 
@@ -15,24 +15,25 @@
             <VCardItem class="pa-6">
                 <VForm ref="form">
                     <!-- Tên nguyên liệu -->
-                    <div className="mb-4">
-                        <label className="block text-gray-700 text-sm font-medium">Tên bàn <span style="color: red;">*</span></label>
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-medium">Tên bàn <span style="color: red;">*</span></label>
                         
                         <VTextField class="mt-2" density="compact" variant="outlined" v-model:model-value="record.TableName" hide-details
+                            color="primary"
                             :rules="[(v:string|undefined) => v !== undefined && v !== '']"
                         />
                     </div>
 
-                    <div className="mb-4">
+                    <div class="mb-4">
                         <!-- Số ghế -->
                         <div>
-                            <label className="block text-gray-700 text-sm font-medium">Số ghế</label>
-                            <MLNumberField class="mt-2 text-right" hide-spin-buttons density="compact" variant="outlined" v-model:model-value="record.SeatCount" hide-details :rules="[(v: number) => v > 0]" />
+                            <label class="block text-gray-700 text-sm font-medium">Số ghế</label>
+                            <MLNumberField class="mt-2 text-right" color="primary" hide-spin-buttons density="compact" variant="outlined" v-model:model-value="record.SeatCount" hide-details :rules="[(v: number) => v > 0]" />
                         </div>
                     </div>
 
-                    <div className="mb-4">
-                        <label className="block text-gray-700 text-sm font-medium">
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-medium">
                             Khu vực
                         </label>
                         
@@ -53,11 +54,12 @@
                             variant="outlined"
                             hide-details
                             class="mt-2"
+                            color="primary"
                         />
                     </div>
 
-                    <div className="mb-4">
-                        <label className="block text-gray-700 text-sm font-medium">
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-medium">
                             Trạng thái
                         </label>
                         
@@ -72,6 +74,7 @@
                             variant="outlined"
                             hide-details
                             class="mt-2"
+                            color="primary"
                         />
                     </div>
                 </VForm>

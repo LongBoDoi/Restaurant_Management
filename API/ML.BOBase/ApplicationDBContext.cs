@@ -2,6 +2,7 @@
 using API.ML.Common;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
+using System.Reflection;
 
 namespace API.ML.BOBase
 {
@@ -97,6 +98,16 @@ namespace API.ML.BOBase
         /// Bảng yêu cầu tạo món custom
         /// </summary>
         public DbSet<CustomMenuRequest> CustomMenuRequest { get; set; }
+
+        /// <summary>
+        /// Bảng vai trò
+        /// </summary>
+        public DbSet<Role> Role { get; set; }
+
+        /// <summary>
+        /// Bảng phân quyền
+        /// </summary>
+        public DbSet<Permission> Permission { get; set; }
         #endregion
 
         public ApplicationDBContext(DbContextOptions<ApplicationDBContext> options)
@@ -110,8 +121,22 @@ namespace API.ML.BOBase
         /// <returns></returns>
         public override int SaveChanges()
         {
-            UpdateTimestamps();
-            return base.SaveChanges();
+            PrepareDataBeforeSave();
+
+            using (var transaction = Database.BeginTransaction())
+            {
+                try
+                {
+                    var result = base.SaveChanges();
+                    transaction.Commit();
+                    return result;
+                }
+                catch
+                {
+                    transaction.Rollback();
+                    throw;
+                }
+            }
         }
 
         /// <summary>
@@ -121,7 +146,7 @@ namespace API.ML.BOBase
         /// <returns></returns>
         public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
-            UpdateTimestamps();
+            PrepareDataBeforeSave();
             return await base.SaveChangesAsync(cancellationToken);
         }
 
@@ -171,7 +196,83 @@ namespace API.ML.BOBase
             {
                 e.HasIndex(c => c.EmployeeCode).IsUnique();
                 e.HasData(
-                    new { EmployeeID = new Guid("d0929aef-1a5b-44f6-962d-01f7f9bb2b2b"), EmployeeCode = "admin", EmployeeName = "Admin", WorkStatus = EnumEmployeeWorkStatus.Active }
+                    new Employee { EmployeeID = new Guid("d0929aef-1a5b-44f6-962d-01f7f9bb2b2b"), EmployeeCode = "admin", EmployeeName = "Admin", WorkStatus = EnumEmployeeWorkStatus.Active }
+                );
+
+                // Cấp quyền admin cho tài khoản admin
+                e.HasMany(e => e.Roles).WithMany(r => r.Employees).UsingEntity(j => j.HasData(
+                    new { EmployeesEmployeeID = new Guid("d0929aef-1a5b-44f6-962d-01f7f9bb2b2b"), RolesRoleID = new Guid("4a2ef244-b552-498b-918b-cc18fd2afbf3") }
+                ));
+            });
+
+            var manageMenuPermission = new Permission { PermissionID = new Guid("3d1f0881-6469-4255-901f-81cef0298029"), PermissionCode = "ManageMenu", PermissionName = "Quản lý thực đơn" };
+            var manageInventoryPermission = new Permission { PermissionID = new Guid("bf448b0b-b292-44b0-b563-69b78096fe84"), PermissionCode = "ManageInventory", PermissionName = "Quản lý nguyên liệu" };
+            var manageTablePermission = new Permission { PermissionID = new Guid("5db0fbde-6a21-41c9-9676-27a3332760b3"), PermissionCode = "ManageTable", PermissionName = "Quản lý bàn, đặt bàn" };
+            var manageOrderPermission = new Permission { PermissionID = new Guid("45dbc11e-49ff-49a2-8f26-ca1823bf7a34"), PermissionCode = "ManageOrder", PermissionName = "Quản lý order" };
+            var manageCustomerPermission = new Permission { PermissionID = new Guid("50180af9-4ce3-436e-9fd5-57df78da2d74"), PermissionCode = "ManageCustomer", PermissionName = "Quản lý khách hàng" };
+            var manageEmployeePermission = new Permission { PermissionID = new Guid("5dcb6d2a-d5bc-42f2-a184-7c317c30a67d"), PermissionCode = "ManageEmployee", PermissionName = "Quản lý nhân viên" };
+            var manageRolePermission = new Permission { PermissionID = new Guid("3978b007-d63c-442c-bcc1-600dcc251299"), PermissionCode = "ManagePermission", PermissionName = "Quản lý phân quyền" };
+            var viewReportPermission = new Permission { PermissionID = new Guid("0b87ffbc-c7c7-482a-af25-ceb2c9f2daf2"), PermissionCode = "ViewReport", PermissionName = "Xem báo cáo doanh thu" };
+            var manageSettingPermission = new Permission { PermissionID = new Guid("9faeb1ff-0e3f-4faf-afa4-80b0e90b4f60"), PermissionCode = "ManageSetting", PermissionName = "Quản lý thiết lập" };
+
+            modelBuilder.Entity<Role>(r =>
+            {
+                r.HasIndex(r => r.RoleCode).IsUnique();
+                r.HasData(
+                    new Role { RoleID = new Guid("4a2ef244-b552-498b-918b-cc18fd2afbf3"), RoleCode = "AD", RoleName = "Quản trị viên" },
+                    new Role { RoleID = new Guid("b85db478-0a75-4561-91ab-acdc730e9990"), RoleCode = "MNG", RoleName = "Quản lý" },
+                    new Role { RoleID = new Guid("7674405c-363b-48f8-8533-d20d301731b3"), RoleCode = "CSH", RoleName = "Thu ngân" },
+                    new Role { RoleID = new Guid("d5f40283-a427-4731-9548-c83e1c714da6"), RoleCode = "SRV", RoleName = "Phục vụ" }
+                );
+
+                // Cấp quyền mặc định cho các vai trò
+                r.HasMany(r => r.Permissions).WithMany(p => p.Roles).UsingEntity(j => j.HasData(
+                    // Quản trị viên
+                    new { RolesRoleID = new Guid("4a2ef244-b552-498b-918b-cc18fd2afbf3"), PermissionsPermissionID = manageMenuPermission.PermissionID },
+                    new { RolesRoleID = new Guid("4a2ef244-b552-498b-918b-cc18fd2afbf3"), PermissionsPermissionID = manageInventoryPermission.PermissionID },
+                    new { RolesRoleID = new Guid("4a2ef244-b552-498b-918b-cc18fd2afbf3"), PermissionsPermissionID = manageTablePermission.PermissionID },
+                    new { RolesRoleID = new Guid("4a2ef244-b552-498b-918b-cc18fd2afbf3"), PermissionsPermissionID = manageOrderPermission.PermissionID },
+                    new { RolesRoleID = new Guid("4a2ef244-b552-498b-918b-cc18fd2afbf3"), PermissionsPermissionID = manageCustomerPermission.PermissionID },
+                    new { RolesRoleID = new Guid("4a2ef244-b552-498b-918b-cc18fd2afbf3"), PermissionsPermissionID = manageEmployeePermission.PermissionID },
+                    new { RolesRoleID = new Guid("4a2ef244-b552-498b-918b-cc18fd2afbf3"), PermissionsPermissionID = manageRolePermission.PermissionID },
+                    new { RolesRoleID = new Guid("4a2ef244-b552-498b-918b-cc18fd2afbf3"), PermissionsPermissionID = viewReportPermission.PermissionID },
+                    new { RolesRoleID = new Guid("4a2ef244-b552-498b-918b-cc18fd2afbf3"), PermissionsPermissionID = manageSettingPermission.PermissionID },
+
+                    // Quản lý
+                    new { RolesRoleID = new Guid("b85db478-0a75-4561-91ab-acdc730e9990"), PermissionsPermissionID = manageMenuPermission.PermissionID },
+                    new { RolesRoleID = new Guid("b85db478-0a75-4561-91ab-acdc730e9990"), PermissionsPermissionID = manageInventoryPermission.PermissionID },
+                    new { RolesRoleID = new Guid("b85db478-0a75-4561-91ab-acdc730e9990"), PermissionsPermissionID = manageTablePermission.PermissionID },
+                    new { RolesRoleID = new Guid("b85db478-0a75-4561-91ab-acdc730e9990"), PermissionsPermissionID = manageOrderPermission.PermissionID },
+                    new { RolesRoleID = new Guid("b85db478-0a75-4561-91ab-acdc730e9990"), PermissionsPermissionID = manageCustomerPermission.PermissionID },
+                    new { RolesRoleID = new Guid("b85db478-0a75-4561-91ab-acdc730e9990"), PermissionsPermissionID = manageEmployeePermission.PermissionID },
+                    new { RolesRoleID = new Guid("b85db478-0a75-4561-91ab-acdc730e9990"), PermissionsPermissionID = manageRolePermission.PermissionID },
+                    new { RolesRoleID = new Guid("b85db478-0a75-4561-91ab-acdc730e9990"), PermissionsPermissionID = viewReportPermission.PermissionID },
+                    new { RolesRoleID = new Guid("b85db478-0a75-4561-91ab-acdc730e9990"), PermissionsPermissionID = manageSettingPermission.PermissionID },
+
+                    // Thu ngân
+                    new { RolesRoleID = new Guid("7674405c-363b-48f8-8533-d20d301731b3"), PermissionsPermissionID = manageTablePermission.PermissionID },
+                    new { RolesRoleID = new Guid("7674405c-363b-48f8-8533-d20d301731b3"), PermissionsPermissionID = manageOrderPermission.PermissionID },
+                    new { RolesRoleID = new Guid("7674405c-363b-48f8-8533-d20d301731b3"), PermissionsPermissionID = manageCustomerPermission.PermissionID },
+
+                    // Phục vụ
+                    new { RolesRoleID = new Guid("d5f40283-a427-4731-9548-c83e1c714da6"), PermissionsPermissionID = manageTablePermission.PermissionID },
+                    new { RolesRoleID = new Guid("d5f40283-a427-4731-9548-c83e1c714da6"), PermissionsPermissionID = manageOrderPermission.PermissionID }
+                ));
+            });
+
+            modelBuilder.Entity<Permission>(r =>
+            {
+                r.HasIndex(r => r.PermissionCode).IsUnique();
+                r.HasData(
+                    manageMenuPermission,
+                    manageInventoryPermission,
+                    manageTablePermission,
+                    manageOrderPermission,
+                    manageCustomerPermission,
+                    manageEmployeePermission,
+                    manageRolePermission,
+                    viewReportPermission,
+                    manageSettingPermission
                 );
             });
 
@@ -181,7 +282,7 @@ namespace API.ML.BOBase
                 entity.HasOne(ul => ul.Customer).WithOne(c => c.UserLogin).HasForeignKey<UserLogin>(ul => ul.CustomerID)
                     .OnDelete(DeleteBehavior.Cascade);
                 entity.HasData(
-                    new UserLogin { UserLoginID = new Guid("8b59dd9f-72d8-4d01-a971-03bc98c2262f"), EmployeeID = new Guid("d0929aef-1a5b-44f6-962d-01f7f9bb2b2b"), Username = "admin", Password = "123456" }
+                    new UserLogin { UserLoginID = new Guid("8b59dd9f-72d8-4d01-a971-03bc98c2262f"), EmployeeID = new Guid("d0929aef-1a5b-44f6-962d-01f7f9bb2b2b"), Username = "admin", Password = "AQAAAAIAAYagAAAAEKqe/dcgGzIC8jgfJymczuCBpLYck9TdfxOQ19M6h9o4qBbTxjCk8PP2fzb49fPGPQ==" }
                 );
             });
 
@@ -276,7 +377,7 @@ namespace API.ML.BOBase
         /// <summary>
         /// Cập nhật CreatedDate và ModifiedDate
         /// </summary>
-        private void UpdateTimestamps()
+        private void PrepareDataBeforeSave()
         {
             var entities = ChangeTracker.Entries()
                 .Where(e => (e.State == EntityState.Added || e.State == EntityState.Modified));
@@ -285,11 +386,26 @@ namespace API.ML.BOBase
             {
                 if (entityEntry.Entity is IMLEntity entity)
                 {
+                    // Update timestamps
                     entity.ModifiedDate = DateTime.UtcNow;
 
                     if (entityEntry.State == EntityState.Added)
                     {
                         entity.CreatedDate = entity.ModifiedDate;
+                    }
+
+                    // Trimming
+                    var stringProperties = entity.GetType()
+                        .GetProperties(BindingFlags.Public | BindingFlags.Instance)
+                        .Where(p => p.CanRead && p.CanWrite && p.PropertyType == typeof(string));
+
+                    foreach (var prop in stringProperties)
+                    {
+                        var currentValue = prop.GetValue(entity) as string;
+                        if (!string.IsNullOrEmpty(currentValue))
+                        {
+                            prop.SetValue(entity, currentValue.Trim());
+                        }
                     }
                 }
             }

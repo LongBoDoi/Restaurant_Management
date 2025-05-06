@@ -7,7 +7,7 @@
 
             <!-- Header -->
             <VCardTitle class="bg-gradient-to-r from-teal-600 to-green-500 px-6 py-4 d-flex justify-between items-center">
-                <h2 className="text-white text-xl font-bold">Nguyên liệu</h2>
+                <h2 class="text-white text-xl font-bold">Nguyên liệu</h2>
                 <VBtn variant="plain" style="color: white; opacity: 1; width: 40px; height: 40px;" class="ml-auto" icon="mdi-close" @click="handleCloseDialog" />
             </VCardTitle>
 
@@ -15,24 +15,24 @@
             <VCardItem class="pa-6">
                 <VForm ref="form">
                     <!-- Tên nguyên liệu -->
-                    <div className="mb-4">
-                        <label className="block text-gray-700 text-sm font-medium">Tên nguyên liệu <span style="color: red;">*</span></label>
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-medium">Tên nguyên liệu <span style="color: red;">*</span></label>
                         
                         <VTextField color="primary" class="mt-2" density="compact" variant="outlined" v-model:model-value="record.Name" hide-details
                             :rules="[(v:string|undefined) => v !== undefined && v !== '']"
                         />
                     </div>
 
-                    <div className="grid grid-cols-2 gap-4 mb-4">
+                    <div class="grid grid-cols-2 gap-4 mb-4">
                         <!-- Số lượng tồn -->
                         <div>
-                            <label className="block text-gray-700 text-sm font-medium">Số lượng tồn</label>
+                            <label class="block text-gray-700 text-sm font-medium">Số lượng tồn</label>
                             <MLNumberField color="primary" class="mt-2 text-right" hide-spin-buttons density="compact" variant="outlined" v-model:model-value="record.Quantity" hide-details />
                         </div>
 
                         <!-- Đơn vị tính -->
                         <div>
-                            <label className="block text-gray-700 text-sm font-medium">Đơn vị tính <span style="color: red;">*</span></label>
+                            <label class="block text-gray-700 text-sm font-medium">Đơn vị tính <span style="color: red;">*</span></label>
                             <!-- Đơn vị tính -->
                             <VTextField color="primary" density="compact" variant="outlined" class="mt-2" v-model:model-value="record.Unit" hide-details
                                 :rules="[(v:string|undefined) => v !== undefined && v !== '']"
@@ -40,22 +40,22 @@
                         </div>
                     </div>
 
-                    <div className="mb-4">
-                        <label className="block text-gray-700 text-sm font-medium">
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-medium">
                             Số lượng tồn kho cảnh báo
                         </label>
-                        <div className="flex items-center mt-2">
+                        <div class="flex items-center mt-2">
                             <MLNumberField color="primary" class="text-right w-full" hide-spin-buttons density="compact" variant="outlined" v-model:model-value="record.WarningStockQuantity" hide-details
                                 :rules="[(v: number) => v >= 0]"
                             />
-                            <div className="ml-2 text-gray-500 text-sm">
+                            <div class="ml-2 text-gray-500 text-sm">
                                 <i>Nguyên liệu sẽ được đánh dấu là "Sắp hết hàng" khi tồn kho ít hơn số lượng này.</i>
                             </div>
                         </div>
                     </div>
 
-                    <div className="mb-4">
-                        <label className="block text-gray-700 text-sm font-medium">
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-medium">
                             Nhóm nguyên liệu
                         </label>
                         
@@ -76,8 +76,11 @@
                             variant="outlined"
                             hide-details
                             class="mt-2"
+                            no-data-text="Không có dữ liệu."
                         />
                     </div>
+
+                    <VCheckbox color="primary" class="text-gray-700" style="opacity: 1;" label="Ngừng hoạt động" hide-details v-model:model-value="record.Inactive" />
                 </VForm>
             </VCardItem>
 

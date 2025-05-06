@@ -2,15 +2,18 @@
 
 <template>
     <VSheet style="display: flex; flex-direction: column;" class="h-full pb-2 overflow-hidden">
-        <VBtn width="fit-content" class="bg-green-500 hover:bg-green-600 hover:scale-105 text-white ml-auto mt-4" prepend-icon="mdi-plus" rounded @click="handleAddNewClick">Thêm khách hàng</VBtn>
+        <VBtn width="fit-content" class="bg-green-500 hover:bg-green-600 hover:scale-105 text-white ml-auto mt-4 mr-3" prepend-icon="mdi-plus" rounded @click="handleAddNewClick">Thêm khách hàng</VBtn>
 
         <VCard style="width: 100% ; height: 100%;" color="rgb(249, 250, 251)" class="rounded-lg d-flex flex-column shadow-md border mt-6">
             <!-- Toolbar -->
-            <div className="flex items-center space-x-4 px-6 py-4 border-b">
+            <div class="flex items-center space-x-4 px-6 py-4 border-b">
                 <VTextField density="compact" variant="outlined" prepend-inner-icon="mdi-magnify" class="focus:outline-green-500" style="max-width: 320px;" hide-details placeholder="Tìm kiếm khách hàng/SĐT..."
+                    color="primary"
                     :model-value="options.search"
                     @keypress.enter="options.search = $event.target.value;"
                 />
+
+                <MLSortPopup :items="sortOptionList" v-model="options.sort" />
             </div>
 
             <!-- Bảng dữ liệu -->
@@ -82,6 +85,7 @@
 <script lang="ts">
 import EventBus from '@/common/EventBus';
 import { Customer } from '@/models';
+import MLSortCondition from '@/models/MLSortCondition';
 import { customerStore } from '@/stores/customerStore';
 import { mapActions, mapState } from 'pinia';
 
@@ -93,13 +97,10 @@ export default {
             options: <any>{
                 page: 1,
                 itemsPerPage: 10,
-                search: ''
+                search: '',
+                sort: ''
             }
         }
-    },
-
-    created() {
-        this.getData();
     },
 
     methods: {
@@ -119,7 +120,7 @@ export default {
          */
         async getData() {
             this.loading = true;
-            await this.getDataPaging(this.options.page, this.options.itemsPerPage, this.options.search);
+            await this.getDataPaging(this.options.page, this.options.itemsPerPage, this.options.search, '', this.options.sort);
             this.loading = false;
         },
 
@@ -163,6 +164,21 @@ export default {
                 { title: 'Giá món', value: 'Price', align: 'end', width: 150 },
                 { title: 'Mô tả', value: 'Description' },
                 { title: 'Hết hàng', value: 'OutOfStock', align: 'center', width: 150 }
+            ]
+        },
+
+        sortOptionList():MLSortCondition[] {
+            return [
+                {
+                    Text: 'Tên khách hàng (A-Z)',
+                    Name: 'CustomerName',
+                    Direction: 'ASC'
+                },
+                {
+                    Text: 'Tên khách hàng (Z-A)',
+                    Name: 'CustomerName',
+                    Direction: 'DESC'
+                },
             ]
         }
     },

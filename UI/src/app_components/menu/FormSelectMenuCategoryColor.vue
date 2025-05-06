@@ -13,16 +13,16 @@
 
             <!-- Body -->
             <VCardItem class="pa-6">
-                <div className="mb-6">
-                    <label className="block text-gray-700 text-sm font-medium">
+                <div class="mb-6">
+                    <label class="block text-gray-700 text-sm font-medium">
                         Giá trị màu
                     </label>
-                    <div className="flex space-x-3 mt-2">
+                    <div class="flex space-x-3 mt-2">
                         <div
                             style="width: 64px; height: 40px; border-radius: 12px;"
                             type="color"
                             :value="colorValue"
-                            className="border border-gray-300 transition-transform d-flex align-center justify-center"
+                            class="border border-gray-300 transition-transform d-flex align-center justify-center"
                         >
                             <div style="width: 56px; height: 32px;"
                                 :style="[
@@ -35,20 +35,20 @@
                         <!-- <input
                             type="text"
                             value="#3fbc6e"
-                            className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200 font-mono"
+                            class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200 font-mono"
                         /> -->
                     </div>
                 </div>
 
-                <div className="mb-4">
-                    <p className="text-sm text-gray-600 mb-2">Xem trước:</p>
-                    <div className="flex space-x-3 items-center">
-                        <div style="width: 40px; height: 40px;" className="rounded-full shadow-md"
+                <div class="mb-4">
+                    <p class="text-sm text-gray-600 mb-2">Xem trước:</p>
+                    <div class="flex space-x-3 items-center">
+                        <div style="width: 40px; height: 40px;" class="rounded-full shadow-md"
                             :style="[
                                 {'background-color': colorValue}
                             ]"
                         />
-                        <div className="px-3 py-1 rounded-full text-white text-sm font-medium shadow-md"
+                        <div class="px-3 py-1 rounded-full text-white text-sm font-medium shadow-md"
                             :style="[
                                 {'background-color': colorValue}
                             ]"

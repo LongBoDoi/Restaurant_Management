@@ -1,4 +1,6 @@
 class EventName {
+    static ConfigTokenForServices = 'ConfigTokenForServices';
+
     // Mở form chi tiết thực đơn
     static ShowFormMenuDetail = 'ShowFormMenuDetail';
 
@@ -49,6 +51,18 @@ class EventName {
 
     // Mở form chi tiết xử lý yêu cầu tạo sushi custom
     static ShowFormCustomMenuDetail = 'ShowFormCustomMenuDetail';
+
+    // Mở form chi tiết vai trò
+    static ShowFormRoleDetail = 'ShowFormRoleDetail';
+
+    // Mở form đổi mật khẩu
+    static ShowFormChangePassword = 'ShowFormChangePassword';
+
+    // Mở form cập nhật thong tin cá nhân
+    static ShowFormUpdatePersonalInfo = 'ShowFormUpdatePersonalInfo';
+
+    // Load dữ liệu báo cáo
+    static LoadReportData = 'LoadReportData';
 };
 
 export default EventName;

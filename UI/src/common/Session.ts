@@ -6,7 +6,8 @@ interface SessionInterface {
     UserName: string,
     UserType: EnumUserType,
 
-    Settings: Setting[]
+    Settings: Setting[],
+    Permissions: Set<string>,
 }
 
 const session = {} as SessionInterface;

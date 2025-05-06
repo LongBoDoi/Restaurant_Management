@@ -78,14 +78,14 @@
                 </VForm>
             </VCardItem>
 
-            <VCardActions class="px-6 py-4 bg-gray-50 border-t flex justify-end space-x-3">
+            <VCardActions class="px-6 py-4 bg-gray-50 border-t flex justify-end">
                 <VSpacer />
 
-                <MLHbox class="space-x-3" v-if="record.Status === $enumeration.EnumCustomMenuRequestStatus.Pending">
+                <div class="space-x-3" v-if="record.Status === $enumeration.EnumCustomMenuRequestStatus.Pending">
                     <VBtn class="border-gray-300 text-gray-700" variant="outlined" rounded @click="handleCloseDialog">Huỷ</VBtn>
-                    <VBtn variant="tonal" class="bg-red-500 hover:bg-red-600 text-white ml-1 hover:scale-105" rounded @click="handleSave($enumeration.EnumCustomMenuRequestStatus.Rejected)">Từ chối</VBtn>
-                    <VBtn variant="tonal" class="bg-green-500 hover:bg-green-600 text-white ml-1 hover:scale-105" rounded @click="handleSave($enumeration.EnumCustomMenuRequestStatus.Approved)" :disabled="!record.SaveToOrder && !record.SaveToMenu">Xác nhận</VBtn>
-                </MLHbox>
+                    <VBtn variant="tonal" class="bg-red-500 hover:bg-red-600 text-white hover:scale-105" rounded @click="handleSave($enumeration.EnumCustomMenuRequestStatus.Rejected)">Từ chối</VBtn>
+                    <VBtn variant="tonal" class="bg-green-500 hover:bg-green-600 text-white hover:scale-105" rounded @click="handleSave($enumeration.EnumCustomMenuRequestStatus.Approved)" :disabled="!record.SaveToOrder && !record.SaveToMenu">Xác nhận</VBtn>
+                </div>
 
                 <MLHbox v-else>
                     <VBtn variant="tonal" class="bg-green-500 hover:bg-green-600 text-white ml-1 hover:scale-105" rounded @click="isShow = false;">Đóng</VBtn>

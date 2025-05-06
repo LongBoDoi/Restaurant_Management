@@ -7,26 +7,28 @@
             
             <!-- Header -->
             <VCardTitle class="bg-gradient-to-r from-teal-600 to-green-500 px-6 py-4 d-flex justify-between items-center">
-                <h2 className="text-white text-xl font-bold">Khách hàng</h2>
+                <h2 class="text-white text-xl font-bold">Khách hàng</h2>
                 <VBtn variant="plain" style="color: white; opacity: 1; width: 40px; height: 40px;" class="ml-auto" icon="mdi-close" @click="handleCloseDialog" />
             </VCardTitle>
 
             <!-- Body -->
             <VCardItem class="pa-6">
                 <VForm ref="form"> 
-                    <div className="space-y-4">
+                    <div class="space-y-4">
                         <!-- Tên khách hàng -->
                         <div>
-                            <label className="block text-sm font-medium text-gray-700">Tên khách hàng <span style="color: red;">*</span></label>
+                            <label class="block text-sm font-medium text-gray-700">Tên khách hàng <span style="color: red;">*</span></label>
                             <VTextField class="mt-1" density="compact" variant="outlined" v-model:model-value="record.CustomerName" hide-details
+                                color="primary"
                                 :rules="[(v:string|undefined) => v !== undefined && v !== '']"
                             />
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-gray-700">Số điện thoại <span style="color: red;">*</span></label>
+                            <label class="block text-sm font-medium text-gray-700">Số điện thoại <span style="color: red;">*</span></label>
                             <VTextField class="mt-1" density="compact" variant="outlined" v-model:model-value="record.PhoneNumber" hide-details
                                 v-mask="'0### ### ###'"
+                                color="primary"
                                 :rules="[
                                     (v:string|undefined) => v !== undefined && v !== ''
                                 ]"
@@ -34,8 +36,9 @@
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-gray-700">Email</label>
+                            <label class="block text-sm font-medium text-gray-700">Email</label>
                             <VTextField class="mt-1" type="email" density="compact" variant="outlined" v-model:model-value="record.Email" hide-details
+                                color="primary"
                                 :rules="[
                                     (v:string|undefined) => !v || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)
                                 ]"
@@ -43,8 +46,8 @@
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-gray-700">Địa chỉ</label>
-                            <VTextField class="mt-1" type="email" density="compact" variant="outlined" v-model:model-value="record.Address" hide-details />
+                            <label class="block text-sm font-medium text-gray-700">Địa chỉ</label>
+                            <VTextField class="mt-1" type="email" density="compact" variant="outlined" v-model:model-value="record.Address" hide-details color="primary" />
                         </div>
                     </div>
                 </VForm>

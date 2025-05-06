@@ -7,7 +7,7 @@
 
             <!-- Title -->
             <VCardTitle class="bg-gradient-to-r from-teal-600 to-green-500 px-6 py-4 d-flex justify-between items-center">
-                <h2 className="text-white text-xl font-bold">Order</h2>
+                <h2 class="text-white text-xl font-bold">Order</h2>
                 <VBtn variant="plain" style="color: white; opacity: 1; width: 40px; height: 40px;" class="ml-auto" icon="mdi-close" @click="handleCloseDialog" />
             </VCardTitle>
 

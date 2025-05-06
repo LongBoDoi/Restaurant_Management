@@ -2,6 +2,7 @@
 using API.ML.Common;
 using API.ML.CustomAtrributes;
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace API.ML.BO
 {
@@ -53,11 +54,18 @@ namespace API.ML.BO
         /// <summary>
         /// Lịch làm việc
         /// </summary>
-        public string? Schedule {  get; set; }
+        public string? Schedule { get; set; }
 
         /// <summary>
         /// Dữ liệu đăng nhập
         /// </summary>
         public UserLogin? UserLogin { get; set; }
+
+        /// <summary>
+        /// Dữ liệu vai trò
+        /// </summary>
+        [GetDetail]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public IEnumerable<Role> Roles { get; set; } = new List<Role>();
     }
 }

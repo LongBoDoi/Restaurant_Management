@@ -75,56 +75,56 @@
                         <VBtn prepend-icon="mdi-check" class="bg-primary text-white" style="border-radius: 18px; opacity: 1 !important;" @click="handleBookReservationRequest">ĐẶT BÀN</VBtn>
                     </div>
                 </VForm>
-                <div v-else className="flex flex-col items-center justify-center py-8 space-y-6">
+                <div v-else class="flex flex-col items-center justify-center py-8 space-y-6">
                     <VIcon class="bg-emerald-400 text-white rounded-full pa-4" icon="mdi-check" :size="80" />
 
-                    <h3 className="text-2xl font-bold text-emerald-800 text-center">Đặt bàn thành công!</h3>
+                    <h3 class="text-2xl font-bold text-emerald-800 text-center">Đặt bàn thành công!</h3>
 
-                    <p className="text-emerald-700 text-center max-w-md">
+                    <p class="text-emerald-700 text-center max-w-md">
                         Cảm ơn bạn đã đặt bàn tại {{ $commonFunction.getSettingValue('RestaurantName') }}. Chúng tôi sẽ sớm liên hệ với bạn để xác nhận thông tin.
                     </p>
 
-                    <div className="bg-emerald-50 p-6 rounded-lg w-full max-w-md border border-emerald-200">
-                        <h4 className="font-semibold text-emerald-800 mb-4 text-lg">Thông tin đặt bàn</h4>
+                    <div class="bg-emerald-50 p-6 rounded-lg w-full max-w-md border border-emerald-200">
+                        <h4 class="font-semibold text-emerald-800 mb-4 text-lg">Thông tin đặt bàn</h4>
 
-                        <div className="space-y-3">
-                            <div className="flex justify-between">
-                                <span className="text-emerald-700 font-medium">Họ tên:</span>
-                                <span className="text-emerald-900">{{ reservation.CustomerName }}</span>
+                        <div class="space-y-3">
+                            <div class="flex justify-between">
+                                <span class="text-emerald-700 font-medium">Họ tên:</span>
+                                <span class="text-emerald-900">{{ reservation.CustomerName }}</span>
                             </div>
 
-                            <div className="flex justify-between">
-                                <span className="text-emerald-700 font-medium">Số điện thoại:</span>
-                                <span className="text-emerald-900">{{ reservation.CustomerPhoneNumber }}</span>
+                            <div class="flex justify-between">
+                                <span class="text-emerald-700 font-medium">Số điện thoại:</span>
+                                <span class="text-emerald-900">{{ reservation.CustomerPhoneNumber }}</span>
                             </div>
 
-                            <div className="flex justify-between">
-                                <span className="text-emerald-700 font-medium">Ngày:</span>
-                                <span className="text-emerald-900">{{ $commonFunction.formatDate(reservation.ReservationDate) }}</span>
+                            <div class="flex justify-between">
+                                <span class="text-emerald-700 font-medium">Ngày:</span>
+                                <span class="text-emerald-900">{{ $commonFunction.formatDate(reservation.ReservationDate) }}</span>
                             </div>
 
-                            <div className="flex justify-between">
-                                <span className="text-emerald-700 font-medium">Giờ:</span>
-                                <span className="text-emerald-900">{{ $commonFunction.formatTime(reservation.ReservationDate) }}</span>
+                            <div class="flex justify-between">
+                                <span class="text-emerald-700 font-medium">Giờ:</span>
+                                <span class="text-emerald-900">{{ $commonFunction.formatTime(reservation.ReservationDate) }}</span>
                             </div>
 
-                            <div className="flex justify-between">
-                                <span className="text-emerald-700 font-medium">Số người:</span>
-                                <span className="text-emerald-900">{{ reservation.GuestCount }} người</span>
+                            <div class="flex justify-between">
+                                <span class="text-emerald-700 font-medium">Số người:</span>
+                                <span class="text-emerald-900">{{ reservation.GuestCount }} người</span>
                             </div>
 
-                            <div className="flex justify-between">
-                                <span className="text-emerald-700 font-medium">Yêu cầu:</span>
-                                <span className="text-emerald-900 text-right" style="max-width: 10rem;">{{ reservation.Note }}</span>
+                            <div class="flex justify-between">
+                                <span class="text-emerald-700 font-medium">Yêu cầu:</span>
+                                <span class="text-emerald-900 text-right" style="max-width: 10rem;">{{ reservation.Note }}</span>
                             </div>
 
-                            <div className="border-t border-emerald-200 pt-3 mt-3">
+                            <div class="border-t border-emerald-200 pt-3 mt-3">
                             </div>
                         </div>
                     </div>
 
-                    <h4 className="font-bold text-emerald-800">Chúng tôi rất mong đợi được phục vụ bạn tốt nhất!</h4>
-                    <p className="text-emerald-700 mb-3 text-center max-w-md">
+                    <h4 class="font-bold text-emerald-800">Chúng tôi rất mong đợi được phục vụ bạn tốt nhất!</h4>
+                    <p class="text-emerald-700 mb-3 text-center max-w-md">
                         Vui lòng đến đúng giờ hẹn. Nếu bạn cần thay đổi thông tin hoặc huỷ đặt bàn, vui lòng liên hệ lại cho chúng tôi trước ít nhất 04 tiếng.
                     </p>
                 </div>

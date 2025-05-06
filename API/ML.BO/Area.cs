@@ -23,11 +23,18 @@ namespace API.ML.BO
         /// Số lượng bàn
         /// </summary>
         [NotMapped]
-        public int TableCount { get; set; }
+        public int TableCount
+        {
+            get
+            {
+                return this.Tables?.Count() ?? 0;
+            }
+        }
 
         /// <summary>
         /// Danh sách bàn
         /// </summary>
+        [GetDataPagingInclude]
         public IEnumerable<Table>? Tables { get; set; }
     }
 }

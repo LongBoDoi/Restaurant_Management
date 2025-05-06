@@ -49,6 +49,11 @@ namespace API.ML.BO
         public int LoyaltyPoint { get; set; }
 
         /// <summary>
+        /// Link ảnh
+        /// </summary>
+        public string? ImageUrl { get; set; }
+
+        /// <summary>
         /// Danh sách cuộc hội thoại với chatbot
         /// </summary>
         public IEnumerable<ChatbotConversation>? ChatbotConversations { get; set; }

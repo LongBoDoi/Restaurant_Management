@@ -2,7 +2,7 @@
 
 <template>
     <VContainer style="padding: unset;" class="flex flex-column">
-        <h2 className="text-2xl font-bold text-gray-800">Nhóm thực đơn</h2>
+        <h2 class="text-2xl font-bold text-gray-800">Nhóm thực đơn</h2>
 
         <FormMenuCategoryList class="h-full" />
     </VContainer>

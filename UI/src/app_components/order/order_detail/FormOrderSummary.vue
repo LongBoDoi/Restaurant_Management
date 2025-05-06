@@ -96,7 +96,7 @@
         <!-- Ghi chú -->
         <div class="grid grid-cols-2 gap-6 mb-6">
             <div>
-                <h4 className="font-medium mb-2">Ghi chú</h4>
+                <h4 class="font-medium mb-2">Ghi chú</h4>
                 <div class="border pa-4 rounded-lg" style="min-height: 100px;">
                     {{ order.SpecialRequest }}
                 </div>

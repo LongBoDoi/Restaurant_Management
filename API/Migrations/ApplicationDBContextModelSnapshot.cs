@@ -170,6 +170,9 @@ namespace API.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("varchar(50)");
 
+                    b.Property<string>("ImageUrl")
+                        .HasColumnType("longtext");
+
                     b.Property<int>("LoyaltyPoint")
                         .HasColumnType("int");
 
@@ -243,8 +246,10 @@ namespace API.Migrations
                         new
                         {
                             EmployeeID = new Guid("d0929aef-1a5b-44f6-962d-01f7f9bb2b2b"),
+                            Email = "",
                             EmployeeCode = "admin",
                             EmployeeName = "Admin",
+                            PhoneNumber = "",
                             WorkStatus = 0
                         });
                 });
@@ -572,6 +577,92 @@ namespace API.Migrations
                     b.ToTable("OrderTable");
                 });
 
+            modelBuilder.Entity("API.ML.BO.Permission", b =>
+                {
+                    b.Property<Guid>("PermissionID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
+
+                    b.Property<DateTime?>("CreatedDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<DateTime?>("ModifiedDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("PermissionCode")
+                        .IsRequired()
+                        .HasMaxLength(25)
+                        .HasColumnType("varchar(25)");
+
+                    b.Property<string>("PermissionName")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)");
+
+                    b.HasKey("PermissionID");
+
+                    b.HasIndex("PermissionCode")
+                        .IsUnique();
+
+                    b.ToTable("Permission");
+
+                    b.HasData(
+                        new
+                        {
+                            PermissionID = new Guid("3d1f0881-6469-4255-901f-81cef0298029"),
+                            PermissionCode = "ManageMenu",
+                            PermissionName = "Quản lý thực đơn"
+                        },
+                        new
+                        {
+                            PermissionID = new Guid("bf448b0b-b292-44b0-b563-69b78096fe84"),
+                            PermissionCode = "ManageInventory",
+                            PermissionName = "Quản lý nguyên liệu"
+                        },
+                        new
+                        {
+                            PermissionID = new Guid("5db0fbde-6a21-41c9-9676-27a3332760b3"),
+                            PermissionCode = "ManageTable",
+                            PermissionName = "Quản lý bàn, đặt bàn"
+                        },
+                        new
+                        {
+                            PermissionID = new Guid("45dbc11e-49ff-49a2-8f26-ca1823bf7a34"),
+                            PermissionCode = "ManageOrder",
+                            PermissionName = "Quản lý order"
+                        },
+                        new
+                        {
+                            PermissionID = new Guid("50180af9-4ce3-436e-9fd5-57df78da2d74"),
+                            PermissionCode = "ManageCustomer",
+                            PermissionName = "Quản lý khách hàng"
+                        },
+                        new
+                        {
+                            PermissionID = new Guid("5dcb6d2a-d5bc-42f2-a184-7c317c30a67d"),
+                            PermissionCode = "ManageEmployee",
+                            PermissionName = "Quản lý nhân viên"
+                        },
+                        new
+                        {
+                            PermissionID = new Guid("3978b007-d63c-442c-bcc1-600dcc251299"),
+                            PermissionCode = "ManagePermission",
+                            PermissionName = "Quản lý phân quyền"
+                        },
+                        new
+                        {
+                            PermissionID = new Guid("0b87ffbc-c7c7-482a-af25-ceb2c9f2daf2"),
+                            PermissionCode = "ViewReport",
+                            PermissionName = "Xem báo cáo doanh thu"
+                        },
+                        new
+                        {
+                            PermissionID = new Guid("9faeb1ff-0e3f-4faf-afa4-80b0e90b4f60"),
+                            PermissionCode = "ManageSetting",
+                            PermissionName = "Quản lý thiết lập"
+                        });
+                });
+
             modelBuilder.Entity("API.ML.BO.Reservation", b =>
                 {
                     b.Property<Guid>("ReservationID")
@@ -648,6 +739,62 @@ namespace API.Migrations
                     b.HasIndex("TableID");
 
                     b.ToTable("ReservationTable");
+                });
+
+            modelBuilder.Entity("API.ML.BO.Role", b =>
+                {
+                    b.Property<Guid>("RoleID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
+
+                    b.Property<DateTime?>("CreatedDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<DateTime?>("ModifiedDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("RoleCode")
+                        .IsRequired()
+                        .HasMaxLength(25)
+                        .HasColumnType("varchar(25)");
+
+                    b.Property<string>("RoleName")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)");
+
+                    b.HasKey("RoleID");
+
+                    b.HasIndex("RoleCode")
+                        .IsUnique();
+
+                    b.ToTable("Role");
+
+                    b.HasData(
+                        new
+                        {
+                            RoleID = new Guid("4a2ef244-b552-498b-918b-cc18fd2afbf3"),
+                            RoleCode = "AD",
+                            RoleName = "Quản trị viên"
+                        },
+                        new
+                        {
+                            RoleID = new Guid("b85db478-0a75-4561-91ab-acdc730e9990"),
+                            RoleCode = "MNG",
+                            RoleName = "Quản lý"
+                        },
+                        new
+                        {
+                            RoleID = new Guid("7674405c-363b-48f8-8533-d20d301731b3"),
+                            RoleCode = "CSH",
+                            RoleName = "Thu ngân"
+                        },
+                        new
+                        {
+                            RoleID = new Guid("d5f40283-a427-4731-9548-c83e1c714da6"),
+                            RoleCode = "SRV",
+                            RoleName = "Phục vụ"
+                        });
                 });
 
             modelBuilder.Entity("API.ML.BO.Setting", b =>
@@ -859,7 +1006,7 @@ namespace API.Migrations
                         {
                             UserLoginID = new Guid("8b59dd9f-72d8-4d01-a971-03bc98c2262f"),
                             EmployeeID = new Guid("d0929aef-1a5b-44f6-962d-01f7f9bb2b2b"),
-                            Password = "123456",
+                            Password = "AQAAAAIAAYagAAAAEKqe/dcgGzIC8jgfJymczuCBpLYck9TdfxOQ19M6h9o4qBbTxjCk8PP2fzb49fPGPQ==",
                             Token = "",
                             Username = "admin"
                         });
@@ -878,6 +1025,160 @@ namespace API.Migrations
                     b.HasIndex("InventoryItemsInventoryItemID");
 
                     b.ToTable("CustomMenuRequestInventoryItem");
+                });
+
+            modelBuilder.Entity("EmployeeRole", b =>
+                {
+                    b.Property<Guid>("EmployeesEmployeeID")
+                        .HasColumnType("char(36)");
+
+                    b.Property<Guid>("RolesRoleID")
+                        .HasColumnType("char(36)");
+
+                    b.HasKey("EmployeesEmployeeID", "RolesRoleID");
+
+                    b.HasIndex("RolesRoleID");
+
+                    b.ToTable("EmployeeRole");
+
+                    b.HasData(
+                        new
+                        {
+                            EmployeesEmployeeID = new Guid("d0929aef-1a5b-44f6-962d-01f7f9bb2b2b"),
+                            RolesRoleID = new Guid("4a2ef244-b552-498b-918b-cc18fd2afbf3")
+                        });
+                });
+
+            modelBuilder.Entity("PermissionRole", b =>
+                {
+                    b.Property<Guid>("PermissionsPermissionID")
+                        .HasColumnType("char(36)");
+
+                    b.Property<Guid>("RolesRoleID")
+                        .HasColumnType("char(36)");
+
+                    b.HasKey("PermissionsPermissionID", "RolesRoleID");
+
+                    b.HasIndex("RolesRoleID");
+
+                    b.ToTable("PermissionRole");
+
+                    b.HasData(
+                        new
+                        {
+                            PermissionsPermissionID = new Guid("3d1f0881-6469-4255-901f-81cef0298029"),
+                            RolesRoleID = new Guid("4a2ef244-b552-498b-918b-cc18fd2afbf3")
+                        },
+                        new
+                        {
+                            PermissionsPermissionID = new Guid("bf448b0b-b292-44b0-b563-69b78096fe84"),
+                            RolesRoleID = new Guid("4a2ef244-b552-498b-918b-cc18fd2afbf3")
+                        },
+                        new
+                        {
+                            PermissionsPermissionID = new Guid("5db0fbde-6a21-41c9-9676-27a3332760b3"),
+                            RolesRoleID = new Guid("4a2ef244-b552-498b-918b-cc18fd2afbf3")
+                        },
+                        new
+                        {
+                            PermissionsPermissionID = new Guid("45dbc11e-49ff-49a2-8f26-ca1823bf7a34"),
+                            RolesRoleID = new Guid("4a2ef244-b552-498b-918b-cc18fd2afbf3")
+                        },
+                        new
+                        {
+                            PermissionsPermissionID = new Guid("50180af9-4ce3-436e-9fd5-57df78da2d74"),
+                            RolesRoleID = new Guid("4a2ef244-b552-498b-918b-cc18fd2afbf3")
+                        },
+                        new
+                        {
+                            PermissionsPermissionID = new Guid("5dcb6d2a-d5bc-42f2-a184-7c317c30a67d"),
+                            RolesRoleID = new Guid("4a2ef244-b552-498b-918b-cc18fd2afbf3")
+                        },
+                        new
+                        {
+                            PermissionsPermissionID = new Guid("3978b007-d63c-442c-bcc1-600dcc251299"),
+                            RolesRoleID = new Guid("4a2ef244-b552-498b-918b-cc18fd2afbf3")
+                        },
+                        new
+                        {
+                            PermissionsPermissionID = new Guid("0b87ffbc-c7c7-482a-af25-ceb2c9f2daf2"),
+                            RolesRoleID = new Guid("4a2ef244-b552-498b-918b-cc18fd2afbf3")
+                        },
+                        new
+                        {
+                            PermissionsPermissionID = new Guid("9faeb1ff-0e3f-4faf-afa4-80b0e90b4f60"),
+                            RolesRoleID = new Guid("4a2ef244-b552-498b-918b-cc18fd2afbf3")
+                        },
+                        new
+                        {
+                            PermissionsPermissionID = new Guid("3d1f0881-6469-4255-901f-81cef0298029"),
+                            RolesRoleID = new Guid("b85db478-0a75-4561-91ab-acdc730e9990")
+                        },
+                        new
+                        {
+                            PermissionsPermissionID = new Guid("bf448b0b-b292-44b0-b563-69b78096fe84"),
+                            RolesRoleID = new Guid("b85db478-0a75-4561-91ab-acdc730e9990")
+                        },
+                        new
+                        {
+                            PermissionsPermissionID = new Guid("5db0fbde-6a21-41c9-9676-27a3332760b3"),
+                            RolesRoleID = new Guid("b85db478-0a75-4561-91ab-acdc730e9990")
+                        },
+                        new
+                        {
+                            PermissionsPermissionID = new Guid("45dbc11e-49ff-49a2-8f26-ca1823bf7a34"),
+                            RolesRoleID = new Guid("b85db478-0a75-4561-91ab-acdc730e9990")
+                        },
+                        new
+                        {
+                            PermissionsPermissionID = new Guid("50180af9-4ce3-436e-9fd5-57df78da2d74"),
+                            RolesRoleID = new Guid("b85db478-0a75-4561-91ab-acdc730e9990")
+                        },
+                        new
+                        {
+                            PermissionsPermissionID = new Guid("5dcb6d2a-d5bc-42f2-a184-7c317c30a67d"),
+                            RolesRoleID = new Guid("b85db478-0a75-4561-91ab-acdc730e9990")
+                        },
+                        new
+                        {
+                            PermissionsPermissionID = new Guid("3978b007-d63c-442c-bcc1-600dcc251299"),
+                            RolesRoleID = new Guid("b85db478-0a75-4561-91ab-acdc730e9990")
+                        },
+                        new
+                        {
+                            PermissionsPermissionID = new Guid("0b87ffbc-c7c7-482a-af25-ceb2c9f2daf2"),
+                            RolesRoleID = new Guid("b85db478-0a75-4561-91ab-acdc730e9990")
+                        },
+                        new
+                        {
+                            PermissionsPermissionID = new Guid("9faeb1ff-0e3f-4faf-afa4-80b0e90b4f60"),
+                            RolesRoleID = new Guid("b85db478-0a75-4561-91ab-acdc730e9990")
+                        },
+                        new
+                        {
+                            PermissionsPermissionID = new Guid("5db0fbde-6a21-41c9-9676-27a3332760b3"),
+                            RolesRoleID = new Guid("7674405c-363b-48f8-8533-d20d301731b3")
+                        },
+                        new
+                        {
+                            PermissionsPermissionID = new Guid("45dbc11e-49ff-49a2-8f26-ca1823bf7a34"),
+                            RolesRoleID = new Guid("7674405c-363b-48f8-8533-d20d301731b3")
+                        },
+                        new
+                        {
+                            PermissionsPermissionID = new Guid("50180af9-4ce3-436e-9fd5-57df78da2d74"),
+                            RolesRoleID = new Guid("7674405c-363b-48f8-8533-d20d301731b3")
+                        },
+                        new
+                        {
+                            PermissionsPermissionID = new Guid("5db0fbde-6a21-41c9-9676-27a3332760b3"),
+                            RolesRoleID = new Guid("d5f40283-a427-4731-9548-c83e1c714da6")
+                        },
+                        new
+                        {
+                            PermissionsPermissionID = new Guid("45dbc11e-49ff-49a2-8f26-ca1823bf7a34"),
+                            RolesRoleID = new Guid("d5f40283-a427-4731-9548-c83e1c714da6")
+                        });
                 });
 
             modelBuilder.Entity("API.ML.BO.ChatbotConversation", b =>
@@ -1058,6 +1359,36 @@ namespace API.Migrations
                     b.HasOne("API.ML.BO.InventoryItem", null)
                         .WithMany()
                         .HasForeignKey("InventoryItemsInventoryItemID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("EmployeeRole", b =>
+                {
+                    b.HasOne("API.ML.BO.Employee", null)
+                        .WithMany()
+                        .HasForeignKey("EmployeesEmployeeID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("API.ML.BO.Role", null)
+                        .WithMany()
+                        .HasForeignKey("RolesRoleID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("PermissionRole", b =>
+                {
+                    b.HasOne("API.ML.BO.Permission", null)
+                        .WithMany()
+                        .HasForeignKey("PermissionsPermissionID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("API.ML.BO.Role", null)
+                        .WithMany()
+                        .HasForeignKey("RolesRoleID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

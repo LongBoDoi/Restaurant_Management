@@ -8,6 +8,7 @@ interface InventoryItem extends MLEntity {
     WarningStockQuantity: number,
     Unit: string,
     InventoryItemCategoryID: string,
+    Inactive: boolean,
 
     InventoryItemCategory?: InventoryItemCategory
 };

@@ -1,6 +1,7 @@
 ﻿using API.ML.BO;
 using API.ML.BOBase;
 using API.ML.Common;
+using API.ML.Extensions;
 using API.ML.Utility;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -8,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using System.IdentityModel.Tokens.Jwt;
+using System.Net;
 using System.Security.Claims;
 using System.Text;
 
@@ -24,6 +26,8 @@ namespace API.Controllers
             public object? UserData { get; set; }
 
             public EnumUserType? UserType { get; set; }
+
+            public string Token { get; set; } = string.Empty;
 
             public List<Setting> Settings { get; set; } = [];
         }
@@ -44,6 +48,11 @@ namespace API.Controllers
 
             try
             {
+                if (customer.UserLogin != null)
+                {
+                    customer.UserLogin.Password = PasswordHasherService.HashPassword(customer.UserLogin.Password);
+                }
+
                 Customer? dbCustomer = _context.Customer.FirstOrDefault(c =>
                     (!string.IsNullOrEmpty(customer.PhoneNumber) && c.PhoneNumber == customer.PhoneNumber) ||
                     (!string.IsNullOrEmpty(customer.Email) && c.Email == customer.Email)
@@ -91,17 +100,13 @@ namespace API.Controllers
         [HttpPost("LoginEmployee")]
         public MLActionResult LoginEmployee(UserLogin userLogin)
         {
-            MLActionResult result = new()
-            {
-                Success = true
-            };
+            MLActionResult result = new();
 
             try
             {
                 Employee? employee = _context.Employee.Include(x => x.UserLogin).FirstOrDefault(x => x.UserLogin != null && 
-                                                                                       userLogin.Username.Equals(x.UserLogin.Username, StringComparison.OrdinalIgnoreCase) &&
-                                                                                       userLogin.Password.Equals(x.UserLogin.Password));
-                if (employee != null && employee.UserLogin != null)
+                                                                                       userLogin.Username.Equals(x.EmployeeCode, StringComparison.OrdinalIgnoreCase));
+                if (employee != null && employee.UserLogin != null && PasswordHasherService.VerifyPassword(userLogin.Password, employee.UserLogin.Password))
                 {
                     var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("da3d80f0-b79b-4179-b791-cc4e8bfdeb2b"));
                     var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
@@ -139,7 +144,18 @@ namespace API.Controllers
                         Response.Cookies.Delete("AuthToken");
                     }
 
-                    result.Data = userToken;
+                    employee.UserLogin.Token = userToken;
+                    _context.Entry(employee.UserLogin).State = EntityState.Modified;
+
+                    if (_context.SaveChanges() > 0)
+                    {
+                        result.Success = true;
+                        result.Data = new
+                        {
+                            UserID = employee.EmployeeID,
+                            Token = userToken
+                        };
+                    }
                 } else
                 {
                     result.Success = false;
@@ -163,10 +179,7 @@ namespace API.Controllers
         [HttpPost("LoginCustomer")]
         public MLActionResult LoginCustomer(UserLogin userLogin)
         {
-            MLActionResult result = new()
-            {
-                Success = true
-            };
+            MLActionResult result = new();
 
             try
             {
@@ -184,7 +197,7 @@ namespace API.Controllers
                     } else
                     {
                         // Nếu đúng mật khẩu thì đăng nhập
-                        if (dbUserLogin.Password == userLogin.Password)
+                        if (PasswordHasherService.VerifyPassword(userLogin.Password, dbUserLogin.Password))
                         {
                             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("da3d80f0-b79b-4179-b791-cc4e8bfdeb2b"));
                             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
@@ -222,7 +235,18 @@ namespace API.Controllers
                                 Response.Cookies.Delete("AuthToken");
                             }
 
-                            result.Data = userToken;
+                            dbUserLogin.Token = userToken;
+                            _context.Entry(dbUserLogin).State = EntityState.Modified;
+
+                            if (_context.SaveChanges() > 0)
+                            {
+                                result.Success = true;
+                                result.Data = new
+                                {
+                                    UserID = dbCustomer.CustomerID,
+                                    Token = userToken
+                                };
+                            }
                             return result;
                         }
                     }
@@ -255,6 +279,22 @@ namespace API.Controllers
 
             try
             {
+                string strUserID = User.Claims.FirstOrDefault(x => x.Type == "UserID")?.Value ?? "";
+                if (Guid.TryParse(strUserID, out Guid userID))
+                {
+                    var userLoginData = _context.UserLogin.FirstOrDefault(ul => ul.EmployeeID == userID || ul.CustomerID == userID);
+                    if (userLoginData != null)
+                    {
+                        userLoginData.Token = "";
+                        _context.Entry(userLoginData).State = EntityState.Modified;
+
+                        if (_context.SaveChanges() > 0)
+                        {
+                            result.Success = true;
+                        }
+                    }
+                }
+
                 Response.Cookies.Delete("AuthToken");
 
                 //Session.Token = string.Empty;
@@ -268,7 +308,7 @@ namespace API.Controllers
         }
 
         [HttpGet("GetUserData")]
-        public MLActionResult GetUserData([FromHeader] string authorization)
+        public MLActionResult GetUserData(string? userID = "")
         {
             MLActionResult result = new()
             {
@@ -284,22 +324,25 @@ namespace API.Controllers
                 };
                 result.Data = sessionInterface;
 
+                if (!Guid.TryParse(userID, out Guid gUserID))
+                {
+                    result.Success = false;
+                    return result;
+                }
+                string? token = _context.UserLogin.FirstOrDefault(ul => ul.EmployeeID == gUserID || ul.CustomerID == gUserID)?.Token;
                 // Validate token
-                if (string.IsNullOrEmpty(authorization) || !authorization.StartsWith("Bearer "))
+                if (string.IsNullOrEmpty(token))
                 {
                     result.Success = false;
                     return result;
                 }
 
-                string token = authorization.Split(" ")[1];
                 JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();
 
                 try
                 {
                     tokenHandler.ValidateToken(token, CommonValue.TokenValidationParameters, out _);
 
-                    string strUserID = User.Claims.FirstOrDefault(x => x.Type == "UserID")?.Value ?? "";
-                    _ = Guid.TryParse(strUserID, out Guid userID);
                     string strUserName = User.Claims.FirstOrDefault(x => x.Type == "Username")?.Value ?? "";
                     string strUserType = User.Claims.FirstOrDefault(x => x.Type == "UserType")?.Value ?? "";
                     _ = EnumUserType.TryParse(strUserType, out EnumUserType userType);
@@ -310,10 +353,18 @@ namespace API.Controllers
                     switch (userType)
                     {
                         case EnumUserType.Employee:
-                            sessionInterface.UserData = _context.Employee.FirstOrDefault(e => e.EmployeeID == userID);
+                            var employeeData = _context.Employee.Include(e => e.Roles).ThenInclude(r => r.Permissions).FirstOrDefault(e => e.EmployeeID == gUserID);
+                            employeeData.RemoveCircularReferences();
+                            sessionInterface.UserData = employeeData;
+
+                            sessionInterface.Token = _context.UserLogin.FirstOrDefault(ul => ul.EmployeeID == gUserID)?.Token ?? "";
                             break;
                         case EnumUserType.Customer:
-                            sessionInterface.UserData = _context.Customer.FirstOrDefault(e => e.CustomerID == userID);
+                            var customerData = _context.Customer.FirstOrDefault(e => e.CustomerID == gUserID);
+
+                            sessionInterface.Token = _context.UserLogin.FirstOrDefault(ul => ul.CustomerID == gUserID)?.Token ?? "";
+                            customerData.RemoveCircularReferences();
+                            sessionInterface.UserData = customerData;
                             break;
                     }
 
@@ -323,6 +374,52 @@ namespace API.Controllers
                 {
                     result.Success = false;
                     Response.Cookies.Delete("AuthToken");
+                }
+            }
+            catch (Exception ex)
+            {
+                CommonFunction.HandleException(ex, result, _context);
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Đổi mật khẩu
+        /// </summary>
+        /// <param name="userLogin"></param>
+        /// <param name="userType"></param>
+        /// <returns></returns>
+        [Authorize]
+        [HttpPost("ChangePassword")]
+        public MLActionResult ChangePassword(UserLogin userLogin)
+        {
+            MLActionResult result = new();
+
+            try
+            {
+                UserLogin? dbUserLogin = _context.UserLogin.FirstOrDefault(ul =>
+                    ((userLogin.EmployeeID.HasValue && ul.EmployeeID == userLogin.EmployeeID) || (userLogin.CustomerID.HasValue && ul.CustomerID == userLogin.CustomerID))
+                );
+
+                if (dbUserLogin != null)
+                {
+                    if (!PasswordHasherService.VerifyPassword(userLogin.OldPassword, dbUserLogin.Password))
+                    {
+                        result.ErrorMsg = "Mật khẩu hiện tại không chính xác. Vui lòng kiểm tra lại.";
+                        return result;
+                    }
+
+                    dbUserLogin.Password = PasswordHasherService.HashPassword(userLogin.Password);
+                    dbUserLogin.Token = "";
+
+                    _context.Entry(dbUserLogin).State = EntityState.Modified;
+                    result.Success = _context.SaveChanges() > 0;
+
+                    if (result.Success)
+                    {
+                        Response.Cookies.Delete("AuthToken");
+                    }
                 }
             }
             catch (Exception ex)

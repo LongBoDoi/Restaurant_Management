@@ -17,6 +17,7 @@ namespace API.Controllers
         /// </summary>
         /// <param name="reservation"></param>
         /// <returns></returns>
+        [Authorize]
         [HttpPost("CreateCustomerReservation")]
         public MLActionResult CreateCustomerReservation(Reservation reservation)
         {

@@ -7,7 +7,7 @@
 
             <!-- Header -->
             <VCardTitle class="bg-gradient-to-r from-teal-600 to-green-500 px-6 py-4 d-flex justify-between items-center">
-                <h2 className="text-white text-xl font-bold">Nguyên liệu</h2>
+                <h2 class="text-white text-xl font-bold">Nguyên liệu</h2>
                 <VBtn variant="plain" style="color: white; opacity: 1; width: 40px; height: 40px;" class="ml-auto" icon="mdi-close" @click="handleCloseDialog" />
             </VCardTitle>
 
@@ -15,8 +15,8 @@
             <VCardItem class="pa-6">
                 <VForm ref="form">
                     <!-- Tên nhóm nguyên liệu -->
-                    <div className="mb-4">
-                        <label className="block text-gray-700 text-sm font-medium">Tên nhóm nguyên liệu <span style="color: red;">*</span></label>
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-medium">Tên nhóm nguyên liệu <span style="color: red;">*</span></label>
                         
                         <VTextField class="mt-2" density="compact" variant="outlined" v-model:model-value="record.InventoryItemCategoryName" hide-details
                             :rules="[(v:string|undefined) => v !== undefined && v !== '']"
@@ -24,7 +24,7 @@
                     </div>
 
                     <!-- Ngừng hoạt động -->
-                    <div className="mb-4">
+                    <div class="mb-4">
                         <VCheckbox color="primary" hide-details v-model:model-value="record.Inactive" label="Ngừng hoạt động" />
                     </div>
                 </VForm>

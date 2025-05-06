@@ -12,18 +12,36 @@ import Cleave from 'cleave.js';
 import { PropType } from 'vue';
 
 export default {
+    inject: {
+        registerInput: {
+            from: 'registerInput',
+            default: undefined
+        },
+        unregisterInput: {
+            from: 'unregisterInput',
+            default: undefined
+        }
+    },
     props: {
         modelValue: {
-            type: Number
+            type: Number||undefined
         },
 
         rules: {
-            type: Object as PropType<((v:number) => boolean)[]>,
+            type: Object as PropType<((v:number) => boolean|string)[]>,
             default: []
+        },
+
+        nullable: {
+            type: Boolean,
+            default: false
         }
     },
 
     mounted() {
+        if (this.registerInput && typeof(this.registerInput) === 'function') {
+            this.registerInput(this);
+        }
         const inputEl = (this.$refs.txtFieldRef as any)?.$el.querySelector('input');
         if (inputEl) {
             this.cleave = new Cleave(inputEl, {
@@ -32,22 +50,21 @@ export default {
                 numeralDecimalMark: ',',
                 delimiter: '.',
                 onValueChanged: (e) => {
-                    if (e.target.rawValue === '') {
+                    if (!this.nullable && e.target.rawValue === '') {
                         this.cleave?.setRawValue('0');
                         return;
                     }
                     this.formattedValue = e.target.value;
                     
-                    const rawValue = parseFloat(this.cleave?.getRawValue() ?? '0');
+                    const rawValue = parseFloat(this.cleave?.getRawValue() ?? this.defaultValue);
                     this.rawValue = rawValue;
 
-                    const errorRule = this.rules.find((method) => method(rawValue) === false);
-                    this.error = errorRule !== undefined;
+                    this.checkValid(rawValue);
                 }
             })
         }
 
-        this.cleave?.setRawValue(this.modelValue?.toString() ?? '0');
+        this.cleave?.setRawValue(this.modelValue?.toString() ?? this.defaultValue);
         this.rawValue = this.modelValue ?? 0;
 
         this.$nextTick().then(() => {
@@ -55,13 +72,20 @@ export default {
         });
     },
 
+    unmounted() {
+        if (this.unregisterInput && typeof(this.unregisterInput) === 'function') {
+            this.unregisterInput(this);
+        }
+    },
+
     data() {
         return {
             rawValue: <number>0,
-            formattedValue: <string>'0',
+            formattedValue: <string>'',
 
             cleave: <Cleave|undefined>undefined,
             error: <boolean>false,
+            errorMessage: <string>'',
             init: <boolean>false
         }
     },
@@ -71,13 +95,46 @@ export default {
             if (!this.init) {
                 return;
             }
-            this.cleave?.setRawValue(this.modelValue?.toString() ?? '0');
+            this.cleave?.setRawValue(this.modelValue?.toString() ?? this.defaultValue);
         }
     },
 
     methods: {
         onInputBlur() {
+            if (this.formattedValue === '') {
+                this.$emit('update:modelValue', undefined);
+                return;
+            }
             this.$emit('update:modelValue', this.rawValue);
+        },
+
+        checkValid(number: number) {
+            this.error = false;
+            if (this.nullable && this.formattedValue === '') {
+                this.error = false;
+                return;
+            }
+
+            const ruleResults = this.rules.map((method) => method(number));
+            const errorResult = ruleResults.find(r => r !== true);
+            if (errorResult !== undefined) {
+                this.error = true;
+                
+                if (typeof(errorResult) === 'string') {
+                    this.errorMessage = errorResult;
+                }
+            }
+        },
+
+        validate() {
+            this.checkValid(this.rawValue);
+            return (!this.error || this.errorMessage || false);
+        }
+    },
+
+    computed: {
+        defaultValue() {
+            return this.nullable ? '' : '0';
         }
     }
 }

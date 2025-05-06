@@ -60,10 +60,10 @@
                                     @click="record.Color = color;"
                                 />
 
-                                <div style="width: 32px; height: 32px; cursor: pointer;" className="border flex items-center justify-center rounded-full bg-gray-100 border-2 border-gray-300 hover:bg-gray-200 transition-all duration-200 hover:scale-110"
+                                <div style="width: 32px; height: 32px; cursor: pointer;" class="border flex items-center justify-center rounded-full bg-gray-100 border-2 border-gray-300 hover:bg-gray-200 transition-all duration-200 hover:scale-110"
                                     @click="openFormSelectColor"
                                 >
-                                    <span className="material-symbols-outlined text-sm text-gray-600">add</span>
+                                    <span class="material-symbols-outlined text-sm text-gray-600">add</span>
                                 </div>
                             </MLHbox>
                         </div>

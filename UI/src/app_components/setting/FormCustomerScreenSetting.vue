@@ -38,6 +38,7 @@
                         density="compact" 
                         variant="outlined"
                         hide-details
+                        color="primary"
                         placeholder="Nhập tên nhà hàng" 
                         v-model:model-value="getSettingByKey('RestaurantName').SettingValue"
                     />
@@ -52,6 +53,7 @@
                         density="compact" 
                         variant="outlined"
                         hide-details
+                        color="primary"
                         placeholder="Nhập số điện thoại nhà hàng"
                         v-mask="'0### ### ###'"
                         v-model="getSettingByKey('RestaurantPhoneNumber').SettingValue" 
@@ -67,7 +69,8 @@
                     density="compact" 
                     variant="outlined"
                     hide-details
-                    style="width: 65%;" 
+                    color="primary"
+                    style="width: 65%;"
                     placeholder="Nhập địa chỉ nhà hàng" 
                     v-model="getSettingByKey('RestaurantAddress').SettingValue" 
                 />
@@ -81,6 +84,7 @@
                     density="compact" 
                     variant="outlined"
                     hide-details
+                    color="primary"
                     style="width: 65%;" 
                     placeholder="Nhập châm ngôn phục vụ của nhà hàng" 
                     v-model="getSettingByKey('RestaurantSlogan').SettingValue" 

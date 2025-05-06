@@ -16,6 +16,19 @@
         InvalidLoginInfo = 4002
     }
 
+    public enum EnumTimeFilter
+    {
+        ByDay = 0,
+
+        ByWeek = 1,
+
+        ByMonth = 2,
+
+        ByYear = 3,
+
+        Custom = 4
+    }
+
     /// <summary>
     /// Edit mode
     /// </summary>
@@ -208,5 +221,37 @@
         Approved = 1,
 
         Rejected = 2
+    }
+
+    /// <summary>
+    /// Enum loại chương trình khuyến mại
+    /// </summary>
+    public enum EnumPromotionType
+    {
+        /// <summary>
+        /// Giảm giá món
+        /// </summary>
+        ItemDiscount = 0,
+
+        /// <summary>
+        /// Giảm giá order
+        /// </summary>
+        OrderDiscount = 1
+    }
+
+    /// <summary>
+    /// Enum cách tính giá trị khuyến mại
+    /// </summary>
+    public enum EnumPromotionValueType
+    {
+        /// <summary>
+        /// Theo phần trăm
+        /// </summary>
+        ByPercent = 0,
+
+        /// <summary>
+        /// Theo số tiền
+        /// </summary>
+        ByAmount = 1
     }
 }

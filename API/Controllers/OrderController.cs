@@ -96,11 +96,20 @@ namespace API.Controllers
                     order.OrderDate = DateTime.UtcNow;
 
                     // Nếu là tạo order mới mà chưa thanh toán thì gán tất cả bàn sang trạng thái "Hết chỗ"
-                    if (order.Status != EnumOrderStatus.Paid && order.OrderTables != null && order.OrderTables.Any())
+                    if (order.OrderTables != null && order.OrderTables.Any())
                     {
                         foreach (OrderTable orderTable in order.OrderTables)
                         {
                             Table saveTable = new Table { TableID = orderTable.TableID, Status = EnumTableStatus.Occupied };
+
+                            if (order.Status == EnumOrderStatus.Paid)
+                            {
+                                saveTable.Status = EnumTableStatus.Available;
+                            } else
+                            {
+                                saveTable.Status = EnumTableStatus.Occupied;
+                            }
+
                             _context.Attach(saveTable);
                             _context.Entry(saveTable).Property(t => t.Status).IsModified = true;
                         }

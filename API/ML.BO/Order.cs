@@ -68,6 +68,7 @@ namespace API.ML.BO
         /// <summary>
         /// Tên bàn
         /// </summary>
+        [SearchField]
         public string? TableName { get; set; }
 
         /// <summary>

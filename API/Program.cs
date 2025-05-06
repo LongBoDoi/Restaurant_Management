@@ -11,7 +11,13 @@ var builder = WebApplication.CreateBuilder(args);
 //Use HTTPS
 builder.WebHost.ConfigureKestrel(options =>
 {
-    options.ListenAnyIP(7198);
+    options.ListenAnyIP(7198, listenOptions =>
+    {
+        if (Config.UseCookie)
+        {
+            //listenOptions.UseHttps();
+        }
+    });
     //options.ListenLocalhost(7197, listenOptions =>
     //{
     //    listenOptions.UseHttps();
@@ -68,7 +74,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                             {
                                 var authToken = context.HttpContext.Request.Cookies["AuthToken"];
 
-                                if (!string.IsNullOrEmpty(authToken) && authToken == Session.Token)
+                                if (!string.IsNullOrEmpty(authToken))
                                 {
                                     context.Token = authToken;
                                 }
@@ -112,7 +118,10 @@ app.UseStaticFiles(new StaticFileOptions
 app.UseAuthentication();
 app.UseAuthorization();
 
-//app.UseHttpsRedirection();
+if (Config.UseCookie)
+{
+    //app.UseHttpsRedirection();
+}
 app.MapControllers();
 
 app.Run();

@@ -4,18 +4,98 @@
     <VSheet style="display: flex; flex-direction: column; overflow: hidden;" class="h-full pb-2">
         <VBtn width="fit-content" class="bg-green-500 hover:bg-green-600 hover:scale-105 mr-2 mt-1 text-white ml-auto" prepend-icon="mdi-plus" rounded @click="handleAddNewMenuItem">Thêm món mới</VBtn>
         <VCard style="width: 100% ; height: 100%;" color="rgb(249, 250, 251)" class="rounded-lg d-flex flex-column shadow-md border mt-6">
-            <div className="flex items-center space-x-4 px-6 py-4 border-b">
+            <div class="flex items-center space-x-4 px-6 py-4 border-b">
                 <VTextField density="compact" variant="outlined" prepend-inner-icon="mdi-magnify" class="focus:outline-green-500" style="max-width: 320px;" hide-details placeholder="Tìm kiếm món ăn..."
+                    color="primary"
                     :model-value="options.search"
                     @keypress.enter="options.search = $event.target.value;"
                 />
 
                 <VSelect density="compact" variant="outlined" hide-details class="ml-4" style="max-width: 160px;"
+                    color="primary"
                     :items="lstItemCategory"
                     item-title="MenuItemCategoryName"
                     item-value="MenuItemCategoryID"
                     v-model:model-value="options.categoryID"
                 />
+
+                <MLFilterPopup :filter-count="lstFilters.length" v-on:apply-filter="handleApplyFilters" v-on:reset-filter="handleResetFilters">
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block font-medium text-gray-700">Khoảng giá</label>
+                            <div class="flex items-center space-x-2 mt-1">
+                                <MLNumberField
+                                    placeholder="Tối thiểu"
+                                    variant="outlined"
+                                    density="compact"
+                                    hide-details
+                                    suffix="đ"
+                                    color="primary"
+                                    nullable
+                                    style="flex-grow: 0.5;"
+                                    
+                                    v-model="minPrice"
+                                    :rules="[
+                                        $commonValue.positiveNumberRule,
+                                        (value: number) => {
+                                            return (maxPrice === undefined || value <= maxPrice) || 'Giá tối thiểu không được lớn hơn giá tối đa.';
+                                        }
+                                    ]"
+                                />
+                                <MLNumberField
+                                    placeholder="Tối đa"
+                                    variant="outlined"
+                                    density="compact"
+                                    hide-details
+                                    suffix="đ"
+                                    color="primary"
+                                    nullable
+                                    style="flex-grow: 0.5;"
+                                    
+                                    v-model="maxPrice"
+                                    :rules="[
+                                        $commonValue.positiveNumberRule,
+                                        (value: number) => {
+                                            return minPrice === undefined || value >= minPrice;
+                                        }
+                                    ]"
+                                />
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block font-medium text-gray-700">Trạng thái</label>
+                            <VSelect
+                                :items="[
+                                    {
+                                        Text: 'Tất cả',
+                                        Value: -1
+                                    },
+                                    {
+                                        Text: 'Đang hoạt động',
+                                        Value: false
+                                    },
+                                    {
+                                        Text: 'Ngừng hoạt động',
+                                        Value: true
+                                    },
+                                ]"
+                                item-title="Text"
+                                item-value="Value"
+                                :return-object="false"
+                                v-model:model-value="status"
+
+                                density="compact"
+                                variant="outlined"
+                                hide-details
+                                color="primary"
+                                class="mt-1"
+                            />
+                        </div>
+                    </div>
+                </MLFilterPopup>
+
+                <MLSortPopup :items="lstSortOptions" v-model="options.sort" />
             </div>
 
             <VDataTableServer
@@ -40,7 +120,7 @@
                         <th class="py-3 px-6 text-right font-medium text-gray-500" style="min-width: 150px;">Giá món</th>
                         <th class="py-3 px-6 text-left font-medium text-gray-500" style="min-width: 250px;">Nhóm thực đơn</th>
                         <th class="py-3 px-6 text-left font-medium text-gray-500" style="min-width: 400px; width: 100%;">Mô tả</th>
-                        <th class="py-3 px-6 text-left font-medium text-gray-500" style="min-width: 128px;">Ngừng hoạt động</th>
+                        <th class="py-3 px-6 text-center font-medium text-gray-500" style="min-width: 128px;">Ngừng hoạt động</th>
                         <th class="py-3 px-6 text-left font-medium text-gray-500" style="min-width: 128px;">Thao tác</th>
                     </tr>
                 </template>
@@ -81,35 +161,7 @@
                 </template>
 
                 <template #bottom>
-                    <div className="px-6 py-4 bg-gray-50 border-t flex items-center justify-between">
-                        <div className="text-gray-600">{{ recordNumberText }}</div>
-                        <div className="flex align-center">
-                            <span class="text-gray-600">Số bản ghi</span>
-
-                            <VSelect
-                                class="ml-4" 
-                                style="width: 100px;" 
-                                density="compact" 
-                                variant="outlined" 
-                                hide-details 
-                                :items="[10, 25, 50, 100]"
-                                v-model:model-value="options.itemsPerPage"
-                            />
-
-                            <VBtn icon="mdi-skip-previous" variant="outlined" class="text-gray-600 ml-10" :width="40" :disabled="options.page <= 1" @click="options.page = 1;" />
-                            <VBtn icon="mdi-chevron-left" variant="outlined" class="text-gray-600 ml-2" :width="40" :disabled="options.page <= 1" @click="options.page--;" />
-
-                            <VTextField type="number" hide-spin-buttons style="width: 72px;" class="ml-2 text-center" density="compact" variant="outlined" hide-details :model-value="options.page" 
-                                :rules="[(v:string) => {
-                                    return parseInt(v) > 0 && parseInt(v) <= Math.ceil(totalCount / options.itemsPerPage);
-                                }]"
-                                @blur="onPageNumberBlur"
-                            />
-
-                            <VBtn icon="mdi-chevron-right" variant="outlined" class="text-gray-600 ml-2" :width="40" :disabled="options.page >= Math.ceil(totalCount / options.itemsPerPage)" @click="options.page++;" />
-                            <VBtn icon="mdi-skip-next" variant="outlined" class="text-gray-600 ml-2" :width="40" :disabled="options.page >= Math.ceil(totalCount / options.itemsPerPage)" @click="options.page = Math.ceil(totalCount / options.itemsPerPage);" />
-                        </div>
-                    </div>
+                    <MLDataTableFooter :options="options" :total-count="totalCount" />
                 </template>
             </VDataTableServer>
         </VCard>
@@ -119,13 +171,13 @@
 <script lang="ts">
 import EventBus from '@/common/EventBus';
 import { MenuItem, MenuItemCategory } from '@/models';
+import MLFilterCondition from '@/models/MLFilterCondition';
+import MLSortCondition from '@/models/MLSortCondition';
 import { menuItemStore } from '@/stores/menuItemStore';
 import { mapActions, mapState } from 'pinia';
 
 export default {
     created() {
-        this.getMenuItems();
-
         this.$service.MenuItemCategoryService.getAll().then((data: MenuItemCategory[]) => {
             this.itemCategories = data;
         });
@@ -139,10 +191,16 @@ export default {
                 page: 1,
                 itemsPerPage: 10,
                 search: '',
-                categoryID: this.$commonValue.GuidEmpty
+                categoryID: '',
+                sort: ''
             },
 
-            itemCategories: <MenuItemCategory[]>[]
+            lstFilters: <MLFilterCondition[]>[],
+            minPrice: <number|undefined>undefined,
+            maxPrice: <number|undefined>undefined,
+            status: <any>-1,
+
+            itemCategories: <MenuItemCategory[]>[],
         }
     },
 
@@ -156,7 +214,7 @@ export default {
     },
 
     methods: {
-        ...mapActions(menuItemStore as any, ['getMenuItemPaging', 'setSelectedIndex', 'addNewRecord']),
+        ...mapActions(menuItemStore as any, ['getDataPaging', 'setSelectedIndex', 'addNewRecord']),
         
         /**
          * Xử lý thêm món ăn mới
@@ -172,7 +230,7 @@ export default {
          */
         async getMenuItems() {
             this.loading = true;
-            await this.getMenuItemPaging(this.options.page, this.options.itemsPerPage, this.options.search, this.options.categoryID);
+            await this.getDataPaging(this.options.page, this.options.itemsPerPage, this.options.search, this.filterJson, this.options.sort);
             this.loading = false;
         },
 
@@ -206,42 +264,94 @@ export default {
             });
         },
 
-        onPageNumberBlur(event: any) {
-            const pageNum = parseInt(event.target.value);
-            if (pageNum > 0 && pageNum <= Math.ceil(this.totalCount / this.options.itemsPerPage)) {
-                this.options.page = pageNum;
+        handleResetFilters() {
+            this.minPrice = undefined;
+            this.maxPrice = undefined;
+            this.status = -1;
+        },
+
+        handleApplyFilters() {
+            this.lstFilters = [];
+            if (this.minPrice !== undefined) {
+                this.lstFilters.push({
+                    Name: 'Price',
+                    Operator: '>=',
+                    Value: this.minPrice
+                } as MLFilterCondition);
             }
+            if (this.maxPrice !== undefined) {
+                this.lstFilters.push({
+                    Name: 'Price',
+                    Operator: '<=',
+                    Value: this.maxPrice
+                } as MLFilterCondition);
+            }
+            if (this.status !== -1) {
+                this.lstFilters.push({
+                    Name: 'Inactive',
+                    Operator: '==',
+                    Value: this.status
+                } as MLFilterCondition);
+            }
+
+            this.getMenuItems();
         }
     },
 
     computed: {
         ...mapState(menuItemStore, ['dataList', 'totalCount', 'selectedIndex']),
 
-        tableHeaders():any {
-            return [
-                { title: 'Tên món', value: 'Name', width: 300, color: 'primary' },
-                { title: 'Giá món', value: 'Price', align: 'end', width: 150 },
-                { title: 'Loại món', value: 'Category', width: 200 },
-                { title: 'Mô tả', value: 'Description' },
-                { title: 'Hết hàng', value: 'OutOfStock', align: 'center', width: 150 }
-            ]
-        },
-
-        recordNumberText() {
-            if (this.totalCount === 0) {
-                return 'Hiển thị 0-0 trên 0 bản ghi';
-            }
-
-            const startIndex:number = (this.options.page - 1) * (this.options.itemsPerPage) + 1;
-            const endIndex:number = startIndex + Math.min(this.options.itemsPerPage, this.totalCount) - 1;
-            return `Hiển thị ${startIndex}-${endIndex} trên ${this.totalCount} bản ghi`;
-        },
-
         lstItemCategory() {
             return [{
-                MenuItemCategoryID: this.$commonValue.GuidEmpty,
+                MenuItemCategoryID: '',
                 MenuItemCategoryName: 'Tất cả'
             } as MenuItemCategory].concat(this.itemCategories);
+        },
+
+        filterJson() {
+            var result = '';
+
+            var filterArray = [];
+            if (this.options.categoryID) {
+                filterArray.push({
+                    Name: 'MenuItemCategoryID',
+                    Operator: '==',
+                    Value: this.options.categoryID
+                } as MLFilterCondition);
+            }
+
+            filterArray = filterArray.concat(this.lstFilters);
+
+            if (filterArray.length) {
+                result = JSON.stringify(filterArray);
+            }
+
+            return result;
+        },
+
+        lstSortOptions():MLSortCondition[] {
+            return [
+                {
+                    Text: 'Tên món (A-Z)',
+                    Name: 'Name',
+                    Direction: 'ASC'
+                },
+                {
+                    Text: 'Tên món (Z-A)',
+                    Name: 'Name',
+                    Direction: 'DESC'
+                },
+                {
+                    Text: 'Giá món (Tăng dần)',
+                    Name: 'Price',
+                    Direction: 'ASC'
+                },
+                {
+                    Text: 'Giá món (Giảm dần)',
+                    Name: 'Price',
+                    Direction: 'DESC'
+                }
+            ]
         }
     }
 }

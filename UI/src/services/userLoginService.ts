@@ -1,6 +1,7 @@
 import MLBaseService from "./baseService";
 import { Customer, UserLogin } from "../models";
 import MLActionResult from "../models/MLActionResult";
+import CommonFunction from "@/common/CommonFunction";
 
 class UserLoginService extends MLBaseService<UserLogin> {
     protected override entityName: string = 'UserLogin';
@@ -45,10 +46,35 @@ class UserLoginService extends MLBaseService<UserLogin> {
     /**
      * Lấy dữ liệu đăng nhập của người dùng
      */
-    async getUserData():Promise<MLActionResult> {
-        const response = await this.api.get('/GetUserData');
+    async getUserData(userID: string):Promise<MLActionResult> {
+        const response = await this.api.get('/GetUserData', {
+            params: {
+                userID: userID
+            }
+        });
         return response.data;
+    }
+
+    /**
+     * Lấy dữ liệu đăng nhập của người dùng
+     */
+    async changePassword(userLogin: UserLogin):Promise<boolean> {
+        try {
+            const response = await this.api.post('/ChangePassword', userLogin);
+            const actionResult = response.data as MLActionResult;
+
+            if (!actionResult.Success && actionResult.ErrorMsg) {
+                CommonFunction.showToastMessage(actionResult.ErrorMsg, 'error');
+            }
+
+            return actionResult.Success;
+        } catch (e) {
+            CommonFunction.handleException(e);
+        }
+
+        return false;
     }
 }
 
 export default UserLoginService;
+export const userLoginService = new UserLoginService();

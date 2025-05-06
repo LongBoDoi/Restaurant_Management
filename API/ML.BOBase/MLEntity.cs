@@ -20,7 +20,7 @@ namespace API.ML.BOBase
         /// Edit mode
         /// </summary>
         [NotMapped]
-        public EnumEditMode EditMode { get; set; }
+        public EnumEditMode? EditMode { get; set; }
 
         /// <summary>
         /// Clone đối tượng

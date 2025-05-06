@@ -2,7 +2,7 @@
     <MLVbox class="bg-white h-full">
         <div class="bg-emerald-800 text-white flex-1">
             <VContainer class="relative" style="padding: unset !important;">
-                <div className="absolute top-0 right-0 w-1/2 h-full opacity-10">
+                <div class="absolute top-0 right-0 w-1/2 h-full opacity-10">
                     <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
                         <path
                             fill="#FFFFFF"
@@ -12,11 +12,11 @@
                     </svg>
                 </div>
 
-                <div className="container mx-auto px-4 md:px-8 py-12 md:py-20 flex flex-col-reverse md:flex-row items-center gap-8 md:gap-12 relative z-10">
-                    <div className="w-full md:w-1/2 space-y-4 md:space-y-6 text-center md:text-left">
-                        <h2 className="text-4xl md:text-5xl font-bold leading-tight">{{ getSettingValue('RestaurantName') }}</h2>
-                        <!-- <h2 className="text-4xl md:text-5xl font-bold leading-tight">Trải nghiệm ẩm thực Nhật Bản chính hiệu</h2> -->
-                        <p className="text-lg text-emerald-100 max-w-md">
+                <div class="container mx-auto px-4 md:px-8 py-12 md:py-20 flex flex-col-reverse md:flex-row items-center gap-8 md:gap-12 relative z-10">
+                    <div class="w-full md:w-1/2 space-y-4 md:space-y-6 text-center md:text-left">
+                        <h2 class="text-4xl md:text-5xl font-bold leading-tight">{{ getSettingValue('RestaurantName') }}</h2>
+                        <!-- <h2 class="text-4xl md:text-5xl font-bold leading-tight">Trải nghiệm ẩm thực Nhật Bản chính hiệu</h2> -->
+                        <p class="text-lg text-emerald-100 max-w-md">
                             <span v-if="getSettingValue('RestaurantSlogan')"></span>
                             <span v-else>Thưởng thức sushi và các món Nhật tinh hoa, được chế biến bởi các bậc thầy đầu bếp với những nguyên liệu tươi ngon nhất.</span>
                         </p>
@@ -43,8 +43,9 @@
                                 {{ getSettingValue('RestaurantPhoneNumber') }}
                             </p>
                         </div>
-                        <div className="flex flex-col sm:flex-row gap-3 md:gap-4 pt-2 md:pt-4">
+                        <div class="flex flex-col sm:flex-row gap-3 md:gap-4 pt-2 md:pt-4">
                             <VBtn
+                                rounded
                                 :to="{name: '//reservation'}"
                                 className="bg-white text-emerald-800 px-6 py-3 rounded-full font-semibold transition-transform hover:shadow-lg hover:-translate-y-1 active:translate-y-0 inline-block text-center"
                             >
@@ -78,12 +79,12 @@
                             </a>
                         </div>
                     </div>
-                    <div className="w-full md:w-1/2 relative md:mt-0">
-                        <div className="rounded-2xl overflow-hidden shadow-2xl transform transition-transform hover:scale-105 duration-300">
+                    <div class="w-full md:w-1/2 relative md:mt-0">
+                        <div class="rounded-2xl overflow-hidden shadow-2xl transform transition-transform hover:scale-105 duration-300">
                             <img
                                 :src="introImageUrl"
                                 alt="Sushi Platter"
-                                className="w-full h-auto"
+                                class="w-full h-auto"
                             />
                         </div>
                     </div>
@@ -91,34 +92,31 @@
             </VContainer>
         </div>
 
-        <div className="py-12 md:py-16 px-4 md:px-8 bg-white" v-if="openingTimes.length">
+        <div class="py-12 md:py-16 px-4 md:px-8 bg-white" v-if="openingTimes.length">
             <VContainer>
-                <div className="flex justify-center items-center mb-12">
-                    <div className="h-0.5 bg-emerald-200 w-24"></div>
-                    <h2 className="text-3xl font-bold px-6 text-center text-emerald-800">Giờ mở cửa</h2>
-                    <div className="h-0.5 bg-emerald-200 w-24"></div>
+                <div class="flex justify-center items-center mb-12">
+                    <div class="h-0.5 bg-emerald-200 w-24"></div>
+                    <h2 class="text-3xl font-bold px-6 text-center text-emerald-800">Giờ mở cửa</h2>
+                    <div class="h-0.5 bg-emerald-200 w-24"></div>
                 </div>
 
-                <div className="flex flex-col sm:flex-row flex-wrap justify-center gap-6 md:gap-8 mx-auto">
-                    <div v-for="openingTime in openingTimes" className="group relative overflow-hidden rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 bg-emerald-50 w-full md:w-30rem">
-                        <div className="p-8">
-                            <h3 className="text-xl font-bold text-emerald-800 mb-4">{{ formatDaysOfWeek(openingTime.Days) }}</h3>
-                            <div className="flex items-center mb-3 text-emerald-700">
+                <div class="flex flex-col sm:flex-row flex-wrap justify-center gap-6 md:gap-8 mx-auto">
+                    <div v-for="openingTime in openingTimes" class="group relative overflow-hidden rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 bg-emerald-50 w-full md:w-30rem">
+                        <div class="p-8">
+                            <h3 class="text-xl font-bold text-emerald-800 mb-4">{{ formatDaysOfWeek(openingTime.Days) }}</h3>
+                            <div class="flex items-center mb-3 text-emerald-700">
                                 <VIcon icon="mdi-clock-outline" />
-                                <p className="text-lg ml-2">{{ $commonFunction.formatTime(openingTime.StartTime) }} - {{ $commonFunction.formatTime(openingTime.EndTime) }}</p>
+                                <p class="text-lg ml-2">{{ $commonFunction.formatTime(openingTime.StartTime) }} - {{ $commonFunction.formatTime(openingTime.EndTime) }}</p>
                             </div>
-                            <p className="text-emerald-600 mt-4 border-t border-emerald-200 pt-4">
-                                Enjoy our traditional dishes in a peaceful atmosphere during weekdays
-                            </p>
                         </div>
                     </div>
 
-                    <!-- <div className="group relative overflow-hidden rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 bg-emerald-50">
-                        <div className="p-8">
-                            <h3 className="text-xl font-bold text-emerald-800 mb-4">Friday - Saturday</h3>
-                            <div className="flex items-center mb-3">
+                    <!-- <div class="group relative overflow-hidden rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 bg-emerald-50">
+                        <div class="p-8">
+                            <h3 class="text-xl font-bold text-emerald-800 mb-4">Friday - Saturday</h3>
+                            <div class="flex items-center mb-3">
                                 <svg
-                                    className="w-6 h-6 text-emerald-600 mr-2"
+                                    class="w-6 h-6 text-emerald-600 mr-2"
                                     viewBox="0 0 24 24"
                                     fill="none"
                                     xmlns="http://www.w3.org/2000/svg"
@@ -128,23 +126,23 @@
                                         fill="currentColor"
                                     />
                                 </svg>
-                                <p className="text-lg text-emerald-700">11:00 AM - 11:30 PM</p>
+                                <p class="text-lg text-emerald-700">11:00 AM - 11:30 PM</p>
                             </div>
-                            <p className="text-emerald-600 mt-4 border-t border-emerald-200 pt-4">
+                            <p class="text-emerald-600 mt-4 border-t border-emerald-200 pt-4">
                                 Extended hours for weekend dining with special night menu options
                             </p>
                         </div>
-                        <div className="absolute top-4 right-4 bg-emerald-600 text-white text-sm font-bold px-3 py-1 rounded-full transform rotate-3 hover:rotate-0 transition-all">
+                        <div class="absolute top-4 right-4 bg-emerald-600 text-white text-sm font-bold px-3 py-1 rounded-full transform rotate-3 hover:rotate-0 transition-all">
                             Extended Hours
                         </div>
                     </div>
 
-                    <div className="group relative overflow-hidden rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 bg-emerald-50">
-                        <div className="p-8">
-                            <h3 className="text-xl font-bold text-emerald-800 mb-4">Sunday</h3>
-                            <div className="flex items-center mb-3">
+                    <div class="group relative overflow-hidden rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 bg-emerald-50">
+                        <div class="p-8">
+                            <h3 class="text-xl font-bold text-emerald-800 mb-4">Sunday</h3>
+                            <div class="flex items-center mb-3">
                                 <svg
-                                    className="w-6 h-6 text-emerald-600 mr-2"
+                                    class="w-6 h-6 text-emerald-600 mr-2"
                                     viewBox="0 0 24 24"
                                     fill="none"
                                     xmlns="http://www.w3.org/2000/svg"
@@ -154,13 +152,13 @@
                                         fill="currentColor"
                                     />
                                 </svg>
-                                    <p className="text-lg text-emerald-700">12:00 PM - 9:00 PM</p>
+                                    <p class="text-lg text-emerald-700">12:00 PM - 9:00 PM</p>
                                 </div>
-                                <p className="text-emerald-600 mt-4 border-t border-emerald-200 pt-4">
+                                <p class="text-emerald-600 mt-4 border-t border-emerald-200 pt-4">
                                     Special Sunday menu featuring family-style dining experiences
                                 </p>
                             </div>
-                            <div className="absolute top-4 right-4 bg-emerald-600 text-white text-sm font-bold px-3 py-1 rounded-full transform rotate-3 hover:rotate-0 transition-all">
+                            <div class="absolute top-4 right-4 bg-emerald-600 text-white text-sm font-bold px-3 py-1 rounded-full transform rotate-3 hover:rotate-0 transition-all">
                                 Sunday Hours
                             </div>
                     </div> -->

@@ -5,7 +5,7 @@ using API.ML.Common;
 
 namespace API.ML.Utility
 {
-    public class CommonFunction
+    public static class CommonFunction
     {
         public static void HandleException(Exception ex, MLActionResult result, ApplicationDBContext context)
         {

@@ -1,7 +1,8 @@
 interface MLFilterCondition {
     Name: string,
-    Operator: '=='|'EqualDate'|'>='|'<='|'<',
-    Value: any
+    Operator: '=='|'EqualDate'|'>='|'<='|'<'|'IN'|'>',
+    Value: any,
+    CompareProperties: boolean
 }
 
 export default MLFilterCondition;

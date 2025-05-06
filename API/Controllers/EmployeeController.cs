@@ -1,11 +1,16 @@
-﻿using API.ML.BO;
+﻿using AngleSharp.Dom;
+using API.ML.BO;
 using API.ML.BOBase;
 using API.ML.Common;
+using API.ML.CustomAtrributes;
+using API.ML.Extensions;
 using API.ML.Utility;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
+using System.Data;
+using System.Reflection;
 
 namespace API.Controllers
 {
@@ -22,10 +27,7 @@ namespace API.Controllers
         [ApiExplorerSettings(IgnoreApi = true)]
         public MLActionResult UpdateEmployee([FromForm] string employee, [FromForm] IFormFile? image)
         {
-            MLActionResult result = new()
-            {
-                Success = true
-            };
+            MLActionResult result = new();
 
             try
             {
@@ -55,22 +57,65 @@ namespace API.Controllers
 
         protected override bool BeforeSave(Employee employee, MLActionResult result)
         {
-            // Kiểm tra mật khẩu cũ khi đổi mật khẩu
-            if (employee.EditMode == EnumEditMode.Edit && employee.UserLogin != null && employee.UserLogin.IsChangePassword)
+            // Kiểm tra trùng mã NV
+            string employeeCode = employee.EmployeeCode.Trim().ToLower();
+            Employee? duplicateEmployeeCode = _context.Employee.FirstOrDefault(e => e.EmployeeCode.Trim().ToLower() == employeeCode &&
+                (employee.EditMode == EnumEditMode.Add || (employee.EditMode == EnumEditMode.Edit && e.EmployeeID != employee.EmployeeID))
+            );
+            if (duplicateEmployeeCode != null)
             {
-                string? oldPassword = _entities.AsNoTracking().Include(e => e.UserLogin).FirstOrDefault(e => e.EmployeeID == employee.EmployeeID)?.UserLogin?.Password;
-                if (!string.IsNullOrEmpty(oldPassword) && employee.UserLogin.OldPassword != oldPassword)
-                {
-                    result.ErrorMsg = "Mật khẩu cũ không chính xác.";
-                    result.Success = false;
-
-                    return false;
-                }
-                else
-                {
-                    _context.Entry(employee.UserLogin).State = EntityState.Modified;
-                }
+                result.Success = false;
+                result.ErrorMsg = "Mã nhân viên đã tồn tại.";
+                return false;
             }
+
+            switch (employee.EditMode)
+            {
+                case EnumEditMode.Add:
+                    if (employee.Roles != null && employee.Roles.Any())
+                    {
+                        foreach (Role role in employee.Roles)
+                        {
+                            _context.Entry(role).State = EntityState.Unchanged;
+                        }
+                    }
+
+                    if (employee.UserLogin != null)
+                    {
+                        employee.UserLogin.Password = PasswordHasherService.HashPassword(employee.UserLogin.Password);
+                    }
+                    break;
+                case EnumEditMode.Edit:
+                    var existingEmployee = _context.Employee
+                        .Include(e => e.Roles)
+                        .FirstOrDefault(e => e.EmployeeID == employee.EmployeeID);
+
+                    if (existingEmployee == null)
+                    {
+                        return false;
+                    }
+
+                    if (existingEmployee.Roles != null && employee.Roles != null)
+                    {
+                        ((HashSet<Role>)existingEmployee.Roles).Clear();
+
+                        foreach (var role in employee.Roles)
+                        {
+                            var trackedRole = _context.Role.Find(role.RoleID);
+                            if (trackedRole != null)
+                            {
+                                ((HashSet<Role>)existingEmployee.Roles).Add(trackedRole);
+                            }
+                        }
+                    }
+
+                    existingEmployee.AssignValuesFrom(employee);
+                    _context.Entry(existingEmployee).State = EntityState.Modified;
+
+                    employee.EditMode = null;
+                    break;
+            }
+
             return true;
         }
     }

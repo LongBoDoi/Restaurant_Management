@@ -255,9 +255,19 @@
 
 <script lang="ts">
 import EventBus from '@/common/EventBus';
+import { session } from '@/common/Session';
 import { Customer, MLActionResult, UserLogin } from '@/models';
 
 export default {
+    beforeRouteEnter(to, from, next) {
+        if (session.UserType !== undefined && session.UserData) {
+            next('/home');
+            return;
+        }
+
+        next();
+    },
+
     data() {
         return {
             customerLoading: <boolean>false,
@@ -295,10 +305,8 @@ export default {
 
             if (!result) return;
 
-            if (result.Success) {
-                if (!this.$config.UseCookies) {
-                    localStorage.setItem(this.$localStorageKey.AuthToken, result.Data);
-                }
+            if (result.Success && result.Data) {
+                localStorage.setItem(this.$localStorageKey.UserID, result.Data.UserID);
                 EventBus.emit('ShowToastMessage', {
                     Message: 'Đăng nhập thành công',
                     Type: 'success'
@@ -374,10 +382,8 @@ export default {
             }
 
             if (!result) return;
-            if (result.Success) {
-                if (!this.$config.UseCookies) {
-                    localStorage.setItem(this.$localStorageKey.AuthToken, result.Data);
-                }
+            if (result.Success && result.Data) {
+                localStorage.setItem(this.$localStorageKey.UserID, result.Data.UserID);
 
                 window.location.reload();
             }

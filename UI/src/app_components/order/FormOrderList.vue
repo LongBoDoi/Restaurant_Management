@@ -6,11 +6,131 @@
 
         <VCard style="width: 100% ; height: 100%;" color="rgb(249, 250, 251)" class="rounded-lg d-flex flex-column shadow-md border mt-6">
             <!-- Toolbar -->
-            <div className="flex items-center space-x-4 px-6 py-4 border-b">
-                <VTextField density="compact" variant="outlined" prepend-inner-icon="mdi-magnify" class="focus:outline-green-500" style="max-width: 320px;" hide-details placeholder="Tìm tên order/khách hàng..."
+            <div class="flex items-center space-x-4 px-6 py-4 border-b">
+                <VTextField color="primary" density="compact" variant="outlined" prepend-inner-icon="mdi-magnify" style="max-width: 320px;" hide-details placeholder="Tìm bàn/khách hàng..."
                     :model-value="options.search"
                     @keypress.enter="options.search = $event.target.value;"
+                    @blur="options.search = $event.target.value;"
                 />
+
+                <VSelect
+                    :items="[
+                        {
+                            Text: 'Tất cả order',
+                            Value: -1
+                        },
+                        {
+                            Text: 'Đang hoạt động',
+                            Value: $enumeration.EnumOrderStatus.Active
+                        },
+                        {
+                            Text: 'Đã thanh toán',
+                            Value: $enumeration.EnumOrderStatus.Paid
+                        },
+                        {
+                            Text: 'Đã huỷ',
+                            Value: $enumeration.EnumOrderStatus.Canceled
+                        }
+                    ]"
+                    item-title="Text"
+                    item-value="Value"
+                    :return-object="false"
+                    v-model:model-value="options.orderStatus"
+
+                    density="compact"
+                    variant="outlined"
+                    hide-details
+                    color="primary"
+                    style="max-width: 200px;"
+                />
+
+                <MLFilterPopup :filter-count="lstFilters.length" v-on:reset-filter="handleResetFilters" v-on:apply-filter="handleApplyFilters" width="365">
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block font-medium text-gray-700">Khoảng thời gian</label>
+                            <MLHbox class="space-x-2 mt-1">
+                                <div class="flex-1">
+                                    <div class="text-sm font-medium text-gray-500">Từ</div>
+                                    <MLDateField
+                                        variant="outlined"
+                                        compact
+                                        hide-details
+                                        color="primary"
+                                        nullable
+                                        style="flex-grow: 0.5;"
+
+                                        v-model="orderFromDate"
+                                        ref="customInput"
+                                        :rules="[(value: Date) => {
+                                            return (orderToDate === undefined || $moment(value).isSameOrBefore(orderToDate)) || 'Thời gian bắt đầu không được lớn hơn thời gian kết thúc';
+                                        }]"
+                                    />
+                                </div>
+                                
+                                <div class="flex-1">
+                                    <div class="text-sm font-medium text-gray-500">Đến</div>
+                                    <MLDateField
+                                        variant="outlined"
+                                        compact
+                                        hide-details
+                                        color="primary"
+                                        nullable
+                                        style="flex-grow: 0.5;"
+                                        
+                                        v-model="orderToDate"
+                                        :rules="[(value: Date) => {
+                                            return (orderFromDate === undefined || $moment(value).isSameOrAfter(orderFromDate)) || 'Thời gian bắt đầu không được lớn hơn thời gian kết thúc';
+                                        }]"
+                                    />
+                                </div>
+                            </MLHbox>
+                        </div>
+
+                        <div>
+                            <label class="block font-medium text-gray-700">Tổng tiền</label>
+                            <div class="flex items-center space-x-2 mt-1">
+                                <MLNumberField
+                                    placeholder="Tối thiểu"
+                                    variant="outlined"
+                                    density="compact"
+                                    hide-details
+                                    suffix="đ"
+                                    color="primary"
+                                    nullable
+                                    style="flex-grow: 0.5;"
+                                    
+                                    v-model="minAmount"
+                                    :rules="[
+                                        $commonValue.positiveNumberRule,
+                                        (value: number) => {
+                                            return (maxAmount === undefined || value <= maxAmount) || 'Số tiền tối thiểu không được lớn hơn số tiền tối đa';
+                                        }
+                                    ]"
+                                />
+                                <MLNumberField
+                                    placeholder="Tối đa"
+                                    variant="outlined"
+                                    density="compact"
+                                    hide-details
+                                    suffix="đ"
+                                    color="primary"
+                                    nullable
+                                    style="flex-grow: 0.5;"
+                                    
+                                    v-model="maxAmount"
+                                    :rules="[
+                                        $commonValue.positiveNumberRule,
+                                        (value: number) => {
+                                            return minAmount === undefined || value >= minAmount;
+                                        }
+                                    ]"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                </MLFilterPopup>
+
+                <MLSortPopup :items="lstSortOptions" v-model:model-value="options.sort" />
             </div>
 
             <!-- Bảng dữ liệu -->
@@ -97,25 +217,31 @@
 import { EnumEditMode, EnumOrderStatus } from '@/common/Enumeration';
 import EventBus from '@/common/EventBus';
 import { MLActionResult, Order } from '@/models';
+import MLFilterCondition from '@/models/MLFilterCondition';
+import MLSortCondition from '@/models/MLSortCondition';
 import { orderStore } from '@/stores/orderStore';
 import moment from 'moment';
 import { mapActions, mapState } from 'pinia';
 
 export default {
-    created() {
-        this.getData();
-    },
-
     data() {
         return {
             loading: <boolean>false,
 
-            orderStatusFilter: <EnumOrderStatus>EnumOrderStatus.Active,
             options: <any>{
                 page: 1,
                 itemsPerPage: 10,
-                search: ''
-            }
+                search: '',
+                orderStatus: <EnumOrderStatus>EnumOrderStatus.Active,
+                sort: ''
+            },
+
+            orderFromDate: <Date|undefined>undefined,
+            orderToDate: <Date|undefined>undefined,
+            minAmount: <number|undefined>undefined,
+            maxAmount: <number|undefined>undefined,
+
+            lstFilters: <MLFilterCondition[]>[],
         }
     },
 
@@ -136,7 +262,7 @@ export default {
          */
         async getData() {
             this.loading = true;
-            await this.getDataPaging(this.options.page, this.options.itemsPerPage, this.options.search);
+            await this.getDataPaging(this.options.page, this.options.itemsPerPage, this.options.search, this.filterJson, this.options.sort);
             this.loading = false;
         },
 
@@ -176,9 +302,50 @@ export default {
             });
         },
 
-        getOrderServingTime(orderDate: Date) {
-            const seconds:number = Math.floor(((this.currentTime as any) - (moment.utc(orderDate).local() as any)) / 1000);
-            return this.$commonFunction.formatTimeBySecond(seconds);
+        handleResetFilters() {
+            this.orderFromDate = undefined;
+            this.orderToDate = undefined;
+            this.minAmount = undefined;
+            this.maxAmount = undefined;
+
+            this.lstFilters = [];
+        },
+
+        handleApplyFilters() {
+            this.lstFilters = [];
+            if (this.orderFromDate) {
+                this.lstFilters.push({
+                    Name: 'OrderDate',
+                    Operator: '>=',
+                    Value: this.orderFromDate
+                } as MLFilterCondition);
+            }
+            
+            if (this.orderToDate) {
+                this.lstFilters.push({
+                    Name: 'OrderDate',
+                    Operator: '<',
+                    Value: moment(this.orderToDate).add(1, 'days')
+                } as MLFilterCondition);
+            }
+
+            if (this.minAmount) {
+                this.lstFilters.push({
+                    Name: 'TotalAmount',
+                    Operator: '>=',
+                    Value: this.minAmount
+                } as MLFilterCondition);
+            }
+
+            if (this.maxAmount) {
+                this.lstFilters.push({
+                    Name: 'TotalAmount',
+                    Operator: '<=',
+                    Value: this.maxAmount
+                } as MLFilterCondition);
+            }
+
+            this.getData();
         },
 
         getOrderStatusName(orderStatus: EnumOrderStatus) {
@@ -190,15 +357,67 @@ export default {
                 case EnumOrderStatus.Canceled:
                     return 'Đã huỷ';
             }
-        }
+        },
     },
 
     computed: {
         ...mapState(orderStore, ['dataList', 'selectedIndex', 'totalCount']),
 
-        currentTime():Date {
-            return new Date()
+        filterJson() {
+            var result = '';
+
+            var filterArray = [];
+            if (this.options.orderStatus && this.options.orderStatus !== -1) {
+                filterArray.push({
+                    Name: 'Status',
+                    Operator: '==',
+                    Value: this.options.orderStatus
+                } as MLFilterCondition);
+            }
+
+            filterArray = filterArray.concat(this.lstFilters);
+
+            if (filterArray.length) {
+                result = JSON.stringify(filterArray);
+            }
+
+            return result;
         },
+
+        lstSortOptions():MLSortCondition[] {
+            return [
+                {
+                    Text: 'Thời gian (Mới nhất)',
+                    Name: 'OrderDate',
+                    Direction: 'DESC'
+                } as MLSortCondition,
+                {
+                    Text: 'Thời gian (Cũ nhất)',
+                    Name: 'OrderDate',
+                    Direction: 'ASC'
+                } as MLSortCondition,
+                {
+                    Text: 'Tổng tiền (Tăng dần)',
+                    Name: 'TotalAmount',
+                    Direction: 'ASC'
+                } as MLSortCondition,
+                {
+                    Text: 'Tổng tiền (Giảm dần)',
+                    Name: 'TotalAmount',
+                    Direction: 'DESC'
+                } as MLSortCondition,
+                {
+                    Text: 'Khách hàng (A-Z)',
+                    Name: 'CustomerName',
+                    Direction: 'ASC'
+                } as MLSortCondition,
+                {
+                    Text: 'Khách hàng (Z-A)',
+                    Name: 'CustomerName',
+                    Direction: 'DESC'
+                } as MLSortCondition
+            ]
+        }
     },
 
     watch: {

@@ -35,7 +35,7 @@ namespace API.Controllers
         /// <param name="itemsPerPage">Kích thước trang</param>
         /// <returns></returns>
         [HttpGet("GetAll")]
-        public virtual MLActionResult GetAll()
+        public virtual MLActionResult GetAll(string? filter = "")
         {
             MLActionResult result = new()
             {
@@ -44,7 +44,7 @@ namespace API.Controllers
 
             try
             {
-                IEnumerable<IMLEntity> dataList = _entities.WithAutoIncludes<IMLEntity, GetAll>().ToList();
+                IEnumerable<IMLEntity> dataList = _entities.WithAutoIncludes<IMLEntity, GetAll>().ApplyFilters(filter).ToList();
                 if (dataList.Any())
                 {
                     foreach (IMLEntity entity in dataList)
@@ -71,7 +71,7 @@ namespace API.Controllers
         /// <returns></returns>
         [Authorize]
         [HttpGet("GetDataPaging")]
-        public virtual MLActionResult GetDataPaging(int page, int itemsPerPage, string? search, string? filter)
+        public virtual MLActionResult GetDataPaging(int page, int itemsPerPage, string? search, string? filter, string? sort)
         {
             MLActionResult result = new()
             {
@@ -80,7 +80,7 @@ namespace API.Controllers
 
             try
             {
-                IEnumerable<IMLEntity> data = _entities.WithAutoIncludes<IMLEntity, GetDataPagingInclude>().ApplyFilters(filter).ToList();
+                IEnumerable<IMLEntity> data = _entities.WithAutoIncludes<IMLEntity, GetDataPagingInclude>().ApplyFilters(filter).ApplySorting(sort).ToList();
 
                 string? normalizedSearchTerm = search?.RemoveDiacritics().ToLower();
                 if (!string.IsNullOrEmpty(normalizedSearchTerm))
@@ -105,7 +105,7 @@ namespace API.Controllers
 
                 int totalCount = data.Count();
 
-                data = data.OrderByDescending(e => e.ModifiedDate).Skip((page - 1) * itemsPerPage).Take(itemsPerPage);
+                data = data.Skip((page - 1) * itemsPerPage).Take(itemsPerPage);
 
                 PrepareExtraData(data);
                 foreach (IMLEntity entity in data)

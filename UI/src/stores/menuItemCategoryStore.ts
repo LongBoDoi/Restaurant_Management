@@ -27,9 +27,9 @@ export const menuItemCategoryStore = createStoreOnBase<MenuItemCategory>('menuIt
             return newRecord;
         },
 
-        async getDataPaging(page: number, itemsPerPage: number, search: string) {
+        async getDataPaging(page: number, itemsPerPage: number, search: string, filter?: string, sort?: string) {
             const me:any = this;
-            const pagingData:PagingData<MenuItemCategory> = await menuItemCategoryService.getDataPaging(page, itemsPerPage, search);
+            const pagingData:PagingData<MenuItemCategory> = await menuItemCategoryService.getDataPaging(page, itemsPerPage, search, filter, sort);
             
             me._dataList = pagingData.Data as MenuItemCategory[];
             me._totalCount = pagingData.TotalCount;

@@ -1,7 +1,7 @@
 <template>
     <div :class="[
         'ml-hbox',
-        alignClassName,
+        alignclass,
         {'stretch-all': stretch}
     ]"
     >
@@ -24,7 +24,7 @@ export default {
     },
 
     computed: {
-        alignClassName() {
+        alignclass() {
             return this.align ? `align-items-${this.align}` : '';
         }
     }

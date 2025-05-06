@@ -1,5 +1,6 @@
 ﻿using API.ML.BOBase;
 using API.ML.Common;
+using API.ML.CustomAtrributes;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
@@ -18,6 +19,7 @@ namespace API.ML.BO
         /// Tên món
         /// </summary>
         [StringLength(128)]
+        [SearchField]
         public string Name { get; set; } = string.Empty;
 
         /// <summary>
@@ -57,6 +59,7 @@ namespace API.ML.BO
         /// Dữ liệu nhóm thực đơn
         /// </summary>
         [ForeignKey("MenuItemCategoryID")]
+        [GetDataPagingInclude]
         public MenuItemCategory? MenuItemCategory { get; set; }
 
         /// <summary>

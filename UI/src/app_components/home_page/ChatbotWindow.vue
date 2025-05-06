@@ -4,8 +4,8 @@
             <VBtn v-bind="props" icon="mdi-chat" color="primary" style="position: fixed; right: 24px; bottom: 24px;" />
         </template>
 
-        <VCard style="position: absolute; z-index: 10; right: 100%; width: 328px; height: 455px; margin-right: 16px; bottom: 0; display: flex; flex-direction: column;">
-            <VCardTitle style="height: 48px; background-color: rgb(var(--v-theme-primary)); color: rgb(var(--v-theme-on-primary)); display: flex; align-items: center;">
+        <VCard class="rounded-lg" style="position: absolute; z-index: 10; right: 100%; width: 328px; height: 455px; margin-right: 16px; bottom: 0; display: flex; flex-direction: column;">
+            <VCardTitle class="px-4 py-2" style="background-color: rgb(var(--v-theme-primary)); color: rgb(var(--v-theme-on-primary)); display: flex; align-items: center;">
                 <VIcon icon="mdi-robot" style="margin-bottom: 4px; margin-right: 12px;" />
                 <span>Chatbot</span>
                 <VIcon icon="mdi-close" style="margin-left: auto; cursor: pointer;" @click="showWindow = false;" />
@@ -15,10 +15,10 @@
 
             <!-- Nội dung tin nhắn -->
             <MLVbox ref="messages" style="flex-grow: 1; padding: 0.625rem 0.5rem; overflow-y: auto;">
-                <template v-for="detail, index in conversation?.ChatbotConversationDetails">
+                <template v-for="detail, index in conversationDetails" :key="index">
                     <VSpacer v-if="index > 0" style="height: 8px; flex-grow: 0; flex-shrink: 0;" />
 
-                    <span v-if="index === 0 || formatTime(detail.Timestamp) !== formatTime(conversation?.ChatbotConversationDetails[index - 1].Timestamp)" 
+                    <span v-if="index === 0 || formatTime(detail.Timestamp) !== formatTime(conversationDetails[index - 1].Timestamp)" 
                         style="text-align: center; font-size: 0.85rem;"
                     >
                         {{ formatTime(detail.Timestamp) }}
@@ -40,7 +40,15 @@
 
                         <VSpacer style="width: 4px; flex-shrink: 0; flex-grow: 0;" />
 
-                        <VCard rounded :color="detail.Sender === $enumeration.EnumChatbotSender.User ? 'primary' : undefined" style="padding: 0.3rem 0.7rem;">{{ detail.Message }}</VCard>
+                        <!-- Tin nhắn -->
+                        <VCard 
+                            class="rounded-lg px-4"
+                            rounded 
+                            :color="detail.Sender === $enumeration.EnumChatbotSender.User ? 'primary' : undefined"
+                            style="padding: 0.3rem 0.7rem; white-space: pre-line;"
+                        >
+                            {{ detail.Message }}
+                        </VCard>
                     </MLHbox>
                 </template>
 
@@ -59,7 +67,7 @@
                             />
                         </div>
 
-                        <div style="position: relative; display: flex; align-items: center; justify-content: center;">
+                        <div style="position: relative; display: flex; align-items: center; justify-content: center;" class="rouned-lg">
                             <VSkeletonLoader color="onPrimary" style="margin-left: 4px;" width="50" height="100%" >
                             </VSkeletonLoader>
                             <VIcon style="position: absolute; color: rgb(var(--v-theme-on-primary))" icon="mdi-dots-horizontal" />
@@ -70,8 +78,8 @@
 
         <VDivider />
 
-        <VCardActions style="flex-shrink: 0;">
-            <VTextField ref="txtMessage" :disabled="waitingRequest" v-model:model-value="messageInput" @keyup.enter="sendNewMessage" density="compact" variant="outlined" hide-details rounded placeholder="Nhập tin nhắn..." />
+        <VCardActions style="flex-shrink: 0;" class="px-4 py-2 bg-gray-50">
+            <VTextField autofocus color="primary" ref="txtMessage" :disabled="waitingRequest" v-model:model-value="messageInput" @keyup.enter="sendNewMessage" density="compact" variant="outlined" hide-details rounded placeholder="Nhập tin nhắn..." />
             <VIcon :disabled="waitingRequest" @click="sendNewMessage" icon="mdi-send" color="primary" />
         </VCardActions>
     </VCard>
@@ -79,84 +87,103 @@
 </template>
 
 <script lang="ts">
-import { ChatbotConversation, ChatbotConversationDetail } from '@/models';
+import { EnumChatbotSender } from '@/common/Enumeration';
+import { ChatbotConversationDetail } from '@/models';
 
 export default {
     async created() {
-        const chatbotConversationID = sessionStorage.getItem('chatbotConversationID');
-        if (chatbotConversationID) {
-            this.conversation = await this.$service.ChatbotService.getChatbotConversation(chatbotConversationID);
+        const conversationDetails = sessionStorage.getItem('chatbotConversation');
+        const chatbotUserID = sessionStorage.getItem('chatbotUserID');
+        if (conversationDetails && chatbotUserID) {
+            this.conversationDetails = JSON.parse(conversationDetails) as ChatbotConversationDetail[];
+            this.userID = chatbotUserID;
+        } else {
+            this.conversationDetails = [] as ChatbotConversationDetail[];
+
+            const responseDetail = await this.$service.ChatbotService.getNewResponse(this.userID, `Hello. Timezone: ${this.$commonFunction.getTimeZone()}`);
+            if (responseDetail.length > 0) {
+                this.conversationDetails = this.conversationDetails.concat(responseDetail);
+
+                sessionStorage.setItem('chatbotConversation', JSON.stringify(this.conversationDetails));
+                sessionStorage.setItem('chatbotUserID', this.userID);
+            }
         }
+        // if (chatbotConversationID) {
+        //     this.conversation = await this.$service.ChatbotService.getChatbotConversation(chatbotConversationID);
+        // }
 
-        //Nếu chưa có đoạn hội thoại trước đó thì tạo đoạn hội thoại mới
-        if (!this.conversation) {
-            this.conversation = await this.$service.ChatbotService.createNewConversation();
-            if (!this.conversation) return;
+        // //Nếu chưa có đoạn hội thoại trước đó thì tạo đoạn hội thoại mới
+        // if (!this.conversation) {
+        //     this.conversation = await this.$service.ChatbotService.createNewConversation();
+        //     if (!this.conversation) return;
 
-            sessionStorage.setItem('chatbotConversationID', this.conversation.ConversationID);
+        //     sessionStorage.setItem('chatbotConversationID', this.conversation.ConversationID);
+        // }
+
+        // this.$nextTick(() => {
+        //     this.scrollToBottom();
+        // });
+    },
+    
+    watch: {
+        showWindow(newValue: boolean) {
+            if (newValue) {
+                this.$nextTick(() => {
+                    this.scrollToBottom();
+                });
+            }
         }
-
-        this.$nextTick(() => {
-            this.scrollToBottom();
-        });
     },
 
     data() {
         return {
             showWindow: <boolean>false,
-            conversation: <ChatbotConversation|undefined>undefined,
+            conversationDetails: <ChatbotConversationDetail[]>[],
 
             messageInput: <string>'',
             waitingRequest: <boolean>false,
-            gettingNewResponse: <boolean>false
+            gettingNewResponse: <boolean>false,
+
+            userID: <string>this.$commonValue.NewGuid()
         }
     },
 
     methods: {
         /**
-         * Đóng/Mở cửa sổ chat bot
-         */
-        async toggleChatbotWindow() {
-            this.showWindow = !this.showWindow;
-            if (this.showWindow) {
-                this.$nextTick(() => {
-                    (this.$refs.txtMessage as any).focus();
-                });
-            }
-        },
-
-        /**
          * Gửi tin nhắn mới
          */
         async sendNewMessage() {
-            if (this.messageInput && this.conversation) {
+            if (this.messageInput) {
                 this.waitingRequest = true;
+                this.conversationDetails.push({
+                    Sender: EnumChatbotSender.User,
+                    Message: this.messageInput
+                } as ChatbotConversationDetail);
+                sessionStorage.setItem('chatbotConversation', JSON.stringify(this.conversationDetails));
 
-                try {
-                    const detail:ChatbotConversationDetail|undefined = await this.$service.ChatbotService.sendNewMessage(this.conversation.ConversationID, this.messageInput);
-                    if (detail) {
-                        this.conversation.ChatbotConversationDetails.push(detail);
-                        this.$nextTick(() => {
-                            this.scrollToBottom();
-                        });
-                        const oldMessage = this.messageInput;
-                        this.messageInput = '';
+                await this.$nextTick();
+                this.scrollToBottom();
+                this.waitingRequest = false;
 
-                        this.gettingNewResponse = true;
-                        const responseDetail:ChatbotConversationDetail|undefined = await this.$service.ChatbotService.getNewResponse(this.conversation.ConversationID, oldMessage);
-                        if (responseDetail) {
-                            this.conversation.ChatbotConversationDetails.push(responseDetail);
-                            this.$nextTick(() => {
-                                this.scrollToBottom();
-                                (this.$refs.txtMessage as any).focus();
-                            });
-                        }
-                    }
-                } catch (e) {
-                } finally {
-                    this.gettingNewResponse = false;
-                    this.waitingRequest = false;
+                this.gettingNewResponse = true;
+                await this.$nextTick();
+                this.scrollToBottom();
+                const message = this.messageInput;
+                this.messageInput = '';
+                const responseDetail = await this.$service.ChatbotService.getNewResponse(this.userID, message);
+                if (responseDetail && responseDetail.length > 0) {
+                    this.conversationDetails = this.conversationDetails.concat(responseDetail);
+                    sessionStorage.setItem('chatbotConversation', JSON.stringify(this.conversationDetails));
+
+                    await this.$nextTick();
+                    this.scrollToBottom();
                 }
+
+                this.gettingNewResponse = false;
+
+                this.$nextTick(() => {
+                    (this.$refs.txtMessage as any).focus();
+                });
             }
         },
 
@@ -182,7 +209,7 @@ export default {
         EnumChatbotSender() {
             return this.$enumeration.EnumChatbotSender;
         }
-    }
+    },
 }
 </script>
 

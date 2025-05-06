@@ -2,6 +2,7 @@ import { MLActionResult, Order, Reservation } from "@/models";
 import { BaseService } from "./baseService";
 import CommonFunction from "@/common/CommonFunction";
 import moment from "moment";
+import { EnumTimeFilter } from "@/common/Enumeration";
 
 class DashboardService extends BaseService {
     protected entityName: string = 'Dashboard';
@@ -14,15 +15,16 @@ class DashboardService extends BaseService {
     /**
      * Lấy dữ liệu doanh thu hôm nay
      */
-    public async getTodayRevenue() : Promise<any> {
+    public async getTotalRevenue(fromDate: string, toDate: string, timeFilter: EnumTimeFilter) : Promise<any> {
         var result = undefined;
 
         try {
-            const minDate = moment().startOf('day').utc().format();
-
-            const response = await this.api.get('/GetTodayRevenue', {
+            const response = await this.api.get('/GetTotalRevenue', {
                 params: {
-                    minDate: minDate
+                    fromDate: fromDate,
+                    toDate: toDate,
+                    timeFilter: timeFilter,
+                    timeZone: CommonFunction.getTimeZone()
                 }
             });
             const actionResult:MLActionResult = response.data as MLActionResult;
@@ -39,15 +41,16 @@ class DashboardService extends BaseService {
     /**
      * Lấy dữ liệu số order hoàn thành
      */
-    public async getCompletedOrders() : Promise<any> {
+    public async getTotalOrders(fromDate: string, toDate: string, timeFilter: EnumTimeFilter) : Promise<any> {
         var result = undefined;
 
         try {
-            const minDate = moment().startOf('day').utc().format();
-
-            const response = await this.api.get('/GetCompletedOrders', {
+            const response = await this.api.get('/GetTotalOrders', {
                 params: {
-                    minDate: minDate
+                    fromDate: fromDate,
+                    toDate: toDate,
+                    timeFilter: timeFilter,
+                    timeZone: CommonFunction.getTimeZone()
                 }
             });
             const actionResult:MLActionResult = response.data as MLActionResult;
@@ -64,15 +67,16 @@ class DashboardService extends BaseService {
     /**
      * Lấy dữ liệu Giá trị order trung bình
      */
-    public async getAverageOrderValue() : Promise<any> {
+    public async getAverageOrderValue(fromDate: string, toDate: string, timeFilter: EnumTimeFilter) : Promise<any> {
         var result = undefined;
 
         try {
-            const minDate = moment().startOf('day').utc().format();
-
             const response = await this.api.get('/GetAverageOrderValue', {
                 params: {
-                    minDate: minDate
+                    fromDate: fromDate,
+                    toDate: toDate,
+                    timeFilter: timeFilter,
+                    timeZone: CommonFunction.getTimeZone()
                 }
             });
             const actionResult:MLActionResult = response.data as MLActionResult;
@@ -108,16 +112,16 @@ class DashboardService extends BaseService {
     /**
      * Lấy dữ liệu Xu hướng doanh thu
      */
-    public async getRevenueTrend(timeFilter: number) : Promise<any> {
+    public async getRevenueTrend(fromDate: string, toDate: string, timeFilter: EnumTimeFilter) : Promise<any> {
         var result = [];
 
         try {
-            const today = moment().startOf('day').utc().format();
-
             const response = await this.api.get('/GetRevenueTrend', {
                 params: {
-                    today: today,
-                    timeFilter: timeFilter
+                    fromDate: fromDate,
+                    toDate: toDate,
+                    timeFilter: timeFilter,
+                    timeZone: CommonFunction.getTimeZone()
                 }
             });
             const actionResult:MLActionResult = response.data as MLActionResult;
@@ -134,15 +138,16 @@ class DashboardService extends BaseService {
     /**
      * Lấy dữ liệu Món phổ biến
      */
-    public async getPopularMenuItems() : Promise<any> {
+    public async getPopularMenuItems(fromDate: string, toDate: string, timeFilter: EnumTimeFilter) : Promise<any> {
         var result = [];
 
         try {
-            const minDate = moment().startOf('day').utc().format();
-
             const response = await this.api.get('/GetPopularMenuItems', {
                 params: {
-                    minDate: minDate
+                    fromDate: fromDate,
+                    toDate: toDate,
+                    timeFilter: timeFilter,
+                    timeZone: CommonFunction.getTimeZone()
                 }
             });
             const actionResult:MLActionResult = response.data as MLActionResult;

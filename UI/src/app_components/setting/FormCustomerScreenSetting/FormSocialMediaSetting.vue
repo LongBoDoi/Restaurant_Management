@@ -10,7 +10,7 @@
                 </template>
             </VCheckbox>
 
-            <VTextField v-if="lstSocialLinks.includes(facebookData)" placeholder="Nhập URL Facebook" density="compact" variant="outlined" class="ml-4" hide-details v-model:model-value="facebookData.Link" />
+            <VTextField v-if="lstSocialLinks.includes(facebookData)" color="primary" placeholder="Nhập URL Facebook" density="compact" variant="outlined" class="ml-4" hide-details v-model:model-value="facebookData.Link" />
         </MLHbox>
 
         <MLHbox align="center" class="mb-2">
@@ -21,7 +21,7 @@
                 </template>
             </VCheckbox>
 
-            <VTextField v-if="lstSocialLinks.includes(instagramData)" placeholder="Nhập URL Instagram" density="compact" variant="outlined" class="ml-4" hide-details v-model:model-value="instagramData.Link" />
+            <VTextField v-if="lstSocialLinks.includes(instagramData)" color="primary" placeholder="Nhập URL Instagram" density="compact" variant="outlined" class="ml-4" hide-details v-model:model-value="instagramData.Link" />
         </MLHbox>
 
         <MLHbox align="center" class="mb-2">
@@ -32,7 +32,7 @@
                 </template>
             </VCheckbox>
 
-            <VTextField v-if="lstSocialLinks.includes(youtubeData)" placeholder="Nhập URL Youtube" density="compact" variant="outlined" class="ml-4 flex-1" hide-details v-model:model-value="youtubeData.Link" />
+            <VTextField v-if="lstSocialLinks.includes(youtubeData)" color="primary" placeholder="Nhập URL Youtube" density="compact" variant="outlined" class="ml-4 flex-1" hide-details v-model:model-value="youtubeData.Link" />
         </MLHbox>
 
         <MLHbox align="center">
@@ -43,7 +43,7 @@
                 </template>
             </VCheckbox>
 
-            <VTextField v-if="lstSocialLinks.includes(tiktokData)" placeholder="Nhập URL TikTok" density="compact" variant="outlined" class="ml-4" hide-details v-model:model-value="tiktokData.Link" />
+            <VTextField v-if="lstSocialLinks.includes(tiktokData)" color="primary" placeholder="Nhập URL TikTok" density="compact" variant="outlined" class="ml-4" hide-details v-model:model-value="tiktokData.Link" />
         </MLHbox>
     </VCard>
 </template>

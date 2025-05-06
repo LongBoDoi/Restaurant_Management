@@ -2,6 +2,12 @@
     border-left-width: 4px !important;
 }
 
+:is(.divide-y > :not([hidden]) ~ :not([hidden])) {
+    --tw-divide-y-reverse: 0;
+    border-bottom-width: calc(1px * var(--tw-divide-y-reverse));
+    border-top-width: calc(1px * (1 - var(--tw-divide-y-reverse)));
+}
+
 // Red
 .border-red-200 {
     --tw-border-opacity: 1;

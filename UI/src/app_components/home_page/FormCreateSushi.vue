@@ -47,7 +47,7 @@
 
                         <VForm ref="form">
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 w-full">
-                            <VCard v-for="category in lstInventoryItemCategories" class="bg-white rounded-lg shadow pa-4 hover:shadow-lg transition-shadow duration-300 border border-emerald-100"
+                            <VCard v-for="category in filteredCategories" class="bg-white rounded-lg shadow pa-4 hover:shadow-lg transition-shadow duration-300 border border-emerald-100"
                                 style="max-height: 19rem;"
                             >
                                 <h4 class="font-semibold text-lg border-b border-emerald-200 pb-2 mb-2">
@@ -136,6 +136,10 @@ export default {
         isCustomerLoggedIn() {
             return this.$session.UserType === this.$enumeration.EnumUserType.Customer && this.$session.UserData !== undefined;
         },
+
+        filteredCategories() {
+            return this.lstInventoryItemCategories.filter(x => x.InventoryItems.length);
+        }
     },
 
     async created() {

@@ -55,8 +55,8 @@ export function createStoreOnBase<IMLEntity extends MLEntity>(storeID: string, s
                 return newRecord;
             },
 
-            async getDataPaging(page: number, itemsPerPage: number, search?: string, filter?: string) {
-                const pagingData:PagingData<IMLEntity> = await service.getDataPaging(page, itemsPerPage, search, filter);
+            async getDataPaging(page: number, itemsPerPage: number, search?: string, filter?: string, sort?: string) {
+                const pagingData:PagingData<IMLEntity> = await service.getDataPaging(page, itemsPerPage, search, filter, sort);
                 
                 this._dataList = pagingData.Data;
                 this._totalCount = pagingData.TotalCount;

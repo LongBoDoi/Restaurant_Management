@@ -23,6 +23,9 @@
 </template>
 
 <script lang="ts">
+import { EnumTimeFilter } from '@/common/Enumeration';
+import EventBus from '@/common/EventBus';
+
 interface Data {
     AverageOrderValue: number,
     Trend: number
@@ -33,17 +36,29 @@ export default {
         return {
             loading: false,
 
-            data: <Data>{}
+            data: <Data>{},
+            timeFilter: <EnumTimeFilter>this.$enumeration.EnumTimeFilter.ByDay
         }
     },
 
-    async created() {
-        this.loading = true;
+    created() {
+        EventBus.on(this.$eventName.LoadReportData, this.loadData);
+    },
 
-        const objectData = await this.$service.DashboardService.getAverageOrderValue();
-        this.data = objectData;
+    beforeUnmount() {
+        EventBus.off(this.$eventName.LoadReportData);
+    },
 
-        this.loading = false;
+    methods: {
+        async loadData(data: any) {
+            this.loading = true;
+
+            this.timeFilter = data.TimeFilter;
+            const objectData = await this.$service.DashboardService.getAverageOrderValue(data.FromDate, data.ToDate, data.TimeFilter);
+            this.data = objectData;
+
+            this.loading = false;
+        }
     },
 
     computed: {
@@ -55,11 +70,27 @@ export default {
         },
 
         revenueTrend() {
+            var compareName = '';
+            switch (this.timeFilter) {
+                case this.$enumeration.EnumTimeFilter.ByDay:
+                    compareName = 'hôm qua';
+                    break;
+                case this.$enumeration.EnumTimeFilter.ByWeek:
+                    compareName = 'tuần trước';
+                    break;
+                case this.$enumeration.EnumTimeFilter.ByMonth:
+                    compareName = 'tháng trước';
+                    break;
+                case this.$enumeration.EnumTimeFilter.ByDay:
+                    compareName = 'năm ngoái';
+                    break;
+            }
+
             if (this.data && this.data.Trend !== null) {
                 if (this.data.Trend >= 0) {
-                    return `+${this.data.Trend}% so với hôm qua`;
+                    return `+${this.data.Trend}% so với ${compareName}`;
                 } else {
-                    return `${this.data.Trend}% so với hôm qua`
+                    return `${this.data.Trend}% so với ${compareName}`;
                 }
             }
 

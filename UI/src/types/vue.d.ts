@@ -10,6 +10,7 @@ import EventName from '@/common/EventName';
 import Config from '@/common/Config';
 import { Setting } from '@/models';
 import CommonValue from '@/common/CommonValue';
+import moment from 'moment';
 
 declare module '@vue/runtime-core' {
   interface ComponentCustomProperties {
@@ -22,6 +23,7 @@ declare module '@vue/runtime-core' {
     $localStorageKey: typeof LocalStorageKey,
     $eventName: typeof EventName,
     $config: typeof Config,
-    $commonValue: typeof CommonValue
+    $commonValue: typeof CommonValue,
+    $moment: typeof moment
   }
 }

@@ -5,15 +5,15 @@
                 <VProgressLinear v-if="loading" indeterminate color="primary" />
             </template>
             <VCardTitle class="bg-gradient-to-r from-teal-600 to-green-500 px-6 py-4 d-flex justify-between items-center">
-                <h2 className="text-white text-xl font-bold">Thông tin món</h2>
+                <h2 class="text-white text-xl font-bold">Thông tin món</h2>
                 <VBtn variant="plain" style="color: white; opacity: 1; width: 40px; height: 40px;" class="ml-auto" icon="mdi-close" @click="handleCloseDialog" />
             </VCardTitle>
 
             <VCardItem class="pa-6">
                 <VForm ref="form">
-                    <div className="grid grid-cols-2 gap-4">
-                        <div className="col-span-2">
-                            <label className="block text-sm font-medium text-gray-700">Tên món <span style="color: red;">*</span></label>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="col-span-2">
+                            <label class="block text-sm font-medium text-gray-700">Tên món <span style="color: red;">*</span></label>
                             <!-- Tên món -->
                             <VTextField
                                 color="primary"
@@ -32,12 +32,12 @@
 
                         <div>
                             <!-- Giá món -->
-                            <label className="block text-sm font-medium text-gray-700">Giá món</label>
+                            <label class="block text-sm font-medium text-gray-700">Giá món</label>
                             <MLNumberField class="w-full mt-2 text-right" density="compact" variant="outlined" suffix="đ" v-model:model-value="menuItem.Price" hide-details :rules="[(v: number) => v >= 0]" color="primary" />
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Nhóm thực đơn</label>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Nhóm thực đơn</label>
 
                             <!-- Nhóm thực đơn -->
                             <VCombobox
@@ -56,15 +56,15 @@
                             />
                         </div>
 
-                        <div className="col-span-2">
+                        <div class="col-span-2">
                             <!-- Mô tả -->
-                            <label className="block text-sm font-medium text-gray-700">Mô tả</label>
+                            <label class="block text-sm font-medium text-gray-700">Mô tả</label>
                             <VTextarea color="primary" no-resize class="mt-2" variant="outlined" v-model:model-value="menuItem.Description" hide-details />
                         </div>
 
-                        <div className="col-span-2">
+                        <div class="col-span-2">
                             <!-- Ảnh món -->
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Ảnh món</label>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Ảnh món</label>
                             <div class="intro-image-box mt-2">
                                 <template v-if="itemImageUrl">
                                     <VImg :src="itemImageUrl" />
@@ -87,20 +87,20 @@
                             </div>
                         </div>
 
-                        <div className="col-span-2" v-if="false">
+                        <div class="col-span-2" v-if="false">
                             <!-- Nguyên liệu -->
-                            <label className="block text-sm font-medium text-gray-700">Nguyên liệu</label>
+                            <label class="block text-sm font-medium text-gray-700">Nguyên liệu</label>
                             <TableMenuItemInventoryItem class="mt-2" :menu-item="menuItem" />
                         </div>
 
-                        <div className="col-span-2">
+                        <div class="col-span-2">
                             <!-- Ngừng hoạt động -->
                             <VCheckbox color="primary" class="text-gray-700" style="opacity: 1;" label="Ngừng hoạt động" v-model:model-value="menuItem.Inactive" hide-details />
                         </div>
 
-                        <div className="col-span-2" v-if="false">
+                        <div class="col-span-2" v-if="false">
                             <!-- Nguyên liệu -->
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Nguyên liệu</label>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Nguyên liệu</label>
                             <VCombobox
                                 class="mt-1"
                                 ref="cbMenuCategory"

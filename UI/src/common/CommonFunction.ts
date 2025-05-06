@@ -33,7 +33,7 @@ class CommonFunction {
     /**
      * Định dạng giờ
      */
-    static formatTime = (date:Date, noTimeZone?:boolean) => {
+    static formatTime = (date:Date|string, noTimeZone?:boolean) => {
         if (noTimeZone) {
             return moment(date).format('HH:mm');
         }
@@ -61,6 +61,13 @@ class CommonFunction {
         }
         return undefined;
     };
+
+    /**
+     * Lấy múi giờ
+     */
+    static getTimeZone = () => {
+        return moment().utcOffset() / 60;
+    }
 
     static showDialog = (dialogData:any) => {
         EventBus.emit(EventName.ShowDialog, dialogData);

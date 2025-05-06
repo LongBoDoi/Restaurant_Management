@@ -13,7 +13,7 @@
             </button>
         </div>
 
-        <div v-if="!data.length">Không có dữ liệu</div>
+        <div v-if="!data.length" class="text-center">Không có dữ liệu.</div>
         
         <div v-else>
             <div class="space-y-3 overflow-hidden transition-all duration-300 pb-3">

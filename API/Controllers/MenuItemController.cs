@@ -1,7 +1,6 @@
 ﻿using API.ML.BO;
 using API.ML.BOBase;
 using API.ML.Common;
-using API.ML.Extensions;
 using API.ML.Utility;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -14,52 +13,6 @@ namespace API.Controllers
     {
         public MenuItemController(ApplicationDBContext context) : base(context)
         {
-        }
-
-        /// <summary>
-        /// Lấy dữ liệu theo phân trang
-        /// </summary>
-        /// <param name="page">Số trang</param>
-        /// <param name="itemsPerPage">Kích thước trang</param>
-        /// <returns></returns>
-        [Authorize]
-        [HttpGet("GetMenuItemPaging")]
-        public MLActionResult GetMenuItemPaging(int page, int itemsPerPage, string? search, string? categoryID)
-        {
-            MLActionResult result = new()
-            {
-                Success = true
-            };
-
-            try
-            {
-                IEnumerable<MenuItem> allData = _entities.AsNoTracking().ToList();
-
-                string? normalizedSearchTerm = search?.RemoveDiacritics().ToLower();
-                Guid.TryParse(categoryID, out Guid gCategoryID);
-
-                allData = allData.Where(e => (string.IsNullOrEmpty(normalizedSearchTerm) || e.Name.RemoveDiacritics().ToLower().Contains(normalizedSearchTerm))
-                    && (gCategoryID == Guid.Empty || e.MenuItemCategoryID == gCategoryID)
-                ).Select(mi =>
-                {
-                    mi.MenuItemCategory = _context.MenuItemCategory.FirstOrDefault(mic => mic.MenuItemCategoryID == mi.MenuItemCategoryID);
-                    return mi;
-                });
-
-                int totalCount = allData.Count();
-
-                result.Data = new
-                {
-                    Data = allData.OrderByDescending(e => e.CreatedDate).Skip((page - 1) * itemsPerPage).Take(itemsPerPage),
-                    TotalCount = totalCount
-                };
-            }
-            catch (Exception ex)
-            {
-                CommonFunction.HandleException(ex, result, _context);
-            }
-
-            return result;
         }
 
         /// <summary>

@@ -47,11 +47,16 @@ namespace API.ML.BO
         /// Số lượng món của thực đơn
         /// </summary>
         [NotMapped]
-        public int ItemCount { get; set; }
+        public int ItemCount { 
+            get {
+                return MenuItems?.Count() ?? 0;
+            }
+        }
 
         /// <summary>
         /// Danh sách món trong nhóm
         /// </summary>
+        [GetDataPagingInclude]
         public List<MenuItem>? MenuItems { get; set; }
     }
 }

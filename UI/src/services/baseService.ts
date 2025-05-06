@@ -2,7 +2,6 @@ import CommonFunction from "@/common/CommonFunction";
 import Config from "@/common/Config";
 import EventBus from "@/common/EventBus";
 import EventName from "@/common/EventName";
-import LocalStorageKey from "@/common/LocalStorageKey";
 import { MLActionResult } from "@/models";
 import PagingData from "@/models/PagingData";
 import axios, { AxiosInstance } from "axios";
@@ -19,14 +18,6 @@ export abstract class BaseService {
       baseURL: this.baseURL,
       withCredentials: true
     });
-
-    if (!Config.UseCookies) {
-      api.interceptors.request.use((config) => {
-        const token = localStorage.getItem(LocalStorageKey.AuthToken);
-        config.headers.Authorization = `Bearer ${token ?? ''}`;
-        return config;
-      });
-    }
     
     api.interceptors.response.use(
       response => {
@@ -46,6 +37,15 @@ export abstract class BaseService {
     );
 
     this.api = api;
+  }
+
+  public setToken(token: string) {
+    if (!Config.UseCookies) {
+      this.api.interceptors.request.use((config) => {
+        config.headers.Authorization = `Bearer ${token ?? ''}`;
+        return config;
+      });
+    }
   }
 }
 
@@ -77,7 +77,7 @@ abstract class MLBaseService<IMLEntity> extends BaseService {
    * @param page Số trang
    * @param itemsPerPage Kích thước trang
    */
-  public async getDataPaging(page: number, itemsPerPage: number, search?: string, filter?: string) : Promise<PagingData<IMLEntity>> {
+  public async getDataPaging(page: number, itemsPerPage: number, search?: string, filter?: string, sort?: string) : Promise<PagingData<IMLEntity>> {
     var result:PagingData<IMLEntity> = {
       Data: [],
       TotalCount: 0
@@ -89,7 +89,8 @@ abstract class MLBaseService<IMLEntity> extends BaseService {
           page: page,
           itemsPerPage: itemsPerPage,
           search: search,
-          filter: filter
+          filter: filter,
+          sort: sort
         }
       });
       const actionResult = response.data as MLActionResult;

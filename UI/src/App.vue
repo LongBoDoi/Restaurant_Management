@@ -13,30 +13,18 @@
 import { mapActions } from 'pinia';
 import { userStore } from './stores/userStore';
 import EventBus from './common/EventBus';
-import { MLActionResult } from './models';
-import { EnumUserType } from './common/Enumeration';
 
 export default {
   async created() {
-    //Lấy dữ liệu người dùng
-    let result:MLActionResult|undefined = undefined;
-    try {
-      this.isLoading = true;
+    
 
-      result = await this.$service.UserLoginService.getUserData();
-    } catch (e) {
-    } finally {
-      this.isLoading = false;
-    }
-
-    if (result?.Success && result?.Data) {
-      Object.assign(this.$session, result.Data);
-      if (result.Data.UserType === EnumUserType.Employee && !window.location.pathname.startsWith('/management')) {
-        this.$router.replace({name: '/management'});
-      }
-    } else {
-      this.redirectToLogin();
-    }
+    // if (result?.Success) {
+    //   if (result.Data.UserType === EnumUserType.Employee && !window.location.pathname.startsWith('/management')) {
+    //     this.$router.replace({name: '/management'});
+    //   }
+    // } else {
+    //   this.redirectToLogin();
+    // }
 
     EventBus.on(this.$eventName.RedirectToLogin, this.redirectToLogin);
   },
@@ -55,7 +43,7 @@ export default {
     ...mapActions(userStore, ['setUserID']),
 
     redirectToLogin() {
-      if (window.location.pathname !== '/login') {
+      if (window.location.pathname.startsWith('/management')) {
         window.location.pathname = '/login';
       }
     }

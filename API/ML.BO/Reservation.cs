@@ -69,6 +69,7 @@ namespace API.ML.BO
         /// Dữ liệu bàn
         /// </summary>
         [GetDetail]
+        [GetDataPagingInclude]
         public IEnumerable<ReservationTable> ReservationTables { get; set; } = new List<ReservationTable>();
     }
 }

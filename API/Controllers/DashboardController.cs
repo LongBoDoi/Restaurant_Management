@@ -21,8 +21,8 @@ namespace API.Controllers
         /// </summary>
         /// <returns></returns>
         [Authorize]
-        [HttpGet("GetTodayRevenue")]
-        public MLActionResult GetTodayRevenue(DateTime minDate)
+        [HttpGet("GetTotalRevenue")]
+        public MLActionResult GetTotalRevenue(DateTime fromDate, DateTime toDate, EnumTimeFilter timeFilter, int timeZone)
         {
             MLActionResult result = new()
             {
@@ -31,16 +31,20 @@ namespace API.Controllers
 
             try
             {
-                decimal todayRevenue = _context.Order.Where(o => o.OrderDate >= minDate && o.Status == EnumOrderStatus.Paid).Sum(o => o.TotalAmount);
+                decimal currentRevenue = _context.Order
+                    .Where(o => o.OrderDate >= fromDate.ApplyTimeZone(timeZone) && o.OrderDate < toDate.ApplyTimeZone(timeZone) && o.Status == EnumOrderStatus.Paid)
+                    .Sum(o => o.TotalAmount);
 
-                DateTime yesterday = minDate.AddDays(-1);
-                decimal yesterdayRevenue = _context.Order.Where(o => o.OrderDate >= yesterday && o.OrderDate < minDate && o.Status == EnumOrderStatus.Paid).Sum(o => o.TotalAmount);
+                DateTime previousFromDate = fromDate.GetFromDateByTimeFilter(timeFilter);
+                decimal previousRevenue = _context.Order
+                    .Where(o => o.OrderDate >= previousFromDate.ApplyTimeZone(timeZone) && o.OrderDate < fromDate.ApplyTimeZone(timeZone) && o.Status == EnumOrderStatus.Paid)
+                    .Sum(o => o.TotalAmount);
 
-                decimal? revenueTrend = yesterdayRevenue > 0 ? Math.Round((todayRevenue - yesterdayRevenue) / yesterdayRevenue * 100) : null;
+                decimal? revenueTrend = previousRevenue > 0 ? Math.Round((currentRevenue - previousRevenue) / previousRevenue * 100) : null;
 
                 object dataResult = new
                 {
-                    Revenue = todayRevenue,
+                    Revenue = currentRevenue,
                     Trend = revenueTrend
                 };
 
@@ -55,12 +59,12 @@ namespace API.Controllers
         }
 
         /// <summary>
-        /// Lấy dữ liệu số order đã hoàn thành
+        /// Lấy dữ liệu tổng số order
         /// </summary>
         /// <returns></returns>
         [Authorize]
-        [HttpGet("GetCompletedOrders")]
-        public MLActionResult GetCompletedOrders(DateTime minDate)
+        [HttpGet("GetTotalOrders")]
+        public MLActionResult GetTotalOrders(DateTime fromDate, DateTime toDate, EnumTimeFilter timeFilter, int timeZone)
         {
             MLActionResult result = new()
             {
@@ -69,16 +73,20 @@ namespace API.Controllers
 
             try
             {
-                decimal todayCompletedOrders = _context.Order.Where(o => o.OrderDate >= minDate && o.Status == ML.Common.EnumOrderStatus.Paid).Count();
+                decimal currentTotalOrders = _context.Order
+                    .Where(o => o.OrderDate >= fromDate.ApplyTimeZone(timeZone) && o.OrderDate < toDate.ApplyTimeZone(timeZone))
+                    .Count();
 
-                DateTime yesterday = minDate.AddDays(-1);
-                decimal yesterdayCompletedOrders = _context.Order.Where(o => o.OrderDate >= yesterday && o.OrderDate < minDate && o.Status == ML.Common.EnumOrderStatus.Paid).Count();
+                DateTime previousFromDate = fromDate.GetFromDateByTimeFilter(timeFilter);
+                decimal previousTotalOrders = _context.Order
+                    .Where(o => o.OrderDate >= previousFromDate.ApplyTimeZone(timeZone) && o.OrderDate < fromDate.ApplyTimeZone(timeZone))
+                    .Count();
 
-                decimal? trend = yesterdayCompletedOrders > 0 ? Math.Round((todayCompletedOrders - yesterdayCompletedOrders) / yesterdayCompletedOrders * 100) : null;
+                decimal? trend = previousTotalOrders > 0 ? Math.Round((currentTotalOrders - previousTotalOrders) / previousTotalOrders * 100) : null;
 
                 object dataResult = new
                 {
-                    CompletedOrders = todayCompletedOrders,
+                    CompletedOrders = currentTotalOrders,
                     Trend = trend
                 };
 
@@ -98,7 +106,7 @@ namespace API.Controllers
         /// <returns></returns>
         [Authorize]
         [HttpGet("GetAverageOrderValue")]
-        public MLActionResult GetAverageOrderValue(DateTime minDate)
+        public MLActionResult GetAverageOrderValue(DateTime fromDate, DateTime toDate, EnumTimeFilter timeFilter, int timeZone)
         {
             MLActionResult result = new()
             {
@@ -107,18 +115,22 @@ namespace API.Controllers
 
             try
             {
-                var todayOrders = _context.Order.Where(o => o.OrderDate >= minDate && o.Status == ML.Common.EnumOrderStatus.Paid).ToList();
-                decimal todayAverage = todayOrders.Any() ? todayOrders.Average(o => o.NetAmount) : 0;
+                var currentOrders = _context.Order
+                    .Where(o => o.OrderDate >= fromDate.ApplyTimeZone(timeZone) && o.OrderDate < toDate.ApplyTimeZone(timeZone) && o.Status == EnumOrderStatus.Paid)
+                    .ToList();
+                decimal currentAverage = currentOrders.Any() ? currentOrders.Average(o => o.NetAmount) : 0;
 
-                DateTime yesterday = minDate.AddDays(-1);
-                var yesterdayOrders = _context.Order.Where(o => o.OrderDate >= yesterday && o.OrderDate < minDate && o.Status == ML.Common.EnumOrderStatus.Paid).ToList();
-                decimal yesterdayAverage = yesterdayOrders.Any() ? yesterdayOrders.Average(o => o.NetAmount) : 0;
+                DateTime previousFromDate = fromDate.GetFromDateByTimeFilter(timeFilter);
+                var previousOrders = _context.Order
+                    .Where(o => o.OrderDate >= previousFromDate.ApplyTimeZone(timeZone) && o.OrderDate < fromDate.ApplyTimeZone(timeZone) && o.Status == EnumOrderStatus.Paid)
+                    .ToList();
+                decimal previousAverage = previousOrders.Any() ? previousOrders.Average(o => o.NetAmount) : 0;
 
-                decimal? trend = yesterdayAverage > 0 ? Math.Round((todayAverage - yesterdayAverage) / yesterdayAverage * 100) : null;
+                decimal? trend = previousAverage > 0 ? Math.Round((currentAverage - previousAverage) / previousAverage * 100) : null;
 
                 object dataResult = new
                 {
-                    AverageOrderValue = Math.Round(todayAverage),
+                    AverageOrderValue = Math.Round(currentAverage),
                     Trend = trend
                 };
 
@@ -177,7 +189,7 @@ namespace API.Controllers
         /// <returns></returns>
         [Authorize]
         [HttpGet("GetRevenueTrend")]
-        public MLActionResult GetRevenueTrend(DateTime today, int timeFilter)
+        public MLActionResult GetRevenueTrend(DateTime fromDate, DateTime toDate, EnumTimeFilter timeFilter, int timeZone)
         {
             MLActionResult result = new()
             {
@@ -188,49 +200,25 @@ namespace API.Controllers
             {
                 List<object> data = [];
 
-                var fromDate = today;
-                switch (timeFilter)
+                while (fromDate < toDate)
                 {
-                    // Lọc theo ngày
-                    case 0:
-                        fromDate = today.AddDays(-30);
-                        break;
-                    // Lọc theo tuần
-                    case 1:
-                        fromDate = today.AddDays(-70);
-                        break;
-                    // Lọc theo tháng
-                    case 2:
-                        fromDate = today.AddMonths(-12);
-                        break;
-                }
-
-                while (fromDate <= today)
-                {
-                    var toDate = fromDate;
-                    switch (timeFilter)
+                    DateTime nextDate = fromDate.GetToDateByTimeFilter(timeFilter);
+                    if (nextDate > toDate)
                     {
-                        case 0:
-                            toDate = fromDate.AddDays(1);
-                            break;
-                        case 1:
-                            toDate = fromDate.AddDays(7 - (int)fromDate.DayOfWeek);
-                            break;
-                        case 2:
-                            toDate = fromDate.AddMonths(1);
-                            break;
-
+                        nextDate = toDate;
                     }
-                    decimal revenue = _context.Order.Where(o => o.OrderDate >= fromDate && o.OrderDate < toDate && o.Status == EnumOrderStatus.Paid).Sum(o => o.TotalAmount);
+                    decimal revenue = _context.Order
+                        .Where(o => o.OrderDate >= fromDate.ApplyTimeZone(timeZone) && o.OrderDate < nextDate.ApplyTimeZone(timeZone) && o.Status == EnumOrderStatus.Paid)
+                        .Sum(o => o.TotalAmount);
 
                     data.Add(new
                     {
                         FromDate = fromDate,
-                        ToDate = toDate,
+                        ToDate = nextDate,
                         Revenue = revenue
                     });
 
-                    fromDate = toDate;
+                    fromDate = nextDate;
                 }
 
                 result.Data = data;
@@ -249,7 +237,7 @@ namespace API.Controllers
         /// <returns></returns>
         [Authorize]
         [HttpGet("GetPopularMenuItems")]
-        public MLActionResult GetPopularMenuItems(DateTime minDate)
+        public MLActionResult GetPopularMenuItems(DateTime fromDate, DateTime toDate, EnumTimeFilter timeFilter, int timeZone)
         {
             MLActionResult result = new()
             {
@@ -258,26 +246,36 @@ namespace API.Controllers
 
             try
             {
-                DateTime yesterday = minDate.AddDays(-1);
+                DateTime previousFromDate = fromDate.GetFromDateByTimeFilter(timeFilter);
 
                 var data = _context.MenuItem
                     .Select(mi => new
                     {
                         MenuItem = mi,
-                        TodayCount = mi.OrderDetails
-                            .Count(od => od.Order != null && od.Order.OrderDate >= minDate && od.Order.Status == EnumOrderStatus.Paid),
-                        YesterdayCount = mi.OrderDetails
-                            .Count(od => od.Order != null && od.Order.OrderDate >= yesterday && od.Order.OrderDate < minDate && od.Order.Status == EnumOrderStatus.Paid)
+                        CurrentCount = mi.OrderDetails
+                            .Count(od => 
+                                od.Order != null && 
+                                od.Order.OrderDate >= fromDate.ApplyTimeZone(timeZone) && 
+                                od.Order.OrderDate < toDate.ApplyTimeZone(timeZone) && 
+                                od.Order.Status == EnumOrderStatus.Paid
+                            ),
+                        PreviousCount = mi.OrderDetails
+                            .Count(od => 
+                                od.Order != null && 
+                                od.Order.OrderDate >= previousFromDate.ApplyTimeZone(timeZone) && 
+                                od.Order.OrderDate < fromDate.ApplyTimeZone(timeZone) && 
+                                od.Order.Status == EnumOrderStatus.Paid
+                            )
                     })
-                    .Where(mi => mi.TodayCount > 0)
-                    .OrderByDescending(x => x.TodayCount)
+                    .Where(mi => mi.CurrentCount > 0)
+                    .OrderByDescending(x => x.CurrentCount)
                     .ThenBy(x => x.MenuItem.Name)
                     .ToList()
                     .Select(d =>
                         new {
                             MenuItem = d.MenuItem,
-                            Count = d.TodayCount,
-                            Trend = (decimal?)(d.YesterdayCount > 0 ? Math.Round((decimal)(d.TodayCount - d.YesterdayCount) / (decimal)d.YesterdayCount * 100) : null)
+                            Count = d.CurrentCount,
+                            Trend = (decimal?)(d.PreviousCount > 0 ? Math.Round((decimal)(d.CurrentCount - d.PreviousCount) / (decimal)d.PreviousCount * 100) : null)
                     })
                     .ToList();
 

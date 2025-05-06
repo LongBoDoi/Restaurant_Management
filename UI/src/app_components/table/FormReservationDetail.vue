@@ -7,16 +7,16 @@
 
             <!-- Header -->
             <VCardTitle class="bg-gradient-to-r from-teal-600 to-green-500 px-6 py-4 d-flex justify-between items-center">
-                <h2 className="text-white text-xl font-bold">Đặt chỗ</h2>
+                <h2 class="text-white text-xl font-bold">Đặt chỗ</h2>
                 <VBtn variant="plain" style="color: white; opacity: 1; width: 40px; height: 40px;" class="ml-auto" icon="mdi-close" @click="handleCloseDialog" />
             </VCardTitle>
 
             <!-- Body -->
             <VCardItem class="pa-6">
-                <VForm ref="form">
+                <MLForm ref="form">
                     <FormReservationSummary v-if="record.Status === $enumeration.EnumReservationStatus.Canceled || record.Status === $enumeration.EnumReservationStatus.Received" :record="record" />
                     <FormReservationEdit v-else :edit-mode="editMode" :record="record" :lst-customers="lstCustomers" :lst-tables="lstTables" :reserved-tables="reservedTables" :receiving-table="receivingTable" />
-                </VForm>
+                </MLForm>
             </VCardItem>
 
             <VCardActions class="px-6 py-4 bg-gray-50 border-t flex justify-end">
@@ -61,6 +61,7 @@
 <script lang="ts">
 import { EnumEditMode, EnumReservationStatus } from '@/common/Enumeration';
 import EventBus from '@/common/EventBus';
+import MLForm from '@/components/MLForm.vue';
 import { Reservation, MLActionResult, Customer, Table, Order } from '@/models';
 import OrderTable from '@/models/OrderTable';
 import { reservationStore } from '@/stores/reservationStore';
@@ -128,8 +129,12 @@ export default {
          * Xử lý nhấn vào nút Lưu
          */
         async handleSaveClick(record: Reservation) {
+            this.receivingTable = false;
+
+            await this.$nextTick();
+
             const form = this.$refs.form as any;
-            const formValid:boolean = (await form.validate()).valid;
+            const formValid:boolean = (await form.validate());
 
             if (!formValid) return;
 
@@ -154,6 +159,15 @@ export default {
          * Xử lý nhận bàn
          */
         async handleReceiveTableClick() {
+            this.receivingTable = true;
+
+            await this.$nextTick();
+
+            const form = this.$refs.form as any;
+            const formValid:boolean = (await form.validate());
+
+            if (!formValid) return;
+
             const order:Order = {
                 EditMode: this.$enumeration.EnumEditMode.Add,
                 CustomerName: this.record.CustomerName,
@@ -175,13 +189,6 @@ export default {
          * Xử lý tạo order hoặc thanh toán thành công khi nhận bàn
          */
         async handleCreateOrderFromReservation() {
-            this.receivingTable = true;
-
-            const form = this.$refs.form as any;
-            const formValid:boolean = (await form.validate()).valid;
-
-            if (!formValid) return;
-
             this.loading = true;
 
             const saveObject = Object.assign({}, this.record);

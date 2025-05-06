@@ -1,6 +1,6 @@
 <template>
     <div class="bg-emerald-50" style="min-height: 100%;">
-        <VContainer class="py-6 px-4 sm:py-8 sm:px-8">
+        <VContainer class="py-6 px-4 sm:py-8 sm:px-8 flex flex-column align-center">
             <div class="text-center mb-12">
                 <div class="flex justify-center items-center mb-4">
                     <div class="h-0.5 bg-emerald-200 w-24"></div>
@@ -12,14 +12,21 @@
                 </p>
             </div>
 
-            <div class="mb-10" v-for="category in lstDisplayItems">
+            <div v-if="displayMenuType === 0" class="bg-emerald-100 rounded-md" style="aspect-ratio: 16/9; width: 100%; max-width: 1000px;">
+                <VCarousel color="primary" style="height: 100%; border-radius: 8px; flex-grow: 1;" show-arrows="hover" hide-delimiter-background cycle>
+                    <VCarouselItem v-for="url in lstMenuImageUrls" :src="url" />
+                </VCarousel>
+            </div>
+
+            <div v-if="displayMenuType === 1" class="w-full">
+                <div class="mb-10" v-for="category in lstDisplayItems">
                 <h3 class="text-xl font-semibold border-b-2 border-emerald-500 pb-2 mb-6">
                     {{ category.MenuItemCategoryName }}
                 </h3>
                 <!-- <div
                     class="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6"
                 > -->
-                <VSlideGroup :direction="(($commonFunction.getScreenCode() === 'xs' || $commonFunction.getScreenCode() === 'sm') ? 'vertical' : 'horizontal')">
+                <VSlideGroup :direction="(($commonFunction.getScreenCode() === 'xs' || $commonFunction.getScreenCode() === 'sm') ? 'vertical' : 'horizontal')" show-arrows="always">
                     <template #prev>
                         <VBtn icon="mdi-chevron-left" />
                     </template>
@@ -30,7 +37,7 @@
                     <VSlideGroupItem
                         v-for="menuItem in category.MenuItems"
                     >
-                        <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 border border-gray-100 my-4 md:my-0 md:mx-4 mb-4 w-full md:max-w-md group">
+                        <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 border border-gray-100 my-4 md:my-0 md:mx-4 mb-4 w-full md:max-w-300 group">
                             <div class="relative overflow-hidden">
                                 <img
                                     v-if="menuItem.ImageUrl"
@@ -62,8 +69,9 @@
                 <!-- </div> -->
                 </VSlideGroup>
             </div>
+            </div>
 
-            <FormCreateSushi />
+            <FormCreateSushi class="w-full" />
         </VContainer>
     </div>
 </template>
@@ -73,7 +81,9 @@ import { MenuItemCategory } from '@/models';
 
 export default {
     async created() {
-        this.lstDisplayItems = await this.$service.SettingService.getMenuItemsForCustomerScreen();
+        if (this.displayMenuType === 1) {
+            this.lstDisplayItems = await this.$service.SettingService.getMenuItemsForCustomerScreen();
+        }
     },
 
     data() {
@@ -97,7 +107,7 @@ export default {
 
         screenCode():string {
             return this.$commonFunction.getScreenCode();
-        }
+        },
     }
 }
 </script>

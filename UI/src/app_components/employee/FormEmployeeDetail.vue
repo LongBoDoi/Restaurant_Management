@@ -7,7 +7,7 @@
 
             <!-- Header -->
             <VCardTitle class="bg-gradient-to-r from-teal-600 to-green-500 px-6 py-4 d-flex justify-between items-center">
-                <h2 className="text-white text-xl font-bold">Nhân viên</h2>
+                <h2 class="text-white text-xl font-bold">Nhân viên</h2>
                 <VBtn variant="plain" style="color: white; opacity: 1; width: 40px; height: 40px;" class="ml-auto" icon="mdi-close" @click="handleCloseDialog" />
             </VCardTitle>
 
@@ -15,9 +15,9 @@
             <VCardItem class="pa-6">
                 <VForm ref="form">
                     <!-- Ảnh nhân viên -->
-                    <div className="mb-6 flex items-center justify-center">
-                        <div className="relative">
-                            <div style="width: 96px; height: 96px; border: 4px solid rgb(220 252 231);" className="rounded-full bg-gray-200 flex items-center justify-center overflow-hidden border-4 border-green-100">
+                    <div class="mb-6 flex items-center justify-center">
+                        <div class="relative">
+                            <div style="width: 96px; height: 96px; border: 4px solid rgb(220 252 231);" class="rounded-full bg-gray-200 flex items-center justify-center overflow-hidden border-4 border-green-100">
                                 <img v-if="imageUrl" :src="imageUrl" >
                                 <VIcon v-else class="text-gray-400" icon="mdi-account-outline" style="font-size: 48px;" />
                             </div>
@@ -42,16 +42,19 @@
                     <div class="grid grid-cols-2 gap-4 mb-4">
                         <div>
                             <!-- Mã nhân viên -->
-                            <label className="block text-sm font-medium text-gray-700">Mã nhân viên <span style="color: red;">*</span></label>
-                            <VTextField class="mt-1" density="compact" variant="outlined" v-model:model-value="record.EmployeeCode" hide-details
-                                :rules="[$commonValue.textFieldRequireRule]"
+                            <label class="block text-sm font-medium text-gray-700">Mã nhân viên <span style="color: red;">*</span></label>
+                            <VTextField class="mt-1" density="compact" variant="outlined" v-model:model-value="record.EmployeeCode" hide-details color="primary"
+                                :rules="[$commonValue.textFieldRequireRule, $commonValue.textNoSpaceRule]"
                             />
+                            <div class="text-xs text-gray-500 mt-1">
+                                <i>Mã nhân viên sẽ được dùng làm tên đăng nhập cho nhân viên.</i>
+                            </div>
                         </div>
 
                         <div>
                             <!-- Họ tên -->
-                            <label className="block text-sm font-medium text-gray-700">Họ tên <span style="color: red;">*</span></label>
-                            <VTextField class="mt-1" density="compact" variant="outlined" v-model:model-value="record.EmployeeName" hide-details
+                            <label class="block text-sm font-medium text-gray-700">Họ tên <span style="color: red;">*</span></label>
+                            <VTextField class="mt-1" density="compact" variant="outlined" v-model:model-value="record.EmployeeName" hide-details color="primary"
                                 :rules="[$commonValue.textFieldRequireRule]"
                             />
                         </div>
@@ -60,24 +63,25 @@
                     <div class="grid grid-cols-2 gap-4 mb-4">
                         <div>
                             <!-- Email -->
-                            <label className="block text-sm font-medium text-gray-700">Email</label>
-                            <VTextField class="mt-1" density="compact" variant="outlined" v-model:model-value="record.Email" hide-details />
+                            <label class="block text-sm font-medium text-gray-700">Email</label>
+                            <VTextField class="mt-1" density="compact" variant="outlined" v-model:model-value="record.Email" hide-details color="primary" :rules="[$commonValue.textEmailRule]" />
                         </div>
 
                         <div>
                             <!-- Số điện thoại -->
-                            <label className="block text-sm font-medium text-gray-700">Số điện thoại</label>
-                            <VTextField class="mt-1" density="compact" variant="outlined" hide-details
+                            <label class="block text-sm font-medium text-gray-700">Số điện thoại</label>
+                            <VTextField class="mt-1" density="compact" variant="outlined" hide-details color="primary"
                                 v-mask="'0### ### ###'"
+                                :model-value="record.PhoneNumber"
                                 v-on:update:model-value="record.PhoneNumber = $commonFunction.getRealPhoneNumberValue($event);"
                             />
                         </div>
                     </div>
 
-                    <div class="grid gap-4 mb-4">
+                    <div class="grid grid-cols-2 gap-4 mb-4">
                         <div>
                             <!-- Trạng thái -->
-                            <label className="block text-sm font-medium text-gray-700">Trạng thái làm việc</label>
+                            <label class="block text-sm font-medium text-gray-700">Trạng thái làm việc</label>
                             <VSelect
                                 :items="lstWorkStatus"
                                 item-title="Text"
@@ -88,35 +92,65 @@
 
                                 density="compact"
                                 variant="outlined"
+                                color="primary"
                                 class="mt-1"
+                            />
+                        </div>
+
+                        <div>
+                            <!-- Vai trò -->
+                            <label class="block text-sm font-medium text-gray-700">Vai trò <span style="color: red;">*</span></label>
+                            <VSelect
+                                :items="allRoles"
+                                item-title="RoleName"
+                                item-value="RoleID"
+                                :return-object="true"
+                                hide-details
+                                multiple
+                                chips
+                                v-model:model-value="record.Roles"
+
+                                density="compact"
+                                variant="outlined"
+                                color="primary"
+                                class="mt-1"
+                                :rules="[(roles: Role[]) => {
+                                    return roles.length > 0;
+                                }]"
                             />
                         </div>
                     </div>
 
-                    <div v-if="editMode === $enumeration.EnumEditMode.Add" class="grid grid-cols-2 gap-4 mb-4">
-                        <div>
-                            <!-- Mật khẩu -->
-                            <label className="block text-sm font-medium text-gray-700">Mật khẩu</label>
-                            <VTextField type="password" class="mt-1" density="compact" variant="outlined" hide-details
-                                :rules="[$commonValue.textFieldRequireRule]"
-                                v-on:update:model-value="(value: string) => {
-                                    if (record.UserLogin) {
-                                        record.UserLogin.Password = value;
-                                    }
-                                }"
-                            />
+                    <div v-if="editMode === $enumeration.EnumEditMode.Add" class="mb-4">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <!-- Mật khẩu -->
+                                <label class="block text-sm font-medium text-gray-700">Mật khẩu</label>
+                                <VTextField type="password" class="mt-1" density="compact" variant="outlined" hide-details color="primary"
+                                    :rules="[$commonValue.textFieldRequireRule, $commonValue.textPasswordRule]"
+                                    v-on:update:model-value="(value: string) => {
+                                        if (record.UserLogin) {
+                                            record.UserLogin.Password = value;
+                                        }
+                                    }"
+                                />
+                            </div>
+
+                            <div>
+                                <!-- Xác nhận mật khẩu -->
+                                <label class="block text-sm font-medium text-gray-700">Xác nhận mật khẩu</label>
+                                <VTextField type="password" class="mt-1" density="compact" variant="outlined" hide-details color="primary"
+                                    :rules="[
+                                        (v) => {
+                                            return v !== undefined && v !== '' && v === record.UserLogin?.Password;
+                                        }
+                                    ]"
+                                />
+                            </div>
                         </div>
 
-                        <div>
-                            <!-- Xác nhận mật khẩu -->
-                            <label className="block text-sm font-medium text-gray-700">Xác nhận mật khẩu</label>
-                            <VTextField type="password" class="mt-1" density="compact" variant="outlined" hide-details
-                                :rules="[
-                                    (v) => {
-                                        return v !== undefined && v !== '' && v === record.UserLogin?.Password;
-                                    }
-                                ]"
-                            />
+                        <div class="text-xs text-gray-500 mt-1">
+                            <i>Mật khẩu phải chứa ít nhất 08 ký tự, bao gồm ít nhất 01 ký tự viết hoa, 01 ký tự viết thường, 01 chữ số và 01 ký tự đặc biệt.</i>
                         </div>
                     </div>
                 </VForm>
@@ -136,13 +170,11 @@
 import { EnumEditMode } from '@/common/Enumeration';
 import EventBus from '@/common/EventBus';
 import { Employee, MLActionResult } from '@/models';
+import Role from '@/models/Role';
 import { employeeStore } from '@/stores/employeeStore';
 import { mapActions, mapState } from 'pinia';
-import { VMoney } from 'v-money';
 
 export default {
-    directives: {money: VMoney},
-
     created() {
         EventBus.on(this.$eventName.ShowFormEmployeeDetail, this.handleShowDialog as any);
     },
@@ -166,8 +198,11 @@ export default {
                 this.imageUrl = this.$commonFunction.getImageUrl(record.ImageUrl);
 
                 this.record = record;
+                this.record.Roles = [];
                 Object.assign(this.oldRecord, this.record);
                 this.isShow = true;
+
+                this.loadAllSubData();
             }
         },
 
@@ -232,6 +267,20 @@ export default {
                 reader.readAsDataURL(file as File);
             }
         },
+
+        loadAllSubData() {
+            this.loading = true;
+
+            var servicesCalled:number = 0;
+            this.subData.forEach((subData:any) => {
+                subData().then(() => {
+                    servicesCalled++;
+                    if (servicesCalled >= this.subData.length) {
+                        this.loading = false;
+                    }
+                });
+            });
+        }
     },
 
     data() {
@@ -244,7 +293,9 @@ export default {
             oldRecord: <Employee>{} as Employee,
 
             imageFile: <File|undefined>undefined,
-            imageUrl: <string>''
+            imageUrl: <string>'',
+
+            allRoles: <Role[]>[]
         }
     },
 
@@ -270,7 +321,24 @@ export default {
                     Value: this.$enumeration.EnumEmployeeWorkStatus.Terminated
                 }
             ]
-        }
+        },
+
+        subData() {
+            return [
+                async () => {
+                    if (this.editMode === this.$enumeration.EnumEditMode.Edit) {
+                        const detail = await this.$service.EmployeeService.getByID(this.record.EmployeeID);
+                        if (detail) {
+                            this.record.Roles = detail.Roles;
+                        }
+                    }
+                },
+                async () => {
+                    const allRoles = await this.$service.RoleService.getAll();
+                    this.allRoles = allRoles;
+                }
+            ]
+        },
     }
 }
 </script>

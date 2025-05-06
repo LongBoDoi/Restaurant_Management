@@ -34,6 +34,7 @@ declare module 'vue-router/auto-routes' {
     '/management/menu': RouteRecordInfo<'/management/menu', '/management/menu', Record<never, never>, Record<never, never>>,
     '/management/menu-category': RouteRecordInfo<'/management/menu-category', '/management/menu-category', Record<never, never>, Record<never, never>>,
     '/management/order': RouteRecordInfo<'/management/order', '/management/order', Record<never, never>, Record<never, never>>,
+    '/management/permission': RouteRecordInfo<'/management/permission', '/management/permission', Record<never, never>, Record<never, never>>,
     '/management/reservation': RouteRecordInfo<'/management/reservation', '/management/reservation', Record<never, never>, Record<never, never>>,
     '/management/setting': RouteRecordInfo<'/management/setting', '/management/setting', Record<never, never>, Record<never, never>>,
     '/management/table': RouteRecordInfo<'/management/table', '/management/table', Record<never, never>, Record<never, never>>,

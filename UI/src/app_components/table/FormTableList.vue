@@ -6,11 +6,82 @@
 
         <VCard style="width: 100% ; height: 100%;" color="rgb(249, 250, 251)" class="rounded-lg d-flex flex-column shadow-md border mt-6">
             <!-- Toolbar -->
-            <div className="flex items-center space-x-4 px-6 py-4 border-b">
+            <div class="flex items-center space-x-4 px-6 py-4 border-b">
                 <VTextField density="compact" variant="outlined" prepend-inner-icon="mdi-magnify" class="focus:outline-green-500" style="max-width: 320px;" hide-details placeholder="Tìm kiếm bàn..."
+                    color="primary"
                     :model-value="options.search"
                     @keypress.enter="options.search = $event.target.value;"
                 />
+
+                <VSelect
+                    :items="areaList"
+                    item-title="AreaName"
+                    item-value="AreaID"
+                    :return-object="false"
+                    v-model:model-value="options.areaID"
+
+                    density="compact"
+                    variant="outlined"
+                    hide-details
+                    color="primary"
+                    style="max-width: 200px;"
+                />
+
+                <MLFilterPopup :filter-count="lstFilters.length" :width="'auto'" v-on:reset-filter="handleResetFilters" v-on:apply-filter="handleApplyFilters">
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block font-medium text-gray-700">Số ghế</label>
+                            <MLNumberField
+                                hide-details
+                                variant="outlined"
+                                density="compact"
+                                class="mt-1"
+                                color="primary"
+                                nullable
+                                :rules="[(value: number) => {
+                                    return value > 0;
+                                }]"
+
+                                v-model="seatCountFilter"
+                            />
+                        </div>
+
+                        <div>
+                            <label class="block font-medium text-gray-700">Trạng thái</label>
+                            <VSelect
+                                :items="[
+                                    {
+                                        Text: 'Tất cả',
+                                        Value: -1
+                                    },
+                                    {
+                                        Text: 'Còn trống',
+                                        Value: $enumeration.EnumTableStatus.Available
+                                    },
+                                    {
+                                        Text: 'Hết chỗ',
+                                        Value: $enumeration.EnumTableStatus.Occupied
+                                    },
+                                    {
+                                        Text: 'Đã đặt chỗ',
+                                        Value: $enumeration.EnumTableStatus.Reserved
+                                    }
+                                ]"
+                                item-title="Text"
+                                item-value="Value"
+                                hide-details
+                                variant="outlined"
+                                density="compact"
+                                class="mt-1"
+                                color="primary"
+
+                                v-model:model-value="tableStatusFilter"
+                            />
+                        </div>
+                    </div>
+                </MLFilterPopup>
+
+                <MLSortPopup :items="sortConditionList" v-model:model-value="options.sort" />
             </div>
 
             <!-- Bảng dữ liệu -->
@@ -86,13 +157,17 @@
 <script lang="ts">
 import { EnumTableStatus } from '@/common/Enumeration';
 import EventBus from '@/common/EventBus';
-import { Table } from '@/models';
+import { Area, Table } from '@/models';
+import MLFilterCondition from '@/models/MLFilterCondition';
+import MLSortCondition from '@/models/MLSortCondition';
 import { tableStore } from '@/stores/tableStore';
 import { mapActions, mapState } from 'pinia';
 
 export default {
     created() {
-        this.getData();
+        this.$service.AreaService.getAll().then((data: Area[]) => {
+            this.allAreas = data;
+        });
     },
 
     data() {
@@ -102,8 +177,16 @@ export default {
             options: <any>{
                 page: 1,
                 itemsPerPage: 10,
-                search: ''
-            }
+                search: '',
+                areaID: '',
+                sort: ''
+            },
+
+            seatCountFilter: <number|undefined>undefined,
+            tableStatusFilter: <EnumTableStatus|number>-1,
+            lstFilters: <MLFilterCondition[]>[],
+
+            allAreas: <Area[]>[],
         }
     },
 
@@ -124,7 +207,7 @@ export default {
          */
         async getData() {
             this.loading = true;
-            await this.getDataPaging(this.options.page, this.options.itemsPerPage, this.options.search);
+            await this.getDataPaging(this.options.page, this.options.itemsPerPage, this.options.search, this.filterJson, this.options.sort);
             this.loading = false;
         },
 
@@ -142,7 +225,7 @@ export default {
         */
         handleDeleteRecord(item: Table) {
             this.$commonFunction.showDialog({
-                Title: 'Xác nhận xoá món',
+                Title: 'Xác nhận xoá bàn',
                 Message: `Bạn có chắc chắn muốn xoá Bàn <b>${item.TableName}</b> không?`,
                 ConfirmAction: async () => {
                     item.EditMode = this.$enumeration.EnumEditMode.Delete;
@@ -181,11 +264,92 @@ export default {
                 case EnumTableStatus.Reserved:
                     return 'bg-yellow-100 text-yellow-700';
             }
+        },
+
+        handleResetFilters() {
+            this.seatCountFilter = undefined;
+            this.tableStatusFilter = -1;
+
+            this.lstFilters = [];
+        },
+
+        handleApplyFilters() {
+            this.lstFilters = [];
+            if (this.seatCountFilter !== undefined) {
+                this.lstFilters.push({
+                    Name: 'SeatCount',
+                    Operator: '==',
+                    Value: this.seatCountFilter
+                } as MLFilterCondition);
+            }
+            if (this.tableStatusFilter !== -1) {
+                this.lstFilters.push({
+                    Name: 'Status',
+                    Operator: '==',
+                    Value: this.tableStatusFilter
+                } as MLFilterCondition);
+            }
+
+            this.getData();
         }
     },
 
     computed: {
         ...mapState(tableStore as any, ['dataList', 'selectedIndex', 'totalCount']),
+
+        areaList() {
+            return [{
+                AreaID: '',
+                AreaName: 'Tất cả khu vực'
+            } as Area,
+            ...this.allAreas];
+        },
+
+        sortConditionList() {
+            return [
+                {
+                    Text: 'Tên bàn (A-Z)',
+                    Name: 'TableName',
+                    Direction: 'ASC'
+                } as MLSortCondition,
+                {
+                    Text: 'Tên bàn (Z-A)',
+                    Name: 'TableName',
+                    Direction: 'DESC'
+                } as MLSortCondition,
+                {
+                    Text: 'Số ghế (Tăng dần)',
+                    Name: 'SeatCount',
+                    Direction: 'ASC'
+                } as MLSortCondition,
+                {
+                    Text: 'Số ghế (Giảm dần)',
+                    Name: 'SeatCount',
+                    Direction: 'DESC'
+                } as MLSortCondition,
+            ]
+        },
+
+        filterJson() {
+            var result = '';
+
+            var filterArray = [];
+            if (this.options.areaID) {
+                filterArray.push({
+                    Name: 'AreaID',
+                    Operator: '==',
+                    Value: this.options.areaID
+                } as MLFilterCondition);
+            }
+
+            filterArray = filterArray.concat(this.lstFilters);
+
+            if (filterArray.length) {
+                result = JSON.stringify(filterArray);
+            }
+
+            return result;
+        },
     },
 
     watch: {

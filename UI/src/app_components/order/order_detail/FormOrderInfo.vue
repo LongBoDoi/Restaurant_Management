@@ -116,6 +116,7 @@
                         rows="3"
                         class="mt-1 w-full bg-white border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-400 transition duration-200"
                         v-model:model-value="record.SpecialRequest"
+                        color="primary"
                     />
                 </div>
 
@@ -141,6 +142,7 @@
                                     suffix="đ"
                                     class="text-right border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-400 transition duration-200"
                                     v-model="record.TipAmount"
+                                    color="primary"
                                     :rules="[(v: number) => v >= 0]"
                                 />
                             </div>
@@ -179,7 +181,7 @@
             <div style="flex-grow: 1; height: 100%; display: flex; flex-direction: column;">
                 <div class="flex justify-between items-center mb-4">
                     <h3 class="text-lg font-semibold text-gray-800">Thực đơn</h3>
-                    <VTextField density="compact" variant="outlined" prepend-inner-icon="mdi-magnify" max-width="225" hide-details placeholder="Tìm kiếm tên món..." v-model:model-value="txtSearch" />
+                    <VTextField density="compact" variant="outlined" prepend-inner-icon="mdi-magnify" max-width="225" hide-details placeholder="Tìm kiếm tên món..." v-model:model-value="txtSearch" color="primary" />
                 </div>
                 <!-- Nhóm món -->
                 <VSlideGroup>
@@ -190,9 +192,10 @@
                         <v-btn
                             variant="outlined"
                             class="mx-2 border-gray-300"
-                            :class="[
-                                {'bg-primary text-white' : category.MenuItemCategoryID === selectedMenuCategory}
-                            ]"
+                            :style="{
+                                'background-color': category.MenuItemCategoryID === selectedMenuCategory ? category.Color : 'white',
+                                'color': category.MenuItemCategoryID === selectedMenuCategory ? 'white' : category.Color
+                            }"
                             rounded
                             @click="selectedMenuCategory = category.MenuItemCategoryID"
                         >
@@ -316,7 +319,8 @@ export default {
         lstMenuItemCategoriesFiltered() {
             return [{
                 MenuItemCategoryID: this.$commonValue.GuidEmpty,
-                MenuItemCategoryName: 'Tất cả'
+                MenuItemCategoryName: 'Tất cả',
+                Color: 'rgb(16, 185, 129)'
             } as MenuItemCategory].concat(this.lstMenuItemCategories);
         },
 

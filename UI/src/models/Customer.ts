@@ -9,6 +9,7 @@ interface Customer extends MLEntity {
     Address: string,
     Preferences: string,
     LoyaltyPoint: number,
+    ImageUrl: string,
 
     UserLogin?: UserLogin,
 

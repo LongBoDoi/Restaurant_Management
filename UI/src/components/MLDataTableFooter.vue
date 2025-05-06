@@ -1,7 +1,7 @@
 <template>
-    <div className="px-6 py-4 bg-gray-50 border-t flex items-center justify-between">
-        <div className="text-gray-600">{{ recordNumberText }}</div>
-        <div className="flex align-center">
+    <div class="px-6 py-4 bg-gray-50 border-t flex items-center justify-between">
+        <div class="text-gray-600">{{ recordNumberText }}</div>
+        <div class="flex align-center">
             <span class="text-gray-600">Số bản ghi</span>
 
             <VSelect

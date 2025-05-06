@@ -34,7 +34,10 @@
                     </div>
                     <div class="text-right">
                         <p class="font-bold">{{ $commonFunction.formatThousands(data.MenuItem.Price) }} đ</p>
-                        <p class="text-xs" :class="`text-${data.Trend >= 0 ? 'green' : 'red'}-600`" v-if="data.Trend !== null">{{ data.Trend }}%</p>
+                        <p class="text-xs flex" :class="`text-${data.Trend >= 0 ? 'green' : 'red'}-600`" v-if="data.Trend !== null">
+                            <span class="material-symbols-outlined text-sm mr-1">{{ getTrendIcon(data.Trend) }}</span>
+                            {{ getTrendText(data.Trend) }}
+                        </p>
                     </div>
                 </div>
             </div>
@@ -57,7 +60,10 @@
                         </div>
                         <div class="text-right">
                             <p class="font-bold">{{ $commonFunction.formatThousands(data.MenuItem.Price) }} đ</p>
-                            <p class="text-xs" :class="`text-${data.Trend >= 0 ? 'green' : 'red'}-600`" v-if="data.Trend !== null">{{ data.Trend }}%</p>
+                            <p class="text-xs" :class="`text-${data.Trend >= 0 ? 'green' : 'red'}-600`" v-if="data.Trend !== null">
+                                <span class="material-symbols-outlined text-sm mr-1">{{ getTrendIcon(data.Trend) }}</span>
+                                {{ getTrendText(data.Trend) }}
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -67,6 +73,8 @@
 </template>
 
 <script lang="ts">
+import { EnumTimeFilter } from '@/common/Enumeration';
+import EventBus from '@/common/EventBus';
 import { MenuItem } from '@/models';
 
 interface Data {
@@ -81,17 +89,69 @@ export default {
             loading: false,
             expanded: <boolean>false,
 
-            data: <Data[]>[]
+            data: <Data[]>[],
+            timeFilter: <EnumTimeFilter>this.$enumeration.EnumTimeFilter.ByDay
         }
     },
 
-    async created() {
-        this.loading = true;
+    created() {
+        EventBus.on(this.$eventName.LoadReportData, this.loadData);
+    },
 
-        const objectData = await this.$service.DashboardService.getPopularMenuItems();
-        this.data = objectData;
+    beforeUnmount() {
+        EventBus.off(this.$eventName.LoadReportData);
+    },
 
-        this.loading = false;
+    methods: {
+        async loadData(data: any) {
+            this.loading = true;
+
+            this.timeFilter = data.TimeFilter;
+            const objectData = await this.$service.DashboardService.getPopularMenuItems(data.FromDate, data.ToDate, data.TimeFilter);
+            this.data = objectData;
+
+            this.loading = false;
+        },
+
+        getTrendText(trend: number) {
+            var compareName = '';
+            switch (this.timeFilter) {
+                case this.$enumeration.EnumTimeFilter.ByDay:
+                    compareName = 'hôm qua';
+                    break;
+                case this.$enumeration.EnumTimeFilter.ByWeek:
+                    compareName = 'tuần trước';
+                    break;
+                case this.$enumeration.EnumTimeFilter.ByMonth:
+                    compareName = 'tháng trước';
+                    break;
+                case this.$enumeration.EnumTimeFilter.ByDay:
+                    compareName = 'năm ngoái';
+                    break;
+            }
+
+            if (trend !== null) {
+                if (trend >= 0) {
+                    return `+${trend}% so với ${compareName}`;
+                } else {
+                    return `${trend}% so với ${compareName}`;
+                }
+            }
+
+            return '';
+        },
+
+        getTrendIcon(trend: number) {
+            if (trend !== null) {
+                if (trend >= 0) {
+                    return 'trending_up';
+                } else {
+                    return 'trending_down';
+                }
+            }
+
+            return '';
+        }
     },
 
     computed: {

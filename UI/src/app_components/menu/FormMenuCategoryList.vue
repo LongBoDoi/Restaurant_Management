@@ -10,25 +10,56 @@
                     @keypress.enter="options.search = $event.target.value;"
                 />
 
-                <VSpacer />
+                <MLFilterPopup :filter-count="lstFilters.length" v-on:reset-filter="handleResetFilter" v-on:apply-filter="handleApplyFilters">
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block font-medium text-gray-700">Trạng thái</label>
+                            <VSelect
+                                :items="[
+                                    {
+                                        Text: 'Tất cả',
+                                        Value: -1
+                                    },
+                                    {
+                                        Text: 'Đang hoạt động',
+                                        Value: false
+                                    },
+                                    {
+                                        Text: 'Ngừng hoạt động',
+                                        Value: true
+                                    },
+                                ]"
+                                item-title="Text"
+                                item-value="Value"
+                                :return-object="false"
+                                v-model:model-value="statusFilter"
 
-                <button class="pa-2 hover:bg-green-100 hover:text-green-700 rounded-lg transition-all duration-200 group relative overflow-hidden"
-                    @click="enableSort"
-                    :class="[{'bg-green-100 text-green-700' : sorting}]"
-                >
-                    <div style="width: 24px; height: 24px;" class="relative overflow-hidden flex items-center justify-center">
-                        <span class="material-symbols-outlined absolute transition-transform duration-300 transform translate-x-0"
-                            :class="[{'translate-x-[-100%]' : sorting}]"
-                        >
-                            swap_vert
-                        </span>
-                        <span class="material-symbols-outlined absolute transition-transform duration-300 transform translate-x-[100%]"
-                            :class="[{'translate-x-0' : sorting}]"
-                        >
-                            save
-                        </span>
+                                density="compact"
+                                variant="outlined"
+                                hide-details
+                                color="primary"
+                                class="mt-1"
+                            />
+                        </div>
                     </div>
-                </button>
+                </MLFilterPopup>
+
+                <VMenu :model-value="sorting">
+                    <template v-slot:activator="{ props }">
+                        <VBtn
+                            rounded 
+                            variant="outlined"
+                            style="border-color: rgba(0, 0, 0, 0.38); background-color: white;"
+                            :prepend-icon="sorting ? 'mdi-content-save-outline' : 'mdi-swap-vertical'"
+                            v-bind="props"
+                            class="transition-all duration-300"
+                            @click="enableSort"
+                            :color="sorting ? 'primary' : ''"
+                        >
+                            {{ sorting ? 'Lưu thứ tự' : 'Sắp xếp thứ tự' }}
+                        </VBtn>
+                    </template>
+                </VMenu>
             </div>
 
             <VDataTableServer
@@ -119,6 +150,7 @@
 <script lang="ts">
 import EventBus from '@/common/EventBus';
 import { MenuItemCategory } from '@/models';
+import MLFilterCondition from '@/models/MLFilterCondition';
 import { menuItemCategoryStore } from '@/stores/menuItemCategoryStore';
 import { mapActions, mapState } from 'pinia';
 
@@ -137,6 +169,9 @@ export default {
                 itemsPerPage: 10,
                 search: ''
             },
+
+            lstFilters: <MLFilterCondition[]>[],
+            statusFilter: <any>-1,
 
             sorting: <boolean>false,
         }
@@ -160,7 +195,7 @@ export default {
          async getData() {
             this.loading = true;
             
-            await this.getDataPaging(this.options.page, this.options.itemsPerPage, this.options.search);
+            await this.getDataPaging(this.options.page, this.options.itemsPerPage, this.options.search, this.filterJson);
 
             this.loading = false;
         },
@@ -204,6 +239,25 @@ export default {
             });
         },
 
+        handleResetFilter() {
+            this.statusFilter = -1;
+
+            this.lstFilters = [];
+        },
+
+        handleApplyFilters() {
+            this.lstFilters = [];
+            if (this.statusFilter !== -1) {
+                this.lstFilters.push({
+                    Name: 'Inactive',
+                    Operator: '==',
+                    Value: this.statusFilter
+                } as MLFilterCondition);
+            }
+
+            this.getData();
+        },
+
         async enableSort() {
             if (!this.sorting) {
                 this.sorting = true;
@@ -236,7 +290,14 @@ export default {
 
         lstRecord():MenuItemCategory[] {
             return this.dataList.toSorted((a:MenuItemCategory, b:MenuItemCategory) => a.SortOrder - b.SortOrder);
-        }
+        },
+
+        filterJson():string {
+            if (this.lstFilters.length) {
+                return JSON.stringify(this.lstFilters);
+            }
+            return '';
+        },
     }
 }
 </script>

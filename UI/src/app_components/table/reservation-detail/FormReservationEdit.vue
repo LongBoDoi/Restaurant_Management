@@ -1,7 +1,7 @@
 <template>
     <div class="flex flex-col">
         <div class="flex align-center mb-6" v-if="editMode !== $enumeration.EnumEditMode.Add">
-            <label className="block text-gray-700 text-sm font-medium">Trạng thái:</label>
+            <label class="block text-gray-700 text-sm font-medium">Trạng thái:</label>
             <span class="px-2.5 py-1 ml-2 rounded-full text-xs font-medium"
                 :class="reservationStatusClass"
             >
@@ -12,7 +12,7 @@
         <div class="grid grid-cols-2 gap-4 mb-4">
             <!-- Khách hàng -->
             <div>
-                <label className="block text-gray-700 text-sm font-medium">Khách hàng <span style="color: red;">*</span></label>
+                <label class="block text-gray-700 text-sm font-medium">Khách hàng <span style="color: red;">*</span></label>
                 <VCombobox
                     class="mt-1"
                     ref="cbMenuCategory"
@@ -33,7 +33,7 @@
             
             <!-- Số điện thoại -->
             <div>
-                <label className="block text-gray-700 text-sm font-medium">Số điện thoại <span style="color: red;">*</span></label>
+                <label class="block text-gray-700 text-sm font-medium">Số điện thoại <span style="color: red;">*</span></label>
                 <VTextField class="mt-1" density="compact" variant="outlined" hide-details
                     v-mask="'0### ### ###'"
                     :rules="[$commonValue.textFieldRequireRule]"
@@ -49,7 +49,7 @@
         <div class="grid grid-cols-2 gap-4">
             <!-- Ngày -->
             <div>
-                <label className="block text-gray-700 text-sm font-medium">Ngày <span style="color: red;">*</span></label>
+                <label class="block text-gray-700 text-sm font-medium">Ngày <span style="color: red;">*</span></label>
                 <MLDateField
                     class="mt-1"
                     variant="outlined"
@@ -65,7 +65,7 @@
             
             <!-- Giờ -->
             <div>
-                <label className="block text-gray-700 text-sm font-medium">Giờ <span style="color: red;">*</span></label>
+                <label class="block text-gray-700 text-sm font-medium">Giờ <span style="color: red;">*</span></label>
                 <MLTimeField
                     class="mt-1"
                     variant="outlined"
@@ -83,7 +83,7 @@
         <div class="grid grid-cols-2 gap-4">
             <!-- Số người -->
             <div>
-                <label className="block text-gray-700 text-sm font-medium">Số người</label>
+                <label class="block text-gray-700 text-sm font-medium">Số người</label>
                 <MLHbox class="align-center space-x-1">
                     <VBtn icon="mdi-minus" variant="text" class="mt-1" @click="record.GuestCount--" />
                     <MLNumberField
@@ -104,7 +104,7 @@
 
             <!-- Bàn -->
             <div>
-                <label className="block text-gray-700 text-sm font-medium">Bàn <span style="color: red;">*</span></label>
+                <label class="block text-gray-700 text-sm font-medium">Bàn <span style="color: red;">*</span></label>
                 <VCombobox
                     class="mt-1"
                     variant="outlined"
@@ -115,6 +115,7 @@
                     item-value="TableID"
                     :items="lstTablesFiltered"
                     :multiple="true"
+                    chips
                     :model-value="selectedTables"
                     :rules="[(v:Table[]) => {
                         if (!v?.length) {
@@ -147,7 +148,7 @@
         <div>
             <!-- Yêu cầu đặc biệt -->
             <div>
-                <label className="block text-gray-700 text-sm font-medium">Yêu cầu đặc biệt</label>
+                <label class="block text-gray-700 text-sm font-medium">Yêu cầu đặc biệt</label>
                 <VTextarea
                     class="mt-1"
                     v-model:model-value="record.Note"
@@ -264,6 +265,7 @@ export default {
                 if (typeof(customer) === 'object') {
                     this.record.CustomerID = customer.CustomerID;
                     this.record.CustomerName = customer.CustomerName;
+                    this.record.CustomerPhoneNumber = customer.PhoneNumber;
                 } else {
                     this.record.CustomerID = undefined;
                     this.record.Customer = undefined;
