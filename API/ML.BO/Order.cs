@@ -45,6 +45,11 @@ namespace API.ML.BO
         /// </summary>
         public decimal TipAmount { get; set; }
 
+        public decimal DiscountAmount { get; set; }
+
+        [NotMapped]
+        public int PointEarnedForCustomer { get; set; }
+
         /// <summary>
         /// Trạng thái order
         /// </summary>

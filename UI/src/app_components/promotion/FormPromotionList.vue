@@ -1,8 +1,6 @@
-<!-- Màn danh sách khách hàng -->
-
 <template>
     <VSheet style="display: flex; flex-direction: column;" class="h-full pb-2 overflow-hidden">
-        <VBtn width="fit-content" class="bg-green-500 hover:bg-green-600 hover:scale-105 text-white ml-auto mt-4 mr-3" prepend-icon="mdi-plus" rounded @click="handleAddNewClick">Thêm khách hàng</VBtn>
+        <VBtn width="fit-content" class="bg-green-500 hover:bg-green-600 hover:scale-105 text-white ml-auto mt-4 mr-3" prepend-icon="mdi-plus" rounded @click="handleAddNewClick">Thêm khuyến mại</VBtn>
 
         <VCard style="width: 100% ; height: 100%;" color="rgb(249, 250, 251)" class="rounded-lg d-flex flex-column shadow-md border mt-6">
             <!-- Toolbar -->
@@ -13,7 +11,7 @@
                     @keypress.enter="options.search = $event.target.value;"
                 />
 
-                <MLSortPopup :items="sortOptionList" v-model="options.sort" />
+                <!-- <MLSortPopup :items="sortOptionList" v-model="options.sort" /> -->
             </div>
 
             <!-- Bảng dữ liệu -->
@@ -138,7 +136,7 @@ export default {
         */
         handleDeleteRecord(item:Customer) {
             this.$commonFunction.showDialog({
-                Title: 'Xác nhận xoá Khách hàng',
+                Title: 'Xác nhận xoá Khuyến mại',
                 Message: `Bạn có chắc chắn muốn xoá Khách hàng <b>${item.CustomerName}</b> không?`,
                 ConfirmAction: async () => {
                     item.EditMode = this.$enumeration.EnumEditMode.Delete;

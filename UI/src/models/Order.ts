@@ -13,9 +13,11 @@ interface Order extends MLEntity {
     TotalAmount: number,
     NetAmount: number,
     TipAmount: number,
+    DiscountAmount: number,
     Status: EnumOrderStatus,
     SpecialRequest: string,
     PaidAmount: number,
+    PointEarnedForCustomer: number,
     PaymentMethod: EnumPaymentMethod,
     TableName: string,
 

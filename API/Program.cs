@@ -15,7 +15,7 @@ builder.WebHost.ConfigureKestrel(options =>
     {
         if (Config.UseCookie)
         {
-            //listenOptions.UseHttps();
+            listenOptions.UseHttps();
         }
     });
     //options.ListenLocalhost(7197, listenOptions =>
@@ -120,7 +120,7 @@ app.UseAuthorization();
 
 if (Config.UseCookie)
 {
-    //app.UseHttpsRedirection();
+    app.UseHttpsRedirection();
 }
 app.MapControllers();
 

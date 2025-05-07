@@ -80,7 +80,11 @@
                             <div>Tiền hàng:</div>
                             <div class="text-right">{{ $commonFunction.formatThousands(order.NetAmount) }} đ</div>
                         </div>
-                        <div class="grid grid-cols-2 gap-2">
+                        <div class="grid grid-cols-2 gap-2" v-if="order.DiscountAmount">
+                            <div>Khuyến mại:</div>
+                            <div class="text-right">- {{ $commonFunction.formatThousands(order.DiscountAmount) }} đ</div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2" v-if="order.TipAmount">
                             <div>Tip:</div>
                             <div class="text-right">{{ $commonFunction.formatThousands(order.TipAmount) }} đ</div>
                         </div>

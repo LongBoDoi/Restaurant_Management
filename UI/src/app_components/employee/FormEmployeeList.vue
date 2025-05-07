@@ -197,7 +197,7 @@ export default {
         */
         handleDeleteRecord(item: Employee) {
             this.$commonFunction.showDialog({
-                Title: 'Xác nhận xoá món',
+                Title: 'Xác nhận xoá Nhân viên',
                 Message: `Bạn có chắc chắn muốn xoá Nhân viên <b>${item.EmployeeName}</b> không?`,
                 ConfirmAction: async () => {
                     item.EditMode = this.$enumeration.EnumEditMode.Delete;

@@ -86,9 +86,15 @@ namespace API.Controllers
 
         protected override bool BeforeSave(Order order, MLActionResult result)
         {
-            order.Customer = null;
             order.OrderDetails.RemoveAllReferences();
             order.OrderTables.RemoveAllReferences();
+
+            if (order.Status == EnumOrderStatus.Paid && order.Customer != null && order.PointEarnedForCustomer != 0)
+            {
+                _context.Attach(order.Customer);
+                order.Customer.LoyaltyPoint += order.PointEarnedForCustomer;
+                _context.Entry(order.Customer).State = EntityState.Modified;
+            }
 
             switch (order.EditMode)
             {

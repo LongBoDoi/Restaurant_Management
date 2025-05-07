@@ -2,7 +2,12 @@
 
 <template>
     <VSheet style="display: flex; flex-direction: column; overflow: hidden;" class="h-full pb-2">
-        <VBtn width="fit-content" class="bg-green-500 hover:bg-green-600 hover:scale-105 text-white ml-auto mt-4 mr-3" prepend-icon="mdi-plus" rounded @click="handleAddNewClick">Thêm nguyên liệu</VBtn>
+        <MLHbox class="mt-4 space-x-4">
+            <VBtn class="ml-auto hover:scale-105 shadow-md bg-blue-500 hover:bg-blue-600 text-white" rounded prepend-icon="mdi-clipboard-plus-outline" @click="handleUpdateStockClick">
+                Cập nhật tồn kho
+            </VBtn>
+            <VBtn width="fit-content" class="bg-green-500 hover:bg-green-600 hover:scale-105 text-white mr-3" prepend-icon="mdi-plus" rounded @click="handleAddNewClick">Thêm nguyên liệu</VBtn>
+        </MLHbox>
 
         <VCard style="width: 100% ; height: 100%;" color="rgb(249, 250, 251)" class="rounded-lg d-flex flex-column shadow-md border mt-6">
             <!-- Toolbar -->
@@ -197,6 +202,12 @@ export default {
         this.$service.InventoryItemCategoryService.getAll().then((data: InventoryItemCategory[]) => {
             this.allInventoryItemCategories = data;
         });
+
+        EventBus.on(this.$eventName.ReloadInventoryItemData, this.getData);
+    },
+
+    beforeUnmount() {
+        EventBus.off(this.$eventName.ReloadInventoryItemData);
     },
 
     data() {
@@ -359,6 +370,10 @@ export default {
 
             return `${statusName} (${this.$commonFunction.formatThousands(item.Quantity)})`;
         },
+
+        handleUpdateStockClick() {
+            EventBus.emit(this.$eventName.ShowFormUpdateStock);
+        }
     },
 
     computed: {

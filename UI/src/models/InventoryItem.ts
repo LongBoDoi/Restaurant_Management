@@ -10,7 +10,9 @@ interface InventoryItem extends MLEntity {
     InventoryItemCategoryID: string,
     Inactive: boolean,
 
-    InventoryItemCategory?: InventoryItemCategory
+    InventoryItemCategory?: InventoryItemCategory,
+
+    NewStockQuantity?: number,
 };
 
 export default InventoryItem;

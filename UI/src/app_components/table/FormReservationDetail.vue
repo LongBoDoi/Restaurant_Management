@@ -61,7 +61,6 @@
 <script lang="ts">
 import { EnumEditMode, EnumReservationStatus } from '@/common/Enumeration';
 import EventBus from '@/common/EventBus';
-import MLForm from '@/components/MLForm.vue';
 import { Reservation, MLActionResult, Customer, Table, Order } from '@/models';
 import OrderTable from '@/models/OrderTable';
 import { reservationStore } from '@/stores/reservationStore';

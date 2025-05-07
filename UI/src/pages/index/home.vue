@@ -45,6 +45,7 @@
                         </div>
                         <div class="flex flex-col sm:flex-row gap-3 md:gap-4 pt-2 md:pt-4">
                             <VBtn
+                                v-if="$commonFunction.getSettingValue('DisplayBookingScreenForCustomer')"
                                 rounded
                                 :to="{name: '//reservation'}"
                                 className="bg-white text-emerald-800 px-6 py-3 rounded-full font-semibold transition-transform hover:shadow-lg hover:-translate-y-1 active:translate-y-0 inline-block text-center"
@@ -52,6 +53,7 @@
                                 Đặt bàn ngay
                             </VBtn>
                             <VBtn
+                                v-if="$commonFunction.getSettingValue('DisplayMenuScreenForCustomer')"
                                 :to="{name: '//menu'}"
                                 className="border border-white px-6 py-3 rounded-full font-semibold transition-transform hover:bg-emerald-700 hover:shadow-lg hover:-translate-y-1 active:translate-y-0 inline-block text-center"
                             >

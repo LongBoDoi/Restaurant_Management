@@ -154,8 +154,20 @@ abstract class MLBaseService<IMLEntity> extends BaseService {
    * @param entity Bản ghi
    */
   public async saveChangesMultiple(entities: IMLEntity[]) : Promise<MLActionResult> {
-    const result = await this.api.post('/SaveChangesMultiple', entities);
-    return result.data as MLActionResult;
+    try {
+      const result = await this.api.post('/SaveChangesMultiple', entities);
+
+      const actionResult = result.data as MLActionResult;
+      if (actionResult?.Success === false && actionResult?.ErrorMsg) {
+        CommonFunction.showToastMessage(actionResult.ErrorMsg, 'error');
+      }
+      return result.data as MLActionResult;
+    } catch (e) {
+      CommonFunction.handleException(e);
+      return {
+        Success: false
+      } as MLActionResult;
+    }
   }
 }
 

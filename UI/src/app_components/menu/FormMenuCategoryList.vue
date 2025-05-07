@@ -223,7 +223,7 @@ export default {
          */
          handleDeleteRecord(item:MenuItemCategory) {
             this.$commonFunction.showDialog({
-                Title: 'Xác nhận xoá món',
+                Title: 'Xác nhận xoá Nhóm thực đơn',
                 Message: `Bạn có chắc chắn muốn xoá Nhóm thực đơn <b>${item.MenuItemCategoryName}</b> không? Các món ăn thuộc nhóm này sẽ bị gỡ ra khỏi nhóm.`,
                 ConfirmAction: async () => {
                     item.EditMode = this.$enumeration.EnumEditMode.Delete;

@@ -56,7 +56,7 @@
                                     <h4 class="text-lg font-semibold">
                                         {{ menuItem.Name }}
                                     </h4>
-                                    <span class="font-bold">
+                                    <span class="font-bold" style="white-space: nowrap;">
                                         {{ $commonFunction.formatThousands(menuItem.Price) }} đ
                                     </span>
                                 </div>
@@ -81,6 +81,9 @@ import { MenuItemCategory } from '@/models';
 
 export default {
     async created() {
+        if (!this.$commonFunction.getSettingValue('DisplayMenuScreenForCustomer')) {
+            this.$router.replace('/page-not-found');
+        }
         if (this.displayMenuType === 1) {
             this.lstDisplayItems = await this.$service.SettingService.getMenuItemsForCustomerScreen();
         }

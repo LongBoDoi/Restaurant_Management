@@ -131,6 +131,10 @@
                             <span class="text-gray-600">Tax (8%):</span>
                             <span class="font-medium">$3.76</span>
                         </div>
+                        <div class="flex justify-between" v-if="record.DiscountAmount">
+                            <span class="text-gray-600">Khuyến mại:</span>
+                            <span class="font-medium">- {{ $commonFunction.formatThousands(record.DiscountAmount) }} đ</span>
+                        </div>
                         <div class="flex justify-between align-center">
                             <span class="text-gray-600">Tip:</span>
                             <div class="relative flex align-center" style="width: 128px;">
@@ -155,7 +159,83 @@
                         </div>
                     </div>
 
-                    <div class="flex justify-between gap-2 mt-">
+                    <div v-if="record.CustomerID && record.Customer">
+                        <div className="flex items-center gap-2 mt-4">
+                            <span className="material-symbols-outlined text-purple-600">
+                                loyalty
+                            </span>
+                            <span>Điểm tích luỹ của khách hàng</span>
+
+                            <span class="ml-auto">{{ record.Customer.LoyaltyPoint }} điểm</span>
+                        </div>
+
+                        <div class="mt-2 ml-4 flex items-center">
+                            <VCheckbox
+                                hide-details
+                                color="primary"
+                                v-model="earnPointForCustomer"
+                                v-on:update:model-value="(v: boolean|null) => {
+                                    if (v) {
+                                        useCustomerPoint = false;
+
+                                        record.DiscountAmount = 0;
+                                        pointUsed = 0;
+                                    }
+                                }"
+                            >
+                                <template #label>
+                                    <VIcon icon="mdi-wallet-plus-outline" class="text-yellow-600 mr-2" />
+                                    Tích điểm cho khách hàng
+                                </template>
+                            </VCheckbox>
+
+                            <i class="text-gray-500 ml-auto" v-if="earnPointForCustomer">{{ pointEarned }} điểm</i>
+                        </div>
+
+                        <div class="mt-2 ml-4 flex items-center">
+                            <VCheckbox
+                                hide-details
+                                color="primary"
+                                v-model="useCustomerPoint"
+                                v-on:update:model-value="(v: boolean|null) => {
+                                    if (v) {
+                                        earnPointForCustomer = false;
+
+                                        record.PointEarnedForCustomer = 0;
+                                    }
+                                }"
+                            >
+                                <template #label>
+                                    <div>
+                                        <div class="flex items-center">
+                                            <VIcon icon="mdi-wallet-giftcard" class="text-green-600 mr-2" />
+                                            Sử dụng điểm tích luỹ&nbsp;&nbsp;
+                                            <i class="text-sm text-gray-500 mr-1">(1 điểm = 10đ)</i>
+                                        </div>
+                                    </div>
+                                </template>
+                            </VCheckbox>
+
+                            <MLNumberField
+                                v-if="useCustomerPoint"
+                                style="max-width: 100px;"
+                                hide-details
+                                variant="outlined"
+                                density="compact"
+                                color="primary"
+                                class="ml-auto text-right"
+                                :rules="[(v: number) => v >= 0 && v <= (record.Customer?.LoyaltyPoint ?? 0) && v * 1000 <= record.NetAmount]"
+                                v-model="pointUsed"
+                                v-on:update:model-value="(v: number) => {
+                                    if (v >= 0 && v <= (record.Customer?.LoyaltyPoint ?? 0) && v * 1000 <= record.NetAmount) {
+                                        record.DiscountAmount = v * 10;
+                                    }
+                                }"
+                            />
+                        </div>
+                    </div>
+
+                    <div class="flex justify-between gap-2 mt-4">
                         <div class="relative flex-1" v-if="false">
                             <select class="w-full bg-white border border-gray-300 rounded-lg px-4 py-3 appearance-none focus:outline-none focus:ring-2 focus:ring-primary-400 transition duration-200">
                                 <option value="cash">Cash</option>
@@ -305,6 +385,10 @@ export default {
             selectedMenuCategory: <string>this.$commonValue.GuidEmpty,
 
             txtSearch: <string>'',
+            earnPointForCustomer: <boolean>true,
+            useCustomerPoint: <boolean>false,
+
+            pointUsed: <number>0
         }
     },
 
@@ -337,7 +421,19 @@ export default {
         },
 
         orderTotalAmount() {
-            return this.orderNetAmount + (this.record.TipAmount ?? 0);
+            return this.orderNetAmount + (this.record.TipAmount ?? 0) - (this.record.DiscountAmount ?? 0);
+        },
+
+        pointEarned() {
+            if (this.earnPointForCustomer) {
+                return this.orderNetAmount / 1000;
+            }
+
+            if (this.useCustomerPoint) {
+                return this.pointUsed * -1;
+            }
+
+            return 0;
         }
     },
 
@@ -377,6 +473,7 @@ export default {
                 if (typeof(customer) === 'object') {
                     this.record.CustomerID = customer.CustomerID;
                     this.record.CustomerName = customer.CustomerName;
+                    this.record.Customer = customer as Customer;
                 } else {
                     this.record.CustomerID = undefined;
                     this.record.Customer = undefined;
@@ -395,6 +492,10 @@ export default {
 
         orderTotalAmount() {
             this.record.TotalAmount = this.orderTotalAmount;
+        },
+
+        pointEarned() {
+            this.record.PointEarnedForCustomer = this.pointEarned;
         }
     },
 }

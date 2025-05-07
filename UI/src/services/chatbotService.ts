@@ -5,7 +5,7 @@ import axios from "axios";
 import CommonFunction from "@/common/CommonFunction";
 
 const chatbotApi = axios.create({
-    baseURL: `http://localhost:5005`
+    baseURL: import.meta.env.VITE_CHATBOT_URL,
 })
 
 class ChatbotService extends MLBaseService<ChatbotConversation> {

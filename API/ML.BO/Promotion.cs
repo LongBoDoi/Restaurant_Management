@@ -1,4 +1,5 @@
 ﻿using API.ML.Common;
+using API.ML.CustomAtrributes;
 using System.ComponentModel.DataAnnotations;
 
 namespace API.ML.BO
@@ -14,11 +15,13 @@ namespace API.ML.BO
         /// <summary>
         /// Mã khuyến mại
         /// </summary>
+        [SearchField]
         public string PromotionCode { get; set; } = "";
 
         /// <summary>
         /// Tên khuyến mại
         /// </summary>
+        [SearchField]
         public string PromotionName { get; set; } = "";
 
         /// <summary>
@@ -36,5 +39,15 @@ namespace API.ML.BO
         /// Giá trị khuyến mại
         /// </summary>
         public decimal Value { get; set; }
+
+        /// <summary>
+        /// ID món áp dụng khuyến mại
+        /// </summary>
+        public Guid? MenuItemID { get; set; }
+
+        /// <summary>
+        /// Dữ liệu món áp dụng khuyến mại
+        /// </summary>
+        public MenuItem? MenuItem { get; set; }
     }
 }

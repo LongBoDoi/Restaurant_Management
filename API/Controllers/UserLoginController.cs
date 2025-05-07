@@ -133,7 +133,7 @@ namespace API.Controllers
                         var cookieOptions = new CookieOptions
                         {
                             HttpOnly = true,
-                            Secure = true,
+                            Secure = false,
                             SameSite = SameSiteMode.None,
                             Expires = DateTime.UtcNow.AddDays(1)
                         };
@@ -224,7 +224,7 @@ namespace API.Controllers
                                 var cookieOptions = new CookieOptions
                                 {
                                     HttpOnly = true,
-                                    Secure = true,
+                                    Secure = false,
                                     SameSite = SameSiteMode.None,
                                     Expires = DateTime.UtcNow.AddDays(1)
                                 };

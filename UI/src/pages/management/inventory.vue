@@ -5,5 +5,7 @@
         <FormInventoryItemList class="h-full" />
 
         <FormInventoryItemDetail class="h-full" />
+
+        <FormUpdateStock />
     </VContainer>
 </template>

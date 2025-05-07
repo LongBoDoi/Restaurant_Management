@@ -63,6 +63,11 @@ class EventName {
 
     // Load dữ liệu báo cáo
     static LoadReportData = 'LoadReportData';
+
+    // Mở form cập nhật tồn kho
+    static ShowFormUpdateStock = 'ShowFormUpdateStock';
+
+    static ReloadInventoryItemData = 'ReloadInventoryItemData';
 };
 
 export default EventName;

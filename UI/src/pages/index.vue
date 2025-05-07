@@ -15,6 +15,7 @@
                     Trang chủ
                 </RouterLink>
                 <RouterLink
+                    v-if="$commonFunction.getSettingValue('DisplayMenuScreenForCustomer')"
                     :to="{name: '//menu'}"
                     active-class="after:w-full"
                     class="font-medium relative after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 after:bg-emerald-400 hover:after:w-full after:transition-all after:duration-300"
@@ -22,6 +23,7 @@
                     Thực đơn
                 </RouterLink>
                 <RouterLink
+                    v-if="$commonFunction.getSettingValue('DisplayBookingScreenForCustomer')"
                     :to="{name: '//reservation'}"
                     active-class="after:w-full"
                     class="font-medium relative after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 after:bg-emerald-400 hover:after:w-full after:transition-all after:duration-300"
