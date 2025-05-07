@@ -224,10 +224,10 @@
                                 density="compact"
                                 color="primary"
                                 class="ml-auto text-right"
-                                :rules="[(v: number) => v >= 0 && v <= (record.Customer?.LoyaltyPoint ?? 0) && v * 1000 <= record.NetAmount]"
+                                :rules="[(v: number) => v >= 0 && v <= (record.Customer?.LoyaltyPoint ?? 0) && v * 10 <= record.NetAmount]"
                                 v-model="pointUsed"
                                 v-on:update:model-value="(v: number) => {
-                                    if (v >= 0 && v <= (record.Customer?.LoyaltyPoint ?? 0) && v * 1000 <= record.NetAmount) {
+                                    if (v >= 0 && v <= (record.Customer?.LoyaltyPoint ?? 0) && v * 10 <= record.NetAmount) {
                                         record.DiscountAmount = v * 10;
                                     }
                                 }"
