@@ -18,7 +18,7 @@
                     <div class="mb-4">
                         <label class="block text-gray-700 text-sm font-medium">Tên nhóm nguyên liệu <span style="color: red;">*</span></label>
                         
-                        <VTextField class="mt-2" density="compact" variant="outlined" v-model:model-value="record.InventoryItemCategoryName" hide-details
+                        <VTextField class="mt-2" density="compact" variant="outlined" v-model:model-value="record.InventoryItemCategoryName" hide-details color="primary"
                             :rules="[(v:string|undefined) => v !== undefined && v !== '']"
                         />
                     </div>

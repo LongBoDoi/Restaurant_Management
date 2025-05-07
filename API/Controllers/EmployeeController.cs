@@ -97,16 +97,19 @@ namespace API.Controllers
 
                     if (existingEmployee.Roles != null && employee.Roles != null)
                     {
-                        ((HashSet<Role>)existingEmployee.Roles).Clear();
+                        HashSet<Role> roles = new HashSet<Role>();
+                        ((List<Role>)existingEmployee.Roles).Clear();
 
                         foreach (var role in employee.Roles)
                         {
                             var trackedRole = _context.Role.Find(role.RoleID);
                             if (trackedRole != null)
                             {
-                                ((HashSet<Role>)existingEmployee.Roles).Add(trackedRole);
+                                roles.Add(trackedRole);
                             }
                         }
+
+                        existingEmployee.Roles = roles;
                     }
 
                     existingEmployee.AssignValuesFrom(employee);
