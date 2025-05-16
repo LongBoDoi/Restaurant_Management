@@ -1,3 +1,0 @@
-docker run -it -v /e/Projects/Restaurant_Management/Chatbot:/app rasa/rasa:3.6.10 init
-docker run -it -v /e/Projects/Restaurant_Management/Chatbot:/app rasa/rasa:3.6.10 train
-docker run -v /e/Projects/Restaurant_Management/Chatbot:/app -p 5005:5005 rasa/rasa:3.6.10 run --enable-api --cors "*" --debug --actions actions

@@ -343,8 +343,9 @@ namespace API.Controllers
                 {
                     tokenHandler.ValidateToken(token, CommonValue.TokenValidationParameters, out _);
 
-                    string strUserName = User.Claims.FirstOrDefault(x => x.Type == "Username")?.Value ?? "";
-                    string strUserType = User.Claims.FirstOrDefault(x => x.Type == "UserType")?.Value ?? "";
+                    var claims = tokenHandler.ReadJwtToken(token).Claims;
+                    string strUserName = claims.FirstOrDefault(x => x.Type == "Username")?.Value ?? "";
+                    string strUserType = claims.FirstOrDefault(x => x.Type == "UserType")?.Value ?? "";
                     _ = EnumUserType.TryParse(strUserType, out EnumUserType userType);
 
                     sessionInterface.UserType = userType;
@@ -428,6 +429,30 @@ namespace API.Controllers
             }
 
             return result;
+        }
+
+        [HttpGet("GetLongTimeToken")]
+        public string GetLongTimeToken(string userName = "")
+        {
+            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("da3d80f0-b79b-4179-b791-cc4e8bfdeb2b"));
+            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+
+            var claims = new[]
+            {
+                new Claim("Username", userName)
+            };
+
+            var token = new JwtSecurityToken(
+                issuer: "ml_issuer",
+                audience: "ml_audience",
+                claims: claims,
+                expires: DateTime.UtcNow.AddYears(100),
+                signingCredentials: credentials
+            );
+
+            string userToken = new JwtSecurityTokenHandler().WriteToken(token);
+
+            return userToken;
         }
     }
 }

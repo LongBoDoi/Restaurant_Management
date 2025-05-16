@@ -15,26 +15,26 @@
 
             <!-- Nội dung tin nhắn -->
             <MLVbox ref="messages" style="flex-grow: 1; padding: 0.625rem 0.5rem; overflow-y: auto;">
-                <template v-for="detail, index in conversationDetails" :key="index">
+                <template v-for="detail, index in displayMessages" :key="index">
                     <VSpacer v-if="index > 0" style="height: 8px; flex-grow: 0; flex-shrink: 0;" />
 
-                    <span v-if="index === 0 || formatTime(detail.Timestamp) !== formatTime(conversationDetails[index - 1].Timestamp)" 
+                    <span v-if="index === 0 || formatTime(detail.timestamp) !== formatTime(conversationDetails[index - 1].timestamp)" 
                         style="text-align: center; font-size: 0.85rem;"
                     >
-                        {{ formatTime(detail.Timestamp) }}
+                        {{ formatTime(detail.timestamp) }}
                     </span>
                     <MLHbox :class="[
                         'chat-message-container',
-                        {'sent-by-user' : detail.Sender === EnumChatbotSender.User}
+                        {'sent-by-user' : detail.role === 'user'}
                     ]">
                         <div class="chat-participant-avatar"
                             :style="{
-                                'background-color': detail.Sender === EnumChatbotSender.Bot ? 'rgb(var(--v-theme-primary))' : '',
-                                'border': detail.Sender === EnumChatbotSender.User ? '1px solid rgb(var(--v-theme-primary))' : ''
+                                'background-color': detail.role === 'assistant' ? 'rgb(var(--v-theme-primary))' : '',
+                                'border': detail.role === 'user' ? '1px solid rgb(var(--v-theme-primary))' : ''
                             }"
                         >
-                            <VIcon size="16" :icon="detail.Sender === EnumChatbotSender.Bot ? 'mdi-robot' : 'mdi-account'"
-                                :style="{'color': `rgb(var(--v-theme${detail.Sender === EnumChatbotSender.Bot ? '-on' : ''}-primary))`}"
+                            <VIcon size="16" :icon="detail.role === 'assistant' ? 'mdi-robot' : 'mdi-account'"
+                                :style="{'color': `rgb(var(--v-theme${detail.role === 'assistant' ? '-on' : ''}-primary))`}"
                             />
                         </div>
 
@@ -44,10 +44,10 @@
                         <VCard 
                             class="rounded-lg px-4"
                             rounded 
-                            :color="detail.Sender === $enumeration.EnumChatbotSender.User ? 'primary' : undefined"
+                            :color="detail.role === 'user' ? 'primary' : undefined"
                             style="padding: 0.3rem 0.7rem; white-space: pre-line;"
                         >
-                            {{ detail.Message }}
+                            <span v-html="formatMessage(detail.content)" />
                         </VCard>
                     </MLHbox>
                 </template>
@@ -67,8 +67,8 @@
                             />
                         </div>
 
-                        <div style="position: relative; display: flex; align-items: center; justify-content: center;" class="rouned-lg">
-                            <VSkeletonLoader color="onPrimary" style="margin-left: 4px;" width="50" height="100%" >
+                        <div style="position: relative; display: flex; align-items: center; justify-content: center;">
+                            <VSkeletonLoader color="onPrimary" style="margin-left: 4px;" width="50" height="100%" class="rounded-lg">
                             </VSkeletonLoader>
                             <VIcon style="position: absolute; color: rgb(var(--v-theme-on-primary))" icon="mdi-dots-horizontal" />
                         </div>
@@ -87,26 +87,15 @@
 </template>
 
 <script lang="ts">
-import { EnumChatbotSender } from '@/common/Enumeration';
 import { ChatbotConversationDetail } from '@/models';
 
 export default {
     async created() {
         const conversationDetails = sessionStorage.getItem('chatbotConversation');
-        const chatbotUserID = sessionStorage.getItem('chatbotUserID');
-        if (conversationDetails && chatbotUserID) {
+        if (conversationDetails) {
             this.conversationDetails = JSON.parse(conversationDetails) as ChatbotConversationDetail[];
-            this.userID = chatbotUserID;
         } else {
-            this.conversationDetails = [] as ChatbotConversationDetail[];
-
-            const responseDetail = await this.$service.ChatbotService.getNewResponse(this.userID, `Hello. Timezone: ${this.$commonFunction.getTimeZone()}`);
-            if (responseDetail.length > 0) {
-                this.conversationDetails = this.conversationDetails.concat(responseDetail);
-
-                sessionStorage.setItem('chatbotConversation', JSON.stringify(this.conversationDetails));
-                sessionStorage.setItem('chatbotUserID', this.userID);
-            }
+            this.conversationDetails = await this.$service.ChatbotService.createNewConversation();
         }
         // if (chatbotConversationID) {
         //     this.conversation = await this.$service.ChatbotService.getChatbotConversation(chatbotConversationID);
@@ -155,11 +144,12 @@ export default {
         async sendNewMessage() {
             if (this.messageInput) {
                 this.waitingRequest = true;
+
                 this.conversationDetails.push({
-                    Sender: EnumChatbotSender.User,
-                    Message: this.messageInput
+                    role: 'user',
+                    content: this.messageInput
                 } as ChatbotConversationDetail);
-                sessionStorage.setItem('chatbotConversation', JSON.stringify(this.conversationDetails));
+                // sessionStorage.setItem('chatbotConversation', JSON.stringify(this.conversationDetails));
 
                 await this.$nextTick();
                 this.scrollToBottom();
@@ -170,10 +160,10 @@ export default {
                 this.scrollToBottom();
                 const message = this.messageInput;
                 this.messageInput = '';
-                const responseDetail = await this.$service.ChatbotService.getNewResponse(this.userID, message);
-                if (responseDetail && responseDetail.length > 0) {
-                    this.conversationDetails = this.conversationDetails.concat(responseDetail);
-                    sessionStorage.setItem('chatbotConversation', JSON.stringify(this.conversationDetails));
+                const responseDetail = await this.$service.ChatbotService.getNewResponse(this.conversationDetails, message);
+                if (responseDetail) {
+                    this.conversationDetails.push(responseDetail)
+                    // sessionStorage.setItem('chatbotConversation', JSON.stringify(this.conversationDetails));
 
                     await this.$nextTick();
                     this.scrollToBottom();
@@ -202,12 +192,21 @@ export default {
                 return this.$commonFunction.formatTime(date);
             }
             return '';
+        },
+
+        formatMessage(input: string) {
+            const formattedInput = input.replace(/\\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, "<b>$1</b>").replace(/'/g, '').replace(/\\/g, '');
+            return formattedInput;
         }
     },
 
     computed: {
         EnumChatbotSender() {
             return this.$enumeration.EnumChatbotSender;
+        },
+
+        displayMessages() {
+            return this.conversationDetails.filter(x => x.role !== 'system');
         }
     },
 }

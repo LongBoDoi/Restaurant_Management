@@ -1,6 +1,5 @@
 import { ChatbotConversation, ChatbotConversationDetail } from "@/models";
 import MLBaseService from "./baseService";
-import { EnumChatbotSender } from "@/common/Enumeration";
 import axios from "axios";
 import CommonFunction from "@/common/CommonFunction";
 
@@ -29,14 +28,26 @@ class ChatbotService extends MLBaseService<ChatbotConversation> {
     //     return response?.data?.Data;
     // }
 
-    // /**
-    //  * Tạo đoạn chat mới
-    //  */
-    // async createNewConversation() : Promise<ChatbotConversation|undefined> {
-    //     const response = await this.api.post('/CreateNewConversation');
-
-    //     return response?.data?.Data;
-    // }
+    /**
+     * Tạo đoạn chat mới
+     */
+    async createNewConversation() : Promise<ChatbotConversationDetail[]> {
+        try {
+            const timezone = CommonFunction.getTimeZone();
+    
+            const response = await chatbotApi.post('/createNewConversation', {
+                timezone: timezone
+            });
+            
+            if (response.status === 200) {
+                return response.data;
+            }
+    
+            return [];
+        } catch (e) {
+            return [];
+        }
+    }
 
     // /**
     //  * Gửi tin nhắn mới
@@ -65,22 +76,21 @@ class ChatbotService extends MLBaseService<ChatbotConversation> {
     /**
      * Lấy phản hồi từ chatbot
      */
-    async getNewResponse(userID: string, message: string) : Promise<ChatbotConversationDetail[]> {
+    async getNewResponse(conversationDetails: ChatbotConversationDetail[], message: string) : Promise<ChatbotConversationDetail|undefined> {
         try {
-            const response = await chatbotApi.post('/webhooks/rest/webhook', {
-                sender: userID,
-                message: message
+            const response = await chatbotApi.post('/getNewResponse', {
+                conversation: conversationDetails,
+                message: message,
+                timezone: CommonFunction.getTimeZone()
             });
-            return response.data.map((item: any) => {
-                return {
-                    Sender: EnumChatbotSender.Bot,
-                    Message: item.text
-                }
-            }) as ChatbotConversationDetail[];
+            
+            if (response.status === 200) {
+                return response.data;
+            }
         } catch (e) {
             CommonFunction.handleException(e);
         }
-        return [];
+        return undefined;
     }
 }
 

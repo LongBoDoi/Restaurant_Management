@@ -169,22 +169,26 @@ namespace API.ML.BOBase
             {
                 entity.HasOne(od => od.Order).WithMany(o => o.OrderDetails).HasForeignKey(od => od.OrderID);
 
-                entity.HasOne(od => od.MenuItem).WithMany(mi => mi.OrderDetails).HasForeignKey(od => od.MenuItemID);
+                entity.HasOne(od => od.MenuItem).WithMany(mi => mi.OrderDetails).HasForeignKey(od => od.MenuItemID)
+                    .OnDelete(DeleteBehavior.SetNull);
             });
 
             modelBuilder.Entity<ChatbotConversation>(entity =>
             {
-                entity.HasOne(cc => cc.Customer).WithMany(c => c.ChatbotConversations).HasForeignKey(cc => cc.CustomerID);
+                entity.HasOne(cc => cc.Customer).WithMany(c => c.ChatbotConversations).HasForeignKey(cc => cc.CustomerID)
+                    .OnDelete(DeleteBehavior.Cascade);
             });
 
             modelBuilder.Entity<ChatbotConversationDetail>(entity =>
             {
-                entity.HasOne(ccd => ccd.ChatbotConversation).WithMany(cc => cc.ChatbotConversationDetails).HasForeignKey(ccd => ccd.ConversationID);
+                entity.HasOne(ccd => ccd.ChatbotConversation).WithMany(cc => cc.ChatbotConversationDetails).HasForeignKey(ccd => ccd.ConversationID)
+                    .OnDelete(DeleteBehavior.Cascade);
             });
 
             modelBuilder.Entity<Reservation>(r =>
             {
-                r.HasOne(r => r.Customer).WithMany(c => c.Reservations).HasForeignKey(r => r.CustomerID);
+                r.HasOne(r => r.Customer).WithMany(c => c.Reservations).HasForeignKey(r => r.CustomerID)
+                    .OnDelete(DeleteBehavior.SetNull);
             });
 
             modelBuilder.Entity<Customer>(c =>
@@ -278,7 +282,8 @@ namespace API.ML.BOBase
 
             modelBuilder.Entity<UserLogin>(entity =>
             {
-                entity.HasOne(ul => ul.Employee).WithOne(e => e.UserLogin).HasForeignKey<UserLogin>(ul => ul.EmployeeID);
+                entity.HasOne(ul => ul.Employee).WithOne(e => e.UserLogin).HasForeignKey<UserLogin>(ul => ul.EmployeeID)
+                    .OnDelete(DeleteBehavior.Cascade);
                 entity.HasOne(ul => ul.Customer).WithOne(c => c.UserLogin).HasForeignKey<UserLogin>(ul => ul.CustomerID)
                     .OnDelete(DeleteBehavior.Cascade);
                 entity.HasData(
@@ -309,7 +314,8 @@ namespace API.ML.BOBase
 
             modelBuilder.Entity<MenuItem>(mi =>
             {
-                mi.HasOne(mi => mi.MenuItemCategory).WithMany(mic => mic.MenuItems).HasForeignKey(mi => mi.MenuItemCategoryID).OnDelete(DeleteBehavior.SetNull);
+                mi.HasOne(mi => mi.MenuItemCategory).WithMany(mic => mic.MenuItems).HasForeignKey(mi => mi.MenuItemCategoryID)
+                    .OnDelete(DeleteBehavior.SetNull);
             });
 
             modelBuilder.Entity<MenuItemCategory>(mic =>
@@ -324,7 +330,8 @@ namespace API.ML.BOBase
 
             modelBuilder.Entity<InventoryItem>(mi =>
             {
-                mi.HasOne(mi => mi.InventoryItemCategory).WithMany(mic => mic.InventoryItems).HasForeignKey(mi => mi.InventoryItemCategoryID);
+                mi.HasOne(mi => mi.InventoryItemCategory).WithMany(mic => mic.InventoryItems).HasForeignKey(mi => mi.InventoryItemCategoryID)
+                    .OnDelete(DeleteBehavior.SetNull);
             });
 
             modelBuilder.Entity<MenuItemInventoryItem>(miii =>
@@ -333,43 +340,51 @@ namespace API.ML.BOBase
 
                 miii.HasOne(sc => sc.MenuItem)
                     .WithMany(s => s.MenuItemInventoryItems)
-                    .HasForeignKey(sc => sc.MenuItemID);
+                    .HasForeignKey(sc => sc.MenuItemID)
+                    .OnDelete(DeleteBehavior.Cascade);
 
                 miii.HasOne(e => e.InventoryItem)
                     .WithMany(e => e.MenuItemInventoryItems)
-                    .HasForeignKey(e => e.InventoryItemID);
+                    .HasForeignKey(e => e.InventoryItemID)
+                    .OnDelete(DeleteBehavior.Cascade);
             });
 
             modelBuilder.Entity<ReservationTable>(rt =>
             {
                 rt.HasOne(rt => rt.Reservation)
                     .WithMany(r => r.ReservationTables)
-                    .HasForeignKey(rt => rt.ReservationID);
+                    .HasForeignKey(rt => rt.ReservationID)
+                    .OnDelete(DeleteBehavior.Cascade);
 
                 rt.HasOne(e => e.Table)
                     .WithMany(e => e.ReservationTables)
-                    .HasForeignKey(e => e.TableID);
+                    .HasForeignKey(e => e.TableID)
+                    .OnDelete(DeleteBehavior.Cascade);
             });
 
             modelBuilder.Entity<OrderTable>(ot =>
             {
                 ot.HasOne(ot => ot.Order)
                     .WithMany(o => o.OrderTables)
-                    .HasForeignKey(ot => ot.OrderID);
+                    .HasForeignKey(ot => ot.OrderID)
+                    .OnDelete(DeleteBehavior.Cascade);
 
                 ot.HasOne(ot => ot.Table)
                     .WithMany(t => t.OrderTables)
-                    .HasForeignKey(e => e.TableID);
+                    .HasForeignKey(e => e.TableID)
+                    .OnDelete(DeleteBehavior.Cascade);
             });
 
             modelBuilder.Entity<Table>(t =>
             {
-                t.HasOne(t => t.Area).WithMany(a => a.Tables).HasForeignKey(t => t.AreaID);
+                t.HasOne(t => t.Area).WithMany(a => a.Tables).HasForeignKey(t => t.AreaID)
+                    .OnDelete(DeleteBehavior.SetNull);
             });
 
             modelBuilder.Entity<CustomMenuRequest>(entity =>
             {
-                entity.HasOne(cmr => cmr.Customer).WithMany(c => c.CustomMenuRequests).HasForeignKey(cmr => cmr.CustomerID);
+                entity.HasOne(cmr => cmr.Customer).WithMany(c => c.CustomMenuRequests).HasForeignKey(cmr => cmr.CustomerID)
+                    .OnDelete(DeleteBehavior.SetNull);
                 entity.HasMany(cmr => cmr.InventoryItems).WithMany(ii => ii.CustomMenuRequests);
             });
         }

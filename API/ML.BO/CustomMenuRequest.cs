@@ -17,7 +17,7 @@ namespace API.ML.BO
         /// <summary>
         /// ID khách hàng
         /// </summary>
-        public Guid CustomerID { get; set; }
+        public Guid? CustomerID { get; set; }
 
         /// <summary>
         /// Tên khách hàng
