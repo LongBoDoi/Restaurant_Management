@@ -129,7 +129,7 @@
                                         type="password" 
                                         class="w-full mt-2 rounded-lg border-emerald-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none transition-all" 
                                         placeholder="••••••••"
-                                        :rules="[$commonValue.textFieldRequireRule]"
+                                        :rules="[$commonValue.textFieldRequireRule, $commonValue.textPasswordRule]"
                                         v-model:model-value="customerSignupData.UserLogin.Password"
                                     />
                                 </div>
@@ -142,10 +142,13 @@
                                         type="password" 
                                         class="w-full mt-2 rounded-lg border-emerald-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none transition-all" 
                                         placeholder="••••••••"
-                                        :rules="[(v:string|undefined) => {
-                                            return v !== undefined && v !== '' && v === customerSignupData.UserLogin?.Password;
+                                        :rules="[$commonValue.textFieldRequireRule, (v:string|undefined) => {
+                                            return v === customerSignupData.UserLogin?.Password;
                                         }]"
                                     />
+                                </div>
+                                <div class="text-xs text-gray-500 mt-1">
+                                    <i>Mật khẩu phải chứa ít nhất 08 ký tự, bao gồm ít nhất 01 ký tự viết hoa, 01 ký tự viết thường, 01 chữ số và 01 ký tự đặc biệt.</i>
                                 </div>
                                 <div class="flex items-center justify-between" v-if="false">
                                     <div class="flex items-center">

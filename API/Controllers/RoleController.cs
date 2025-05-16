@@ -34,6 +34,14 @@ namespace API.Controllers
                             _context.Entry(employee).State = EntityState.Unchanged;
                         }
                     }
+
+                    if (entity.Permissions != null && entity.Permissions.Any())
+                    {
+                        foreach (Permission permission in entity.Permissions)
+                        {
+                            _context.Entry(permission).State = EntityState.Unchanged;
+                        }
+                    }
                     break;
                 case EnumEditMode.Edit:
                     var existingRole = _context.Role

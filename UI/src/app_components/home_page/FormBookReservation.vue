@@ -29,6 +29,7 @@
                             <VTextField variant="outlined" class="" bg-color="white" placeholder="Nhập số điện thoại của bạn"
                                 density="compact"
                                 v-mask="'0### ### ###'"
+                                :model-value="reservation.CustomerPhoneNumber"
                                 v-on:update:model-value="(v:string) => {
                                     reservation.CustomerPhoneNumber = $commonFunction.getRealPhoneNumberValue(v);
                                 }"

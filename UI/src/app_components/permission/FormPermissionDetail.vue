@@ -183,7 +183,7 @@
                                         <span class="font-medium">Xem báo cáo</span>
                                     </div>
                                     
-                                    <VSwitch color="primary" hide-details density="compact" class="mr-1" value="ManagePermission" v-model="record.PermissionCodes" />
+                                    <VSwitch color="primary" hide-details density="compact" class="mr-1" value="ViewReport" v-model="record.PermissionCodes" />
                                 </div>
                             </div>
 
@@ -197,7 +197,7 @@
                                         <span class="font-medium">Thiết lập</span>
                                     </div>
                                     
-                                    <VSwitch color="primary" hide-details density="compact" class="mr-1" value="ManagePermission" v-model="record.PermissionCodes" />
+                                    <VSwitch color="primary" hide-details density="compact" class="mr-1" value="ManageSetting" v-model="record.PermissionCodes" />
                                 </div>
                             </div>
                         </VCard>
@@ -243,6 +243,10 @@ export default {
             if (record) {
                 if (record.EditMode !== undefined) {
                     this.editMode = record.EditMode;
+                }
+
+                if (this.editMode === this.$enumeration.EnumEditMode.Add) {
+                    record.PermissionCodes = [];
                 }
 
                 this.record = record;
