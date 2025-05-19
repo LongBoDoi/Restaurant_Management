@@ -1,3 +1,4 @@
+import os
 from langchain_community.utilities import SQLDatabase
 from groq import Groq
 from flask import Flask, request, jsonify, json
@@ -11,7 +12,7 @@ import ast
 # CONFIG
 host_ip = "14.225.254.152"
 
-api_key = "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"
+api_key = os.getenv("GROQ_API_KEY", "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")
 mysql_uri = f"mysql+pymysql://gudfud_chatbot:gudfudchatbot2712@{host_ip}:3306/restaurant_management"
 backend_url = f"http://{host_ip}:7198/api"
 model = "gemma2-9b-it"
@@ -51,7 +52,31 @@ def convertToLocalTime(timestamp, timezone):
     offset = timedelta(hours=timezone)
 
     timestamp = datetime.strptime(timestamp, "%Y-%m-%dT%H:%M:%SZ")
-    return (timestamp + offset).strftime("%Y-%m-%dT%H:%M:%SZ")
+    return (timestamp + offset)
+
+def getOpeningTimeData(timezone):
+    day_mapping = {
+        0: "Sunday",
+        1: "Monday",
+        2: "Tuesday",
+        3: "Wednesday",
+        4: "Thursday",
+        5: "Friday",
+        6: "Saturday",
+        7: "Holiday"
+    }
+
+    opening_hours = db.run("select settingvalue from setting where settingkey = 'OpeningTimes'")
+    parsed_result = ast.literal_eval(opening_hours)
+    lst_opening_hours = json.loads(parsed_result[0][0])
+
+    for hour_setting in lst_opening_hours:
+        hour_setting['StartTime'] = convertToLocalTime(hour_setting['StartTime'], timezone).strftime("%H:%M")
+        hour_setting['EndTime'] = convertToLocalTime(hour_setting['EndTime'], timezone).strftime("%H:%M")
+        hour_setting['Days'] = [day_mapping.get(num, "Invalid") for num in hour_setting['Days']]
+
+    print(lst_opening_hours)
+    return lst_opening_hours
 
 app = Flask(__name__)
 CORS(app)
@@ -60,15 +85,8 @@ CORS(app)
 def createNewConversation():
     data = request.get_json()
 
-    timezone = int(data['timezone'])
-
-    opening_hours = db.run("select settingvalue from setting where settingkey = 'OpeningTimes'")
-    parsed_result = ast.literal_eval(opening_hours)
-    lst_opening_hours = json.loads(parsed_result[0][0])
-
-    for hour_setting in lst_opening_hours:
-        hour_setting['StartTime'] = convertToLocalTime(hour_setting['StartTime'], timezone)
-        hour_setting['EndTime'] = convertToLocalTime(hour_setting['EndTime'], timezone)
+    timezone = data['timezone']
+    lst_opening_hours = getOpeningTimeData(timezone)
 
     settings = db.run("select * from setting where settingkey in ('RestaurantName', 'SocialMediaUrls', 'RestaurantAddress', 'RestaurantPhoneNumber')")
     
@@ -79,7 +97,7 @@ def createNewConversation():
         },
         {
             "role": "system",
-            "content": f"Here is the database schema of the menu items: {db.get_table_info(table_names=['menuitem'])}"
+            "content": f"Here is the database schema of the menu items: {db.get_table_info(table_names=['menuitem'])}. Answer naturally and display each item in each line using <br> HTML tag, and embolden the item name with <b></b> tags."
         },
         {
             "role": "system",
@@ -87,8 +105,7 @@ def createNewConversation():
         },
         {
             "role": "system",
-            "content": f"""Here is the data for the opening times of the restaurant: {lst_opening_hours}. Use it when the user asks for opening hours of the restaurant.
-            The Days value are 0 for Sunday, 1 for Monday and so on to 6 for Saturday, and 7 for holidays."""
+            "content": f"""Here is the data for the opening times of the restaurant: {lst_opening_hours}. Use it when the user asks for opening hours of the restaurant."""
         },
         {
             'role': 'system',

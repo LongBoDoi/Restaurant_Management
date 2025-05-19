@@ -1,0 +1,1 @@
+docker run --name Gudfud-Chatbot -p 5005:5005 -e GROQ_API_KEY=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 manhlong2712/gudfud-api
